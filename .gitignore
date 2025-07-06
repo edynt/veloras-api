@@ -1,0 +1,6 @@
+/docs
+/tmp
+/storage
+/environment/data
+.env
+.env.prod
