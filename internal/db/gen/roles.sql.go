@@ -12,38 +12,38 @@ import (
 )
 
 const createRole = `-- name: CreateRole :one
-INSERT INTO roles (role_name, role_description) VALUES ($1, $2) RETURNING role_id, role_name, role_description, role_created_at
+INSERT INTO roles (name, description) VALUES ($1, $2) RETURNING id, name, description, created_at
 `
 
 type CreateRoleParams struct {
-	RoleName        string
-	RoleDescription pgtype.Text
+	Name        string
+	Description pgtype.Text
 }
 
 func (q *Queries) CreateRole(ctx context.Context, arg CreateRoleParams) (Role, error) {
-	row := q.db.QueryRow(ctx, createRole, arg.RoleName, arg.RoleDescription)
+	row := q.db.QueryRow(ctx, createRole, arg.Name, arg.Description)
 	var i Role
 	err := row.Scan(
-		&i.RoleID,
-		&i.RoleName,
-		&i.RoleDescription,
-		&i.RoleCreatedAt,
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getRoleByName = `-- name: GetRoleByName :one
-SELECT role_id, role_name, role_description, role_created_at FROM roles WHERE role_name = $1
+SELECT id, name, description, created_at FROM roles WHERE name = $1
 `
 
-func (q *Queries) GetRoleByName(ctx context.Context, roleName string) (Role, error) {
-	row := q.db.QueryRow(ctx, getRoleByName, roleName)
+func (q *Queries) GetRoleByName(ctx context.Context, name string) (Role, error) {
+	row := q.db.QueryRow(ctx, getRoleByName, name)
 	var i Role
 	err := row.Scan(
-		&i.RoleID,
-		&i.RoleName,
-		&i.RoleDescription,
-		&i.RoleCreatedAt,
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.CreatedAt,
 	)
 	return i, err
 }

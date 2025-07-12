@@ -9,75 +9,77 @@ import (
 )
 
 type EmailVerification struct {
-	EvID        int32
-	EvUserID    pgtype.UUID
-	EvCode      string
-	EvExpiresAt pgtype.Timestamptz
-	EvCreatedAt pgtype.Timestamptz
+	ID        int32
+	UserID    pgtype.UUID
+	Code      string
+	ExpiresAt pgtype.Timestamptz
+	CreatedAt pgtype.Timestamptz
 }
 
 type PasswordReset struct {
-	PsID         int32
-	PsUserID     pgtype.UUID
-	PsResetToken string
-	PsExpiresAt  pgtype.Timestamptz
-	PsCreatedAt  pgtype.Timestamptz
+	ID         int32
+	UserID     pgtype.UUID
+	ResetToken string
+	ExpiresAt  pgtype.Timestamptz
+	CreatedAt  pgtype.Timestamptz
 }
 
 type Permission struct {
-	PermissionID          pgtype.UUID
-	PermissionName        string
-	PermissionDescription pgtype.Text
-	PermissionCreatedAt   pgtype.Timestamptz
+	ID          pgtype.UUID
+	Name        string
+	Description pgtype.Text
+	CreatedAt   pgtype.Timestamptz
 }
 
 type Role struct {
-	RoleID          pgtype.UUID
-	RoleName        string
-	RoleDescription pgtype.Text
-	RoleCreatedAt   pgtype.Timestamptz
+	ID          pgtype.UUID
+	Name        string
+	Description pgtype.Text
+	CreatedAt   pgtype.Timestamptz
 }
 
 type RolePermission struct {
-	RpRoleID       pgtype.UUID
-	RpPermissionID pgtype.UUID
+	RoleID       pgtype.UUID
+	PermissionID pgtype.UUID
 }
 
 type Session struct {
-	SessionID           int32
-	SessionUserID       pgtype.UUID
-	SessionRefreshToken string
-	SessionUserAgent    pgtype.Text
-	SessionClientIp     pgtype.Text
-	SessionExpiresAt    pgtype.Timestamptz
-	SessionCreatedAt    pgtype.Timestamptz
+	ID           int32
+	UserID       pgtype.UUID
+	RefreshToken string
+	UserAgent    pgtype.Text
+	ClientIp     pgtype.Text
+	ExpiresAt    pgtype.Timestamptz
+	CreatedAt    pgtype.Timestamptz
 }
 
 type User struct {
-	UserID             pgtype.UUID
-	UserEmail          string
-	UserUsername       string
-	UserHashedPassword string
-	UserIsVerified     pgtype.Bool
-	UserCreatedAt      pgtype.Timestamptz
-	UserUpdatedAt      pgtype.Timestamptz
+	ID             pgtype.UUID
+	Email          string
+	Username       string
+	HashedPassword string
+	IsVerified     pgtype.Bool
+	Status         pgtype.Int4
+	Language       pgtype.Text
+	CreatedAt      pgtype.Timestamptz
+	UpdatedAt      pgtype.Timestamptz
 }
 
 type UserInfo struct {
-	UifID          int32
-	UifUserID      pgtype.UUID
-	UifFullName    pgtype.Text
-	UifAvatarUrl   pgtype.Text
-	UifGender      pgtype.Text
-	UifDateOfBirth pgtype.Date
-	UifPhoneNumber pgtype.Text
-	UifAddress     pgtype.Text
-	UifCountry     pgtype.Text
-	UifCreatedAt   pgtype.Timestamptz
-	UifUpdatedAt   pgtype.Timestamptz
+	ID          int32
+	UserID      pgtype.UUID
+	FullName    pgtype.Text
+	AvatarUrl   pgtype.Text
+	Gender      pgtype.Text
+	DateOfBirth pgtype.Date
+	PhoneNumber pgtype.Text
+	Address     pgtype.Text
+	Country     pgtype.Text
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
 }
 
 type UserRole struct {
-	UrUserID pgtype.UUID
-	UrRoleID pgtype.UUID
+	UserID pgtype.UUID
+	RoleID pgtype.UUID
 }

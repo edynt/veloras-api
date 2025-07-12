@@ -5,6 +5,7 @@ import (
 
 	"github.com/edynnt/veloras-api/internal/auth/controller/http"
 	initialize "github.com/edynnt/veloras-api/internal/initialize/auth"
+	"github.com/edynnt/veloras-api/internal/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,6 +20,9 @@ func InitRouter(db *sql.DB, logLevel string) *gin.Engine {
 		gin.SetMode(gin.ReleaseMode)
 		r = gin.New()
 	}
+
+	r.Use(middleware.CORS) // cross
+	r.Use(middleware.ValidatorMiddleware())
 
 	v1 := r.Group("/api/v1")
 

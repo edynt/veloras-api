@@ -12,65 +12,69 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (user_email, user_username, user_hashed_password)
+INSERT INTO users (email, username, hashed_password)
 VALUES ($1, $2, $3)
-RETURNING user_id, user_email, user_username, user_hashed_password, user_is_verified, user_created_at, user_updated_at
+RETURNING id, email, username, hashed_password, is_verified, status, language, created_at, updated_at
 `
 
 type CreateUserParams struct {
-	UserEmail          string
-	UserUsername       string
-	UserHashedPassword string
+	Email          string
+	Username       string
+	HashedPassword string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, createUser, arg.UserEmail, arg.UserUsername, arg.UserHashedPassword)
+	row := q.db.QueryRow(ctx, createUser, arg.Email, arg.Username, arg.HashedPassword)
 	var i User
 	err := row.Scan(
-		&i.UserID,
-		&i.UserEmail,
-		&i.UserUsername,
-		&i.UserHashedPassword,
-		&i.UserIsVerified,
-		&i.UserCreatedAt,
-		&i.UserUpdatedAt,
+		&i.ID,
+		&i.Email,
+		&i.Username,
+		&i.HashedPassword,
+		&i.IsVerified,
+		&i.Status,
+		&i.Language,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const deleteUser = `-- name: DeleteUser :exec
-DELETE FROM users WHERE user_id = $1
+DELETE FROM users WHERE id = $1
 `
 
-func (q *Queries) DeleteUser(ctx context.Context, userID pgtype.UUID) error {
-	_, err := q.db.Exec(ctx, deleteUser, userID)
+func (q *Queries) DeleteUser(ctx context.Context, id pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, deleteUser, id)
 	return err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT user_id, user_email, user_username, user_hashed_password, user_is_verified, user_created_at, user_updated_at FROM users WHERE user_email = $1
+SELECT id, email, username, hashed_password, is_verified, status, language, created_at, updated_at FROM users WHERE email = $1
 `
 
-func (q *Queries) GetUserByEmail(ctx context.Context, userEmail string) (User, error) {
-	row := q.db.QueryRow(ctx, getUserByEmail, userEmail)
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByEmail, email)
 	var i User
 	err := row.Scan(
-		&i.UserID,
-		&i.UserEmail,
-		&i.UserUsername,
-		&i.UserHashedPassword,
-		&i.UserIsVerified,
-		&i.UserCreatedAt,
-		&i.UserUpdatedAt,
+		&i.ID,
+		&i.Email,
+		&i.Username,
+		&i.HashedPassword,
+		&i.IsVerified,
+		&i.Status,
+		&i.Language,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const verifyUser = `-- name: VerifyUser :exec
-UPDATE users SET user_is_verified = TRUE WHERE user_id = $1
+UPDATE users SET is_verified = TRUE WHERE id = $1
 `
 
-func (q *Queries) VerifyUser(ctx context.Context, userID pgtype.UUID) error {
-	_, err := q.db.Exec(ctx, verifyUser, userID)
+func (q *Queries) VerifyUser(ctx context.Context, id pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, verifyUser, id)
 	return err
 }

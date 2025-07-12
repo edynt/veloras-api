@@ -12,38 +12,38 @@ import (
 )
 
 const createPermission = `-- name: CreatePermission :one
-INSERT INTO permissions (permission_name, permission_description) VALUES ($1, $2) RETURNING permission_id, permission_name, permission_description, permission_created_at
+INSERT INTO permissions (name, description) VALUES ($1, $2) RETURNING id, name, description, created_at
 `
 
 type CreatePermissionParams struct {
-	PermissionName        string
-	PermissionDescription pgtype.Text
+	Name        string
+	Description pgtype.Text
 }
 
 func (q *Queries) CreatePermission(ctx context.Context, arg CreatePermissionParams) (Permission, error) {
-	row := q.db.QueryRow(ctx, createPermission, arg.PermissionName, arg.PermissionDescription)
+	row := q.db.QueryRow(ctx, createPermission, arg.Name, arg.Description)
 	var i Permission
 	err := row.Scan(
-		&i.PermissionID,
-		&i.PermissionName,
-		&i.PermissionDescription,
-		&i.PermissionCreatedAt,
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getPermissionByName = `-- name: GetPermissionByName :one
-SELECT permission_id, permission_name, permission_description, permission_created_at FROM permissions WHERE permission_name = $1
+SELECT id, name, description, created_at FROM permissions WHERE name = $1
 `
 
-func (q *Queries) GetPermissionByName(ctx context.Context, permissionName string) (Permission, error) {
-	row := q.db.QueryRow(ctx, getPermissionByName, permissionName)
+func (q *Queries) GetPermissionByName(ctx context.Context, name string) (Permission, error) {
+	row := q.db.QueryRow(ctx, getPermissionByName, name)
 	var i Permission
 	err := row.Scan(
-		&i.PermissionID,
-		&i.PermissionName,
-		&i.PermissionDescription,
-		&i.PermissionCreatedAt,
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.CreatedAt,
 	)
 	return i, err
 }

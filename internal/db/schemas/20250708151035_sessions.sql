@@ -1,13 +1,13 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS sessions (
-    session_id SERIAL PRIMARY KEY,
-    session_user_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
-    session_refresh_token TEXT NOT NULL,
-    session_user_agent TEXT,
-    session_client_ip TEXT,
-    session_expires_at TIMESTAMPTZ NOT NULL,
-    session_created_at TIMESTAMPTZ DEFAULT now()
+    id SERIAL PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    refresh_token TEXT NOT NULL,
+    user_agent TEXT,
+    client_ip TEXT,
+    expires_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now()
 );
 -- +goose StatementEnd
 

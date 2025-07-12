@@ -1,13 +1,15 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS users (
-    user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_email TEXT NOT NULL UNIQUE,
-    user_username TEXT NOT NULL UNIQUE,
-    user_hashed_password TEXT NOT NULL,
-    user_is_verified BOOLEAN DEFAULT FALSE,
-    user_created_at TIMESTAMPTZ DEFAULT now(),
-    user_updated_at TIMESTAMPTZ DEFAULT now()
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email TEXT NOT NULL UNIQUE,
+    username TEXT NOT NULL UNIQUE,
+    hashed_password TEXT NOT NULL,
+    is_verified BOOLEAN DEFAULT FALSE,
+    status INT DEFAULT 0,
+    language TEXT DEFAULT 'en',
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
 );
 -- +goose StatementEnd
 

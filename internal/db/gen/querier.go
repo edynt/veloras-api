@@ -19,17 +19,17 @@ type Querier interface {
 	CreateRole(ctx context.Context, arg CreateRoleParams) (Role, error)
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
-	DeleteSession(ctx context.Context, sessionID int32) error
-	DeleteUser(ctx context.Context, userID pgtype.UUID) error
+	DeleteSession(ctx context.Context, id int32) error
+	DeleteUser(ctx context.Context, id pgtype.UUID) error
 	GetEmailVerification(ctx context.Context, arg GetEmailVerificationParams) (EmailVerification, error)
 	GetPasswordReset(ctx context.Context, arg GetPasswordResetParams) (PasswordReset, error)
-	GetPermissionByName(ctx context.Context, permissionName string) (Permission, error)
-	GetPermissionsByRole(ctx context.Context, rpRoleID pgtype.UUID) ([]Permission, error)
-	GetRoleByName(ctx context.Context, roleName string) (Role, error)
-	GetRolesByUser(ctx context.Context, urUserID pgtype.UUID) ([]Role, error)
-	GetSession(ctx context.Context, sessionID int32) (Session, error)
-	GetUserByEmail(ctx context.Context, userEmail string) (User, error)
-	VerifyUser(ctx context.Context, userID pgtype.UUID) error
+	GetPermissionByName(ctx context.Context, name string) (Permission, error)
+	GetPermissionsByRole(ctx context.Context, roleID pgtype.UUID) ([]Permission, error)
+	GetRoleByName(ctx context.Context, name string) (Role, error)
+	GetRolesByUser(ctx context.Context, userID pgtype.UUID) ([]Role, error)
+	GetSession(ctx context.Context, id int32) (Session, error)
+	GetUserByEmail(ctx context.Context, email string) (User, error)
+	VerifyUser(ctx context.Context, id pgtype.UUID) error
 }
 
 var _ Querier = (*Queries)(nil)

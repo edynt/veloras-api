@@ -12,27 +12,27 @@ import (
 )
 
 const assignRoleToUser = `-- name: AssignRoleToUser :exec
-INSERT INTO user_roles (ur_user_id, ur_role_id) VALUES ($1, $2)
+INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2)
 `
 
 type AssignRoleToUserParams struct {
-	UrUserID pgtype.UUID
-	UrRoleID pgtype.UUID
+	UserID pgtype.UUID
+	RoleID pgtype.UUID
 }
 
 func (q *Queries) AssignRoleToUser(ctx context.Context, arg AssignRoleToUserParams) error {
-	_, err := q.db.Exec(ctx, assignRoleToUser, arg.UrUserID, arg.UrRoleID)
+	_, err := q.db.Exec(ctx, assignRoleToUser, arg.UserID, arg.RoleID)
 	return err
 }
 
 const getRolesByUser = `-- name: GetRolesByUser :many
-SELECT r.role_id, r.role_name, r.role_description, r.role_created_at FROM roles r
-JOIN user_roles ur ON ur.ur_role_id = r.role_id
-WHERE ur.ur_user_id = $1
+SELECT r.id, r.name, r.description, r.created_at FROM roles r
+JOIN user_roles ur ON ur.role_id = r.role_id
+WHERE ur.user_id = $1
 `
 
-func (q *Queries) GetRolesByUser(ctx context.Context, urUserID pgtype.UUID) ([]Role, error) {
-	rows, err := q.db.Query(ctx, getRolesByUser, urUserID)
+func (q *Queries) GetRolesByUser(ctx context.Context, userID pgtype.UUID) ([]Role, error) {
+	rows, err := q.db.Query(ctx, getRolesByUser, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -41,10 +41,10 @@ func (q *Queries) GetRolesByUser(ctx context.Context, urUserID pgtype.UUID) ([]R
 	for rows.Next() {
 		var i Role
 		if err := rows.Scan(
-			&i.RoleID,
-			&i.RoleName,
-			&i.RoleDescription,
-			&i.RoleCreatedAt,
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.CreatedAt,
 		); err != nil {
 			return nil, err
 		}

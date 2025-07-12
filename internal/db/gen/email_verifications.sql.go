@@ -12,48 +12,48 @@ import (
 )
 
 const createEmailVerification = `-- name: CreateEmailVerification :one
-INSERT INTO email_verifications (ev_user_id, ev_code, ev_expires_at)
+INSERT INTO email_verifications (user_id, code, expires_at)
 VALUES ($1, $2, $3)
-RETURNING ev_id, ev_user_id, ev_code, ev_expires_at, ev_created_at
+RETURNING id, user_id, code, expires_at, created_at
 `
 
 type CreateEmailVerificationParams struct {
-	EvUserID    pgtype.UUID
-	EvCode      string
-	EvExpiresAt pgtype.Timestamptz
+	UserID    pgtype.UUID
+	Code      string
+	ExpiresAt pgtype.Timestamptz
 }
 
 func (q *Queries) CreateEmailVerification(ctx context.Context, arg CreateEmailVerificationParams) (EmailVerification, error) {
-	row := q.db.QueryRow(ctx, createEmailVerification, arg.EvUserID, arg.EvCode, arg.EvExpiresAt)
+	row := q.db.QueryRow(ctx, createEmailVerification, arg.UserID, arg.Code, arg.ExpiresAt)
 	var i EmailVerification
 	err := row.Scan(
-		&i.EvID,
-		&i.EvUserID,
-		&i.EvCode,
-		&i.EvExpiresAt,
-		&i.EvCreatedAt,
+		&i.ID,
+		&i.UserID,
+		&i.Code,
+		&i.ExpiresAt,
+		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getEmailVerification = `-- name: GetEmailVerification :one
-SELECT ev_id, ev_user_id, ev_code, ev_expires_at, ev_created_at FROM email_verifications WHERE ev_user_id = $1 AND ev_code = $2
+SELECT id, user_id, code, expires_at, created_at FROM email_verifications WHERE user_id = $1 AND code = $2
 `
 
 type GetEmailVerificationParams struct {
-	EvUserID pgtype.UUID
-	EvCode   string
+	UserID pgtype.UUID
+	Code   string
 }
 
 func (q *Queries) GetEmailVerification(ctx context.Context, arg GetEmailVerificationParams) (EmailVerification, error) {
-	row := q.db.QueryRow(ctx, getEmailVerification, arg.EvUserID, arg.EvCode)
+	row := q.db.QueryRow(ctx, getEmailVerification, arg.UserID, arg.Code)
 	var i EmailVerification
 	err := row.Scan(
-		&i.EvID,
-		&i.EvUserID,
-		&i.EvCode,
-		&i.EvExpiresAt,
-		&i.EvCreatedAt,
+		&i.ID,
+		&i.UserID,
+		&i.Code,
+		&i.ExpiresAt,
+		&i.CreatedAt,
 	)
 	return i, err
 }

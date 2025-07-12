@@ -12,64 +12,64 @@ import (
 )
 
 const createSession = `-- name: CreateSession :one
-INSERT INTO sessions (session_user_id, session_refresh_token, session_user_agent, session_client_ip, session_expires_at)
+INSERT INTO sessions (user_id, refresh_token, user_agent, client_ip, expires_at)
 VALUES ($1, $2, $3, $4, $5)
-RETURNING session_id, session_user_id, session_refresh_token, session_user_agent, session_client_ip, session_expires_at, session_created_at
+RETURNING id, user_id, refresh_token, user_agent, client_ip, expires_at, created_at
 `
 
 type CreateSessionParams struct {
-	SessionUserID       pgtype.UUID
-	SessionRefreshToken string
-	SessionUserAgent    pgtype.Text
-	SessionClientIp     pgtype.Text
-	SessionExpiresAt    pgtype.Timestamptz
+	UserID       pgtype.UUID
+	RefreshToken string
+	UserAgent    pgtype.Text
+	ClientIp     pgtype.Text
+	ExpiresAt    pgtype.Timestamptz
 }
 
 func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error) {
 	row := q.db.QueryRow(ctx, createSession,
-		arg.SessionUserID,
-		arg.SessionRefreshToken,
-		arg.SessionUserAgent,
-		arg.SessionClientIp,
-		arg.SessionExpiresAt,
+		arg.UserID,
+		arg.RefreshToken,
+		arg.UserAgent,
+		arg.ClientIp,
+		arg.ExpiresAt,
 	)
 	var i Session
 	err := row.Scan(
-		&i.SessionID,
-		&i.SessionUserID,
-		&i.SessionRefreshToken,
-		&i.SessionUserAgent,
-		&i.SessionClientIp,
-		&i.SessionExpiresAt,
-		&i.SessionCreatedAt,
+		&i.ID,
+		&i.UserID,
+		&i.RefreshToken,
+		&i.UserAgent,
+		&i.ClientIp,
+		&i.ExpiresAt,
+		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const deleteSession = `-- name: DeleteSession :exec
-DELETE FROM sessions WHERE session_id = $1
+DELETE FROM sessions WHERE id = $1
 `
 
-func (q *Queries) DeleteSession(ctx context.Context, sessionID int32) error {
-	_, err := q.db.Exec(ctx, deleteSession, sessionID)
+func (q *Queries) DeleteSession(ctx context.Context, id int32) error {
+	_, err := q.db.Exec(ctx, deleteSession, id)
 	return err
 }
 
 const getSession = `-- name: GetSession :one
-SELECT session_id, session_user_id, session_refresh_token, session_user_agent, session_client_ip, session_expires_at, session_created_at FROM sessions WHERE session_id = $1
+SELECT id, user_id, refresh_token, user_agent, client_ip, expires_at, created_at FROM sessions WHERE id = $1
 `
 
-func (q *Queries) GetSession(ctx context.Context, sessionID int32) (Session, error) {
-	row := q.db.QueryRow(ctx, getSession, sessionID)
+func (q *Queries) GetSession(ctx context.Context, id int32) (Session, error) {
+	row := q.db.QueryRow(ctx, getSession, id)
 	var i Session
 	err := row.Scan(
-		&i.SessionID,
-		&i.SessionUserID,
-		&i.SessionRefreshToken,
-		&i.SessionUserAgent,
-		&i.SessionClientIp,
-		&i.SessionExpiresAt,
-		&i.SessionCreatedAt,
+		&i.ID,
+		&i.UserID,
+		&i.RefreshToken,
+		&i.UserAgent,
+		&i.ClientIp,
+		&i.ExpiresAt,
+		&i.CreatedAt,
 	)
 	return i, err
 }

@@ -12,48 +12,48 @@ import (
 )
 
 const createPasswordReset = `-- name: CreatePasswordReset :one
-INSERT INTO password_resets (ps_user_id, ps_reset_token, ps_expires_at)
+INSERT INTO password_resets (user_id, reset_token, expires_at)
 VALUES ($1, $2, $3)
-RETURNING ps_id, ps_user_id, ps_reset_token, ps_expires_at, ps_created_at
+RETURNING id, user_id, reset_token, expires_at, created_at
 `
 
 type CreatePasswordResetParams struct {
-	PsUserID     pgtype.UUID
-	PsResetToken string
-	PsExpiresAt  pgtype.Timestamptz
+	UserID     pgtype.UUID
+	ResetToken string
+	ExpiresAt  pgtype.Timestamptz
 }
 
 func (q *Queries) CreatePasswordReset(ctx context.Context, arg CreatePasswordResetParams) (PasswordReset, error) {
-	row := q.db.QueryRow(ctx, createPasswordReset, arg.PsUserID, arg.PsResetToken, arg.PsExpiresAt)
+	row := q.db.QueryRow(ctx, createPasswordReset, arg.UserID, arg.ResetToken, arg.ExpiresAt)
 	var i PasswordReset
 	err := row.Scan(
-		&i.PsID,
-		&i.PsUserID,
-		&i.PsResetToken,
-		&i.PsExpiresAt,
-		&i.PsCreatedAt,
+		&i.ID,
+		&i.UserID,
+		&i.ResetToken,
+		&i.ExpiresAt,
+		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getPasswordReset = `-- name: GetPasswordReset :one
-SELECT ps_id, ps_user_id, ps_reset_token, ps_expires_at, ps_created_at FROM password_resets WHERE ps_user_id = $1 AND ps_reset_token = $2
+SELECT id, user_id, reset_token, expires_at, created_at FROM password_resets WHERE user_id = $1 AND reset_token = $2
 `
 
 type GetPasswordResetParams struct {
-	PsUserID     pgtype.UUID
-	PsResetToken string
+	UserID     pgtype.UUID
+	ResetToken string
 }
 
 func (q *Queries) GetPasswordReset(ctx context.Context, arg GetPasswordResetParams) (PasswordReset, error) {
-	row := q.db.QueryRow(ctx, getPasswordReset, arg.PsUserID, arg.PsResetToken)
+	row := q.db.QueryRow(ctx, getPasswordReset, arg.UserID, arg.ResetToken)
 	var i PasswordReset
 	err := row.Scan(
-		&i.PsID,
-		&i.PsUserID,
-		&i.PsResetToken,
-		&i.PsExpiresAt,
-		&i.PsCreatedAt,
+		&i.ID,
+		&i.UserID,
+		&i.ResetToken,
+		&i.ExpiresAt,
+		&i.CreatedAt,
 	)
 	return i, err
 }

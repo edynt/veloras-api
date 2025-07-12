@@ -1,5 +1,5 @@
 -- name: CreatePermission :one
-INSERT INTO permissions (permission_name, permission_description) VALUES ($1, $2) RETURNING *;
+INSERT INTO permissions (name, description) VALUES ($1, $2) RETURNING *;
 
 -- name: GetPermissionByName :one
-SELECT * FROM permissions WHERE permission_name = $1;
+SELECT * FROM permissions WHERE name = $1;

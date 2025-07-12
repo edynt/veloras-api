@@ -12,27 +12,27 @@ import (
 )
 
 const assignPermissionToRole = `-- name: AssignPermissionToRole :exec
-INSERT INTO role_permissions (rp_role_id, rp_permission_id) VALUES ($1, $2)
+INSERT INTO role_permissions (role_id, permission_id) VALUES ($1, $2)
 `
 
 type AssignPermissionToRoleParams struct {
-	RpRoleID       pgtype.UUID
-	RpPermissionID pgtype.UUID
+	RoleID       pgtype.UUID
+	PermissionID pgtype.UUID
 }
 
 func (q *Queries) AssignPermissionToRole(ctx context.Context, arg AssignPermissionToRoleParams) error {
-	_, err := q.db.Exec(ctx, assignPermissionToRole, arg.RpRoleID, arg.RpPermissionID)
+	_, err := q.db.Exec(ctx, assignPermissionToRole, arg.RoleID, arg.PermissionID)
 	return err
 }
 
 const getPermissionsByRole = `-- name: GetPermissionsByRole :many
-SELECT p.permission_id, p.permission_name, p.permission_description, p.permission_created_at FROM permissions p
-JOIN role_permissions rp ON rp.rp_permission_id = p.permission_id
-WHERE rp.rp_role_id = $1
+SELECT p.id, p.name, p.description, p.created_at FROM permissions p
+JOIN role_permissions rp ON rp.permission_id = p.permission_id
+WHERE rp.role_id = $1
 `
 
-func (q *Queries) GetPermissionsByRole(ctx context.Context, rpRoleID pgtype.UUID) ([]Permission, error) {
-	rows, err := q.db.Query(ctx, getPermissionsByRole, rpRoleID)
+func (q *Queries) GetPermissionsByRole(ctx context.Context, roleID pgtype.UUID) ([]Permission, error) {
+	rows, err := q.db.Query(ctx, getPermissionsByRole, roleID)
 	if err != nil {
 		return nil, err
 	}
@@ -41,10 +41,10 @@ func (q *Queries) GetPermissionsByRole(ctx context.Context, rpRoleID pgtype.UUID
 	for rows.Next() {
 		var i Permission
 		if err := rows.Scan(
-			&i.PermissionID,
-			&i.PermissionName,
-			&i.PermissionDescription,
-			&i.PermissionCreatedAt,
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.CreatedAt,
 		); err != nil {
 			return nil, err
 		}

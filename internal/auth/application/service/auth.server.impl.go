@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/edynnt/veloras-api/internal/auth/application/service/dto"
+	appDto "github.com/edynnt/veloras-api/internal/auth/application/service/dto"
 	authRepo "github.com/edynnt/veloras-api/internal/auth/domain/repository"
 )
 
@@ -12,7 +12,7 @@ type authService struct {
 }
 
 // Create implements AuthService.
-func (a *authService) CreateUser(ctx context.Context, AcountInputDTO dto.AccountInputDTO) (int64, error) {
+func (a *authService) CreateUser(ctx context.Context, AccountAppDto appDto.AccountAppDTO) (int64, error) {
 	panic("unimplemented")
 }
 

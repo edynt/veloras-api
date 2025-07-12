@@ -1,11 +1,11 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS password_resets (
-    ps_id SERIAL PRIMARY KEY,
-    ps_user_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
-    ps_reset_token TEXT NOT NULL,
-    ps_expires_at TIMESTAMPTZ NOT NULL,
-    ps_created_at TIMESTAMPTZ DEFAULT now()
+    id SERIAL PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    reset_token TEXT NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now()
 );
 -- +goose StatementEnd
 

@@ -1,22 +1,22 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS user_info (
-    uif_id SERIAL PRIMARY KEY,
-    uif_user_id UUID NOT NULL UNIQUE REFERENCES users(user_id) ON DELETE CASCADE,
+    id SERIAL PRIMARY KEY,
+    user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     
-    uif_full_name TEXT,
-    uif_avatar_url TEXT,
-    uif_gender TEXT CHECK (uif_gender IN ('male', 'female', 'other')),
-    uif_date_of_birth DATE,
-    uif_phone_number TEXT,
-    uif_address TEXT,
-    uif_country TEXT, 
-    uif_created_at TIMESTAMPTZ DEFAULT now(),
-    uif_updated_at TIMESTAMPTZ DEFAULT now()
+    full_name TEXT,
+    avatar_url TEXT,
+    gender TEXT CHECK (gender IN ('male', 'female', 'other')),
+    date_of_birth DATE,
+    phone_number TEXT,
+    address TEXT,
+    country TEXT, 
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
 );
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-SELECT 'down SQL query';
+DROP TABLE IF EXISTS user_info;
 -- +goose StatementEnd

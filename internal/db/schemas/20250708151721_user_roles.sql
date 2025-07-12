@@ -1,9 +1,9 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS user_roles (
-    ur_user_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
-    ur_role_id UUID REFERENCES roles(role_id) ON DELETE CASCADE,
-    PRIMARY KEY (ur_user_id, ur_role_id)
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    role_id UUID REFERENCES roles(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, role_id)
 );
 -- +goose StatementEnd
 

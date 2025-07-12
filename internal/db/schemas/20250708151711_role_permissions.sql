@@ -1,9 +1,9 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS role_permissions (
-    rp_role_id UUID REFERENCES roles(role_id) ON DELETE CASCADE,
-    rp_permission_id UUID REFERENCES permissions(permission_id) ON DELETE CASCADE,
-    PRIMARY KEY (rp_role_id, rp_permission_id)
+    role_id UUID REFERENCES roles(id) ON DELETE CASCADE,
+    permission_id UUID REFERENCES permissions(id) ON DELETE CASCADE,
+    PRIMARY KEY (role_id, permission_id)
 );
 
 -- +goose StatementEnd

@@ -5,11 +5,13 @@ import (
 	"github.com/go-playground/validator"
 )
 
-var validate = validator.New()
-
 func ValidatorMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Set("validation", validate)
+		validate := validator.New()
+
+		// set the middleware
+		c.Set("validation", validate) // context
+
 		c.Next()
 	}
 }
