@@ -6,9 +6,10 @@ import (
 
 	"github.com/edynnt/veloras-api/internal/auth/domain/model/entity"
 	"github.com/edynnt/veloras-api/internal/auth/domain/repository"
-	"github.com/edynnt/veloras-api/internal/auth/infrastructure/persistence/sqlc/gen"
-	authsqlc "github.com/edynnt/veloras-api/internal/auth/infrastructure/persistence/sqlc/gen"
+	"github.com/edynnt/veloras-api/internal/shared/gen"
+	authsqlc "github.com/edynnt/veloras-api/internal/shared/gen"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jinzhu/copier"
 )
 
 type authRepository struct {
@@ -21,28 +22,21 @@ func (a *authRepository) EmailExists(ctx context.Context, email string) (bool, e
 }
 
 // CreateUser implements repository.AuthRepository.
-func (a *authRepository) CreateUser(ctx context.Context, account *entity.Account) (int64, error) {
-	createdAccount, err := a.db.CreateUser(ctx, gen.CreateUserParams{
-		Username:    account.Username,
-		Email:       account.Email,
-		Password:    account.Password,
-		PhoneNumber: account.PhoneNumber,
-		FirstName:   account.FirstName,
-		LastName:    account.LastName,
-	})
+func (a *authRepository) CreateUser(ctx context.Context, account *entity.Account) (string, error) {
+
+	var param gen.CreateUserParams
+	copier.Copy(&param, &account)
+
+	createdAccount, err := a.db.CreateUser(ctx, param)
 
 	fmt.Println("createdAccount: ", createdAccount)
 	fmt.Println("err: ", err)
 
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
-	// if createdAccount == nil {
-	// 	return 0, fmt.Errorf("account creation did not return an account instance")
-	// }
-
-	return 123, nil
+	return createdAccount.ID.String(), nil
 }
 
 // UsernameExists implements repository.AuthRepository.

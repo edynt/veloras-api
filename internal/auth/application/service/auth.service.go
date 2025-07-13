@@ -7,5 +7,5 @@ import (
 )
 
 type AuthService interface {
-	CreateUser(ctx context.Context, AccountAppDTO appDto.AccountAppDTO) (int64, error)
+	CreateUser(ctx context.Context, AccountAppDTO appDto.AccountAppDTO) (string, error)
 }
