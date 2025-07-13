@@ -8,4 +8,5 @@ import (
 
 type AuthRepository interface {
 	CreatUser(ctx context.Context, account *entity.Account) (int64, error)
+	UsernameExists(ctx context.Context, username string) (bool, error)
 }

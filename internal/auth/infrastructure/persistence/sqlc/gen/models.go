@@ -2,7 +2,7 @@
 // versions:
 //   sqlc v1.29.0
 
-package db
+package gen
 
 import (
 	"github.com/jackc/pgx/v5/pgtype"
@@ -59,24 +59,13 @@ type User struct {
 	Username       string
 	HashedPassword string
 	IsVerified     pgtype.Bool
+	PhoneNumber    pgtype.Text
+	FirstName      pgtype.Text
+	LastName       pgtype.Text
 	Status         pgtype.Int4
 	Language       pgtype.Text
 	CreatedAt      pgtype.Timestamptz
 	UpdatedAt      pgtype.Timestamptz
-}
-
-type UserInfo struct {
-	ID          int32
-	UserID      pgtype.UUID
-	FullName    pgtype.Text
-	AvatarUrl   pgtype.Text
-	Gender      pgtype.Text
-	DateOfBirth pgtype.Date
-	PhoneNumber pgtype.Text
-	Address     pgtype.Text
-	Country     pgtype.Text
-	CreatedAt   pgtype.Timestamptz
-	UpdatedAt   pgtype.Timestamptz
 }
 
 type UserRole struct {

@@ -3,7 +3,7 @@
 //   sqlc v1.29.0
 // source: email_verifications.sql
 
-package db
+package gen
 
 import (
 	"context"

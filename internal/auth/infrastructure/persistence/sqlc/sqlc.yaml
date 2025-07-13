@@ -1,12 +1,13 @@
 version: "2"
+
 sql:
   - engine: "postgresql"
-    schema: "internal/db/schemas"
-    queries: "internal/db/queries"
+    schema: "./schema"
+    queries: "./queries"
     gen:
       go:
-        package: "db"
-        out: "internal/db/gen"
+        package: "gen"
+        out: "./gen"
         sql_package: "pgx/v5"
         emit_interface: true
         emit_empty_slices: true

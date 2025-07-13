@@ -42,11 +42,16 @@ func (ah *AuthHandler) RegisterUser(ctx *gin.Context) (res interface{}, err erro
 	}
 
 	account := appDto.AccountAppDTO{
-		Username: req.Username,
-		Password: req.Password,
-		Email:    req.Email,
-		Lang:     req.Language,
+		Username:    req.Username,
+		Password:    req.Password,
+		Email:       req.Email,
+		Language:    req.Language,
+		PhoneNumber: req.PhoneNumber,
+		FirstName:   req.Fullname,
+		LastName:    req.Fullname,
 	}
 
-	return account, nil
+	accountId, err := ah.service.CreateUser(ctx, account)
+
+	return accountId, nil
 }

@@ -3,7 +3,7 @@
 //   sqlc v1.29.0
 // source: users.sql
 
-package db
+package gen
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (email, username, hashed_password)
 VALUES ($1, $2, $3)
-RETURNING id, email, username, hashed_password, is_verified, status, language, created_at, updated_at
+RETURNING id, email, username, hashed_password, is_verified, phone_number, first_name, last_name, status, language, created_at, updated_at
 `
 
 type CreateUserParams struct {
@@ -32,6 +32,9 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Username,
 		&i.HashedPassword,
 		&i.IsVerified,
+		&i.PhoneNumber,
+		&i.FirstName,
+		&i.LastName,
 		&i.Status,
 		&i.Language,
 		&i.CreatedAt,
@@ -50,7 +53,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id pgtype.UUID) error {
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, username, hashed_password, is_verified, status, language, created_at, updated_at FROM users WHERE email = $1
+SELECT id, email, username, hashed_password, is_verified, phone_number, first_name, last_name, status, language, created_at, updated_at FROM users WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -62,6 +65,9 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.Username,
 		&i.HashedPassword,
 		&i.IsVerified,
+		&i.PhoneNumber,
+		&i.FirstName,
+		&i.LastName,
 		&i.Status,
 		&i.Language,
 		&i.CreatedAt,

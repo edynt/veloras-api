@@ -56,8 +56,10 @@ down:
 	docker-compose down
 
 # SQLC generator
-sqlc:
-	sqlc generate
+generate-auth:
+	cd internal/auth/infrastructure/persistence/sqlc && sqlc generate
+
+generate-all: generate-auth
 
 # swagger
 swag:
@@ -81,4 +83,4 @@ migrate-down:
 	@GOOSE_DRIVER=$(GOOSE_DRIVER) GOOSE_DBSTRING=$(GOOSE_DBSTRING) \
 	goose -dir=$(MIGRATIONS_DIR) down
 
-.PHONY: all build clean build-linux build-windows build-mac build-all install start
+.PHONY: all build clean build-linux build-windows build-mac build-all install start generate-auth generate-all

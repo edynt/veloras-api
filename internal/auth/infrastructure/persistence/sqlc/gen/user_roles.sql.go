@@ -3,7 +3,7 @@
 //   sqlc v1.29.0
 // source: user_roles.sql
 
-package db
+package gen
 
 import (
 	"context"

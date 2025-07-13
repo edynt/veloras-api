@@ -13,6 +13,11 @@ type authRepository struct {
 	db *sql.DB
 }
 
+// UsernameExists implements repository.AuthRepository.
+func (ar *authRepository) UsernameExists(ctx context.Context, username string) (bool, error) {
+	panic("unimplemented")
+}
+
 // CreatUser implements repository.AuthRepository.
 func (a *authRepository) CreatUser(ctx context.Context, account *entity.Account) (int64, error) {
 	fmt.Println("call create account auth.repo infrastructure")
