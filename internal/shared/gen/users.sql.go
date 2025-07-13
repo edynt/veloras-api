@@ -12,25 +12,35 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (email, username, hashed_password)
-VALUES ($1, $2, $3)
-RETURNING id, email, username, hashed_password, is_verified, phone_number, first_name, last_name, status, language, created_at, updated_at
+INSERT INTO users (email, username, password, phone_number, first_name, last_name)
+VALUES ($1, $2, $3, $4, $5, $6)
+RETURNING id, email, username, password, is_verified, phone_number, first_name, last_name, status, language, created_at, updated_at
 `
 
 type CreateUserParams struct {
-	Email          string
-	Username       string
-	HashedPassword string
+	Email       string
+	Username    string
+	Password    string
+	PhoneNumber string
+	FirstName   string
+	LastName    string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, createUser, arg.Email, arg.Username, arg.HashedPassword)
+	row := q.db.QueryRow(ctx, createUser,
+		arg.Email,
+		arg.Username,
+		arg.Password,
+		arg.PhoneNumber,
+		arg.FirstName,
+		arg.LastName,
+	)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
 		&i.Username,
-		&i.HashedPassword,
+		&i.Password,
 		&i.IsVerified,
 		&i.PhoneNumber,
 		&i.FirstName,
@@ -53,7 +63,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id pgtype.UUID) error {
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, username, hashed_password, is_verified, phone_number, first_name, last_name, status, language, created_at, updated_at FROM users WHERE email = $1
+SELECT id, email, username, password, is_verified, phone_number, first_name, last_name, status, language, created_at, updated_at FROM users WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -63,7 +73,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.ID,
 		&i.Email,
 		&i.Username,
-		&i.HashedPassword,
+		&i.Password,
 		&i.IsVerified,
 		&i.PhoneNumber,
 		&i.FirstName,
@@ -74,6 +84,28 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const getUserEmailExists = `-- name: GetUserEmailExists :one
+SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)
+`
+
+func (q *Queries) GetUserEmailExists(ctx context.Context, email string) (bool, error) {
+	row := q.db.QueryRow(ctx, getUserEmailExists, email)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
+const getUsernameExists = `-- name: GetUsernameExists :one
+SELECT EXISTS(SELECT 1 FROM users WHERE username = $1)
+`
+
+func (q *Queries) GetUsernameExists(ctx context.Context, username string) (bool, error) {
+	row := q.db.QueryRow(ctx, getUsernameExists, username)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
 }
 
 const verifyUser = `-- name: VerifyUser :exec

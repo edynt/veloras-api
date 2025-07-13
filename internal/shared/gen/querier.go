@@ -29,6 +29,8 @@ type Querier interface {
 	GetRolesByUser(ctx context.Context, userID pgtype.UUID) ([]Role, error)
 	GetSession(ctx context.Context, id int32) (Session, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
+	GetUserEmailExists(ctx context.Context, email string) (bool, error)
+	GetUsernameExists(ctx context.Context, username string) (bool, error)
 	VerifyUser(ctx context.Context, id pgtype.UUID) error
 }
 

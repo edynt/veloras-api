@@ -54,18 +54,18 @@ type Session struct {
 }
 
 type User struct {
-	ID             pgtype.UUID
-	Email          string
-	Username       string
-	HashedPassword string
-	IsVerified     pgtype.Bool
-	PhoneNumber    pgtype.Text
-	FirstName      pgtype.Text
-	LastName       pgtype.Text
-	Status         pgtype.Int4
-	Language       pgtype.Text
-	CreatedAt      pgtype.Timestamptz
-	UpdatedAt      pgtype.Timestamptz
+	ID          pgtype.UUID
+	Email       string
+	Username    string
+	Password    string
+	IsVerified  pgtype.Bool
+	PhoneNumber string
+	FirstName   string
+	LastName    string
+	Status      pgtype.Int4
+	Language    pgtype.Text
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
 }
 
 type UserRole struct {

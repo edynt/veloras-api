@@ -16,7 +16,7 @@ GOOSE_DRIVER = postgres
 BINARY_NAME = veloras-cli
 MAIN_RUN = ./cmd/server/main.go
 SWAG_DOCS = ./cmd/swag/docs
-MIGRATIONS_DIR = ./internal/db/schemas
+MIGRATIONS_DIR = ./internal/shared/schemas
 GOOSE_DBSTRING = postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable
 
 # Default target is to build the binary
@@ -56,10 +56,8 @@ down:
 	docker-compose down
 
 # SQLC generator
-generate-auth:
-	cd internal/auth/infrastructure/persistence/sqlc && sqlc generate
-
-generate-all: generate-auth
+sqlc: 
+	cd internal/shared && sqlc generate
 
 # swagger
 swag:
@@ -82,4 +80,4 @@ migrate-down:
 	@GOOSE_DRIVER=$(GOOSE_DRIVER) GOOSE_DBSTRING=$(GOOSE_DBSTRING) \
 	goose -dir=$(MIGRATIONS_DIR) down
 
-.PHONY: all build clean build-linux build-windows build-mac build-all install start generate-auth generate-all
+.PHONY: all build clean build-linux build-windows build-mac build-all install start
