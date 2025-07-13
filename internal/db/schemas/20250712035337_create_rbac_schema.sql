@@ -20,11 +20,6 @@ CREATE INDEX IF NOT EXISTS idx_role_permissions_role_id ON role_permissions(role
 CREATE INDEX IF NOT EXISTS idx_role_permissions_permission_id ON role_permissions(permission_id);
 
 
--- USER_INFO
-CREATE INDEX IF NOT EXISTS idx_user_info_user_id ON user_info(user_id);
-CREATE INDEX IF NOT EXISTS idx_user_info_phone ON user_info(phone_number);
-
-
 -- +goose StatementEnd
 
 -- +goose Down
