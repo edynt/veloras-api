@@ -16,6 +16,13 @@ type authService struct {
 func (as *authService) CreateUser(ctx context.Context, AccountAppDto appDto.AccountAppDTO) (int64, error) {
 	fmt.Println("call create user auth.service.impl")
 
+	//1. Check permissions -> event registered
+
+	// 2. Check username exist
+	_, err := as.authRepo.UsernameExists(ctx, AccountAppDto.Username)
+
+	fmt.Println(err)
+
 	return 1, nil
 }
 

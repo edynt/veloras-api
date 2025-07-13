@@ -66,7 +66,6 @@ swag:
 	@echo "Generating Swagger documentation..."
 	swag init -g $(MAIN_RUN) -o $(SWAG_DOCS)
 
-
 # migrations
 create-migration:
 	goose -dir $(MIGRATIONS_DIR) create $(name) sql
