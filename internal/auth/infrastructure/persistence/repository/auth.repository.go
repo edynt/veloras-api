@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/edynnt/veloras-api/internal/auth/domain/model/entity"
 	"github.com/edynnt/veloras-api/internal/auth/domain/repository"
@@ -28,9 +27,6 @@ func (a *authRepository) CreateUser(ctx context.Context, account *entity.Account
 	copier.Copy(&param, &account)
 
 	createdAccount, err := a.db.CreateUser(ctx, param)
-
-	fmt.Println("createdAccount: ", createdAccount)
-	fmt.Println("err: ", err)
 
 	if err != nil {
 		return "", err

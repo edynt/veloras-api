@@ -6,6 +6,7 @@ type APIError struct {
 	StatusCode int
 	Message    string
 	Err        interface{}
+	ErrorFlag  bool
 }
 
 func (e *APIError) Error() string {
@@ -24,5 +25,6 @@ func NewAPIError(status int, message string, err interface{}) *APIError {
 		StatusCode: status,
 		Message:    message,
 		Err:        err,
+		ErrorFlag:  true,
 	}
 }

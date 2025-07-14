@@ -8,25 +8,28 @@ import (
 
 // StandardRes response format
 type APIResponse struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data,omitempty"`  // data return null not show
-	Error   interface{} `json:"error,omitempty"` // Error return null not show
+	Code      int         `json:"code"`
+	Message   string      `json:"message"`
+	Data      interface{} `json:"data,omitempty"`    // data return null not show
+	Error     interface{} `json:"details,omitempty"` // Error return null not show
+	ErrorFlag bool        `json:"error"`
 }
 
 func SuccessResponse(c *gin.Context, data interface{}) {
 	c.JSON(200, APIResponse{
-		Code:    200,
-		Message: "success",
-		Data:    data,
+		Code:      200,
+		Message:   "success",
+		Data:      data,
+		ErrorFlag: false,
 	})
 }
 
 func ErrorResponse(c *gin.Context, code int, message string, err interface{}) {
 	c.JSON(code, APIResponse{
-		Code:    code,
-		Message: message,
-		Error:   err,
+		Code:      code,
+		Message:   message,
+		Error:     err,
+		ErrorFlag: true,
 	})
 }
 
