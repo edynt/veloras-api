@@ -4,3 +4,4 @@
 /environment/data
 .env
 .env.prod
+__debug_*

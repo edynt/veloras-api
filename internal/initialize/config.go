@@ -2,7 +2,9 @@ package initialize
 
 import (
 	"fmt"
+	"log"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
@@ -17,6 +19,12 @@ type Config struct {
 }
 
 func LoadConfig() (config Config, err error) {
+
+	// Load .env first
+	if err := godotenv.Load(); err != nil {
+		log.Println(".env file not found, skipping...")
+	}
+
 	viper.SetConfigFile(".env")
 	viper.SetConfigType("env")
 

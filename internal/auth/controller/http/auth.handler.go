@@ -53,5 +53,9 @@ func (ah *AuthHandler) RegisterUser(ctx *gin.Context) (res interface{}, err erro
 
 	accountId, err := ah.service.CreateUser(ctx, account)
 
+	if err != nil {
+		return nil, response.NewAPIError(http.StatusConflict, "Registration failed", err.Error())
+	}
+
 	return accountId, nil
 }
