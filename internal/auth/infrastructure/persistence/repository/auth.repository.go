@@ -7,12 +7,27 @@ import (
 	"github.com/edynnt/veloras-api/internal/auth/domain/repository"
 	"github.com/edynnt/veloras-api/internal/shared/gen"
 	authsqlc "github.com/edynnt/veloras-api/internal/shared/gen"
+	"github.com/edynnt/veloras-api/utils"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jinzhu/copier"
 )
 
 type authRepository struct {
 	db *authsqlc.Queries
+}
+
+// CreateVerificationCode implements repository.AuthRepository.
+func (a *authRepository) CreateVerificationCode(ctx context.Context, userVerification *entity.EmailVerification) (string, error) {
+	var param gen.CreateEmailVerificationParams
+	copier.Copy(&param, &userVerification)
+	createdEmailVerification, err := a.db.CreateEmailVerification(ctx, param)
+
+	if err != nil {
+		return "", err
+	}
+
+	return utils.Int32ToString(createdEmailVerification.ID), nil
+
 }
 
 // EmailExists implements repository.AuthRepository.

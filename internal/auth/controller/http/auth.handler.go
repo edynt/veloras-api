@@ -47,8 +47,8 @@ func (ah *AuthHandler) RegisterUser(ctx *gin.Context) (res interface{}, err erro
 		Email:       req.Email,
 		Language:    req.Language,
 		PhoneNumber: req.PhoneNumber,
-		FirstName:   req.Fullname,
-		LastName:    req.Fullname,
+		FirstName:   req.FirstName,
+		LastName:    req.LastName,
 	}
 
 	accountId, err := ah.service.CreateUser(ctx, account)

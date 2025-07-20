@@ -5,7 +5,9 @@ import (
 	"fmt"
 
 	appDto "github.com/edynnt/veloras-api/internal/auth/application/service/dto"
+	"github.com/edynnt/veloras-api/internal/auth/domain/model/entity"
 	authRepo "github.com/edynnt/veloras-api/internal/auth/domain/repository"
+	"github.com/edynnt/veloras-api/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -48,10 +50,17 @@ func (as *authService) CreateUser(ctx context.Context, accountDto appDto.Account
 	hashedPassword := string(hashedPasswordBytes)
 
 	accountDto.Password = hashedPassword
-	accountEntity := appDto.NewAccountFromDTO(&accountDto)
 
 	// 5. Insert account into database
-	newAccountId, err := as.authRepo.CreateUser(ctx, accountEntity)
+	newAccountId, err := as.authRepo.CreateUser(ctx, &entity.Account{
+		Username:    accountDto.Username,
+		Email:       accountDto.Email,
+		Password:    accountDto.Password,
+		PhoneNumber: accountDto.PhoneNumber,
+		FirstName:   accountDto.FirstName,
+		LastName:    accountDto.LastName,
+	})
+
 	if err != nil {
 		// log.Printf("Error creating user %s in database: %v", accountToCreate.Username, err)
 		return "", fmt.Errorf("could not create account: %w", err)
@@ -61,6 +70,12 @@ func (as *authService) CreateUser(ctx context.Context, accountDto appDto.Account
 		// log.Printf("Repository returned invalid account ID %d for user %s", newAccountId, accountToCreate.Username)
 		return "", fmt.Errorf("account creation failed to return a valid ID")
 	}
+
+	as.authRepo.CreateVerificationCode(ctx, &entity.EmailVerification{
+		UserID:    newAccountId,
+		Code:      utils.GenerateSixDigitCode(),
+		ExpiresAt: utils.AddHours(1),
+	})
 
 	// 6. Return account ID
 	return newAccountId, nil

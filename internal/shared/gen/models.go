@@ -11,7 +11,7 @@ import (
 type EmailVerification struct {
 	ID        int32
 	UserID    pgtype.UUID
-	Code      string
+	Code      int32
 	ExpiresAt pgtype.Timestamptz
 	CreatedAt pgtype.Timestamptz
 }

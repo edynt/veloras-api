@@ -10,8 +10,8 @@ import (
 type APIResponse struct {
 	Code      int         `json:"code"`
 	Message   string      `json:"message"`
-	Data      interface{} `json:"data,omitempty"`    // data return null not show
-	Error     interface{} `json:"details,omitempty"` // Error return null not show
+	Data      interface{} `json:"data,omitempty"`          // data return null not show
+	Error     interface{} `json:"error_details,omitempty"` // Error return null not show
 	ErrorFlag bool        `json:"error"`
 }
 

@@ -19,7 +19,7 @@ RETURNING id, user_id, code, expires_at, created_at
 
 type CreateEmailVerificationParams struct {
 	UserID    pgtype.UUID
-	Code      string
+	Code      int32
 	ExpiresAt pgtype.Timestamptz
 }
 
@@ -42,7 +42,7 @@ SELECT id, user_id, code, expires_at, created_at FROM email_verifications WHERE 
 
 type GetEmailVerificationParams struct {
 	UserID pgtype.UUID
-	Code   string
+	Code   int32
 }
 
 func (q *Queries) GetEmailVerification(ctx context.Context, arg GetEmailVerificationParams) (EmailVerification, error) {
