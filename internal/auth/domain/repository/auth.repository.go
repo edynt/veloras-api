@@ -10,5 +10,6 @@ type AuthRepository interface {
 	CreateUser(ctx context.Context, account *entity.Account) (string, error)
 	UsernameExists(ctx context.Context, username string) (bool, error)
 	EmailExists(ctx context.Context, email string) (bool, error)
-	CreateVerificationCode(ctx context.Context, userVerification *entity.EmailVerification) (string, error)
+	CreateVerificationCode(ctx context.Context, userVerification *entity.CreateVerificationCode) (string, error)
+	// GetEmailVerification(ctx context.Context, userID string) (*entity.EmailVerification, error)
 }

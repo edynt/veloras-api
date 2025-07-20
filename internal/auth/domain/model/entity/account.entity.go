@@ -12,7 +12,7 @@ type Account struct {
 	LastName    string `json:"last_name"`
 }
 
-type EmailVerification struct {
+type CreateVerificationCode struct {
 	UserID    string    `json:"user_id"`
 	Code      int       `json:"code"`
 	ExpiresAt time.Time `json:"expires_at"`

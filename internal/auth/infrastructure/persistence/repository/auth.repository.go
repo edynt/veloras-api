@@ -17,7 +17,7 @@ type authRepository struct {
 }
 
 // CreateVerificationCode implements repository.AuthRepository.
-func (a *authRepository) CreateVerificationCode(ctx context.Context, userVerification *entity.EmailVerification) (string, error) {
+func (a *authRepository) CreateVerificationCode(ctx context.Context, userVerification *entity.CreateVerificationCode) (string, error) {
 	var param gen.CreateEmailVerificationParams
 	copier.Copy(&param, &userVerification)
 	createdEmailVerification, err := a.db.CreateEmailVerification(ctx, param)

@@ -71,7 +71,7 @@ func (as *authService) CreateUser(ctx context.Context, accountDto appDto.Account
 		return "", fmt.Errorf("account creation failed to return a valid ID")
 	}
 
-	as.authRepo.CreateVerificationCode(ctx, &entity.EmailVerification{
+	as.authRepo.CreateVerificationCode(ctx, &entity.CreateVerificationCode{
 		UserID:    newAccountId,
 		Code:      utils.GenerateSixDigitCode(),
 		ExpiresAt: utils.AddHours(1),
