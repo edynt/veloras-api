@@ -4,8 +4,8 @@ CREATE TABLE IF NOT EXISTS password_resets (
     id SERIAL PRIMARY KEY,
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     reset_token TEXT NOT NULL,
-    expires_at TIMESTAMPTZ NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT now()
+    expires_at BIGINT NOT NULL,
+    created_at BIGINT DEFAULT extract(epoch from now())
 );
 -- +goose StatementEnd
 

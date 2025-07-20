@@ -9,3 +9,8 @@ type AccountAppDTO struct {
 	FirstName   string `json:"fisrt_name"`
 	LastName    string `json:"last_name"`
 }
+
+type EmailVerification struct {
+	UserID string `json:"user_id"`
+	Code   int    `json:"code"`
+}

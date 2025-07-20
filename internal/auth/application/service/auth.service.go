@@ -7,5 +7,6 @@ import (
 )
 
 type AuthService interface {
-	CreateUser(ctx context.Context, AccountAppDTO appDto.AccountAppDTO) (string, error)
+	CreateUser(ctx context.Context, accountAppDTO appDto.AccountAppDTO) (string, error)
+	VerifyUser(ctx context.Context, verificationEmailAppDTO appDto.EmailVerification) (bool, error)
 }

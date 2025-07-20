@@ -15,10 +15,25 @@ type authService struct {
 	authRepo authRepo.AuthRepository
 }
 
+// VerifyUser implements AuthService.
+func (as *authService) VerifyUser(ctx context.Context, verificationEmailAppDTO appDto.EmailVerification) (bool, error) {
+
+	existsVerificationCode, err := as.authRepo.GetVerificationCode(ctx, verificationEmailAppDTO.UserID, verificationEmailAppDTO.Code)
+
+	if err != nil {
+		return false, fmt.Errorf("failed to get verification code: %w", err)
+	}
+
+	now := utils.GetNowUnix()
+	if existsVerificationCode.ExpiresAt < now {
+		return false, fmt.Errorf("verification code expired")
+	}
+
+	return true, nil
+}
+
 // Create implements AuthService.
 func (as *authService) CreateUser(ctx context.Context, accountDto appDto.AccountAppDTO) (string, error) {
-	fmt.Println("call create user auth.service.impl")
-
 	//1. Check permissions -> event registered
 
 	// 2. Check username exists
@@ -71,7 +86,7 @@ func (as *authService) CreateUser(ctx context.Context, accountDto appDto.Account
 		return "", fmt.Errorf("account creation failed to return a valid ID")
 	}
 
-	as.authRepo.CreateVerificationCode(ctx, &entity.CreateVerificationCode{
+	as.authRepo.CreateVerificationCode(ctx, &entity.EmailVerification{
 		UserID:    newAccountId,
 		Code:      utils.GenerateSixDigitCode(),
 		ExpiresAt: utils.AddHours(1),

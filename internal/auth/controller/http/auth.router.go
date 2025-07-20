@@ -9,4 +9,5 @@ func RegisterAuthRoutes(rg *gin.RouterGroup, handler *AuthHandler) {
 	auth := rg.Group("/auth")
 	// user registration
 	auth.POST("/register", response.Wrap(handler.RegisterUser))
+	auth.GET("/verify/:userId/:code", response.Wrap(handler.VerifyUser))
 }

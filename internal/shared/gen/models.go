@@ -12,30 +12,30 @@ type EmailVerification struct {
 	ID        int32
 	UserID    pgtype.UUID
 	Code      int32
-	ExpiresAt pgtype.Timestamptz
-	CreatedAt pgtype.Timestamptz
+	ExpiresAt int64
+	CreatedAt pgtype.Int8
 }
 
 type PasswordReset struct {
 	ID         int32
 	UserID     pgtype.UUID
 	ResetToken string
-	ExpiresAt  pgtype.Timestamptz
-	CreatedAt  pgtype.Timestamptz
+	ExpiresAt  int64
+	CreatedAt  pgtype.Int8
 }
 
 type Permission struct {
 	ID          pgtype.UUID
 	Name        string
 	Description pgtype.Text
-	CreatedAt   pgtype.Timestamptz
+	CreatedAt   pgtype.Int8
 }
 
 type Role struct {
 	ID          pgtype.UUID
 	Name        string
 	Description pgtype.Text
-	CreatedAt   pgtype.Timestamptz
+	CreatedAt   pgtype.Int8
 }
 
 type RolePermission struct {
@@ -50,7 +50,7 @@ type Session struct {
 	UserAgent    pgtype.Text
 	ClientIp     pgtype.Text
 	ExpiresAt    pgtype.Timestamptz
-	CreatedAt    pgtype.Timestamptz
+	CreatedAt    pgtype.Int8
 }
 
 type User struct {
@@ -64,8 +64,8 @@ type User struct {
 	LastName    string
 	Status      pgtype.Int4
 	Language    pgtype.Text
-	CreatedAt   pgtype.Timestamptz
-	UpdatedAt   pgtype.Timestamptz
+	CreatedAt   pgtype.Int8
+	UpdatedAt   pgtype.Int8
 }
 
 type UserRole struct {

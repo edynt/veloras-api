@@ -16,8 +16,25 @@ type authRepository struct {
 	db *authsqlc.Queries
 }
 
+// GetVerificationCode implements repository.AuthRepository.
+func (a *authRepository) GetVerificationCode(ctx context.Context, userID string, code int) (*entity.EmailVerification, error) {
+	var param gen.GetEmailVerificationParams
+	copier.Copy(&param, &entity.EmailVerification{UserID: userID, Code: code})
+
+	result, err := a.db.GetEmailVerification(ctx, param)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var entityResult entity.EmailVerification
+	copier.Copy(&entityResult, &result)
+
+	return &entityResult, nil
+}
+
 // CreateVerificationCode implements repository.AuthRepository.
-func (a *authRepository) CreateVerificationCode(ctx context.Context, userVerification *entity.CreateVerificationCode) (string, error) {
+func (a *authRepository) CreateVerificationCode(ctx context.Context, userVerification *entity.EmailVerification) (string, error) {
 	var param gen.CreateEmailVerificationParams
 	copier.Copy(&param, &userVerification)
 	createdEmailVerification, err := a.db.CreateEmailVerification(ctx, param)

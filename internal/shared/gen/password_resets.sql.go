@@ -20,7 +20,7 @@ RETURNING id, user_id, reset_token, expires_at, created_at
 type CreatePasswordResetParams struct {
 	UserID     pgtype.UUID
 	ResetToken string
-	ExpiresAt  pgtype.Timestamptz
+	ExpiresAt  int64
 }
 
 func (q *Queries) CreatePasswordReset(ctx context.Context, arg CreatePasswordResetParams) (PasswordReset, error) {

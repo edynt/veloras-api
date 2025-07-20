@@ -1,7 +1,5 @@
 package entity
 
-import "time"
-
 type Account struct {
 	ID          string `json:"id"`
 	Email       string `json:"email"`
@@ -12,8 +10,8 @@ type Account struct {
 	LastName    string `json:"last_name"`
 }
 
-type CreateVerificationCode struct {
-	UserID    string    `json:"user_id"`
-	Code      int       `json:"code"`
-	ExpiresAt time.Time `json:"expires_at"`
+type EmailVerification struct {
+	UserID    string `json:"user_id"`
+	Code      int    `json:"code"`
+	ExpiresAt int64  `json:"expires_at"`
 }

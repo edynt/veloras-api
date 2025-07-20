@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     user_agent TEXT,
     client_ip TEXT,
     expires_at TIMESTAMPTZ NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT now()
+    created_at BIGINT DEFAULT extract(epoch from now())
 );
 -- +goose StatementEnd
 

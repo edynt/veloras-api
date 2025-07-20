@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS users (
     last_name TEXT NOT NULL,
     status INT DEFAULT 0,
     language TEXT DEFAULT 'en',
-    created_at TIMESTAMPTZ DEFAULT now(),
-    updated_at TIMESTAMPTZ DEFAULT now()
+    created_at BIGINT DEFAULT extract(epoch from now()),
+    updated_at BIGINT DEFAULT extract(epoch from now())
 );
 -- +goose StatementEnd
 

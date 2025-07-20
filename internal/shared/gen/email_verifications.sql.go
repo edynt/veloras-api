@@ -20,7 +20,7 @@ RETURNING id, user_id, code, expires_at, created_at
 type CreateEmailVerificationParams struct {
 	UserID    pgtype.UUID
 	Code      int32
-	ExpiresAt pgtype.Timestamptz
+	ExpiresAt int64
 }
 
 func (q *Queries) CreateEmailVerification(ctx context.Context, arg CreateEmailVerificationParams) (EmailVerification, error) {

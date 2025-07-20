@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS roles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT UNIQUE NOT NULL,
     description TEXT,
-    created_at TIMESTAMPTZ DEFAULT now()
+    created_at BIGINT DEFAULT extract(epoch from now())
 );
 -- +goose StatementEnd
 

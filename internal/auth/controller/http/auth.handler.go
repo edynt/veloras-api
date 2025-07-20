@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/edynnt/veloras-api/internal/auth/application/service"
@@ -22,9 +21,6 @@ func NewAuthHandler(service service.AuthService) *AuthHandler {
 }
 
 func (ah *AuthHandler) RegisterUser(ctx *gin.Context) (res interface{}, err error) {
-
-	fmt.Println(("----> RegisterUser"))
-
 	var req ctlDto.UserRegisterReq
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -58,4 +54,23 @@ func (ah *AuthHandler) RegisterUser(ctx *gin.Context) (res interface{}, err erro
 	}
 
 	return accountId, nil
+}
+
+func (ah *AuthHandler) VerifyUser(ctx *gin.Context) (res interface{}, err error) {
+
+	userID := ctx.Param("userId")
+	code := ctx.Param("code")
+
+	verificationEmail := appDto.EmailVerification{
+		UserID: userID,
+		Code:   utils.StringToInt(code),
+	}
+
+	isExist, err := ah.service.VerifyUser(ctx, verificationEmail)
+
+	if err != nil {
+		return nil, response.NewAPIError(http.StatusBadRequest, "Invalid request", err.Error())
+	}
+
+	return isExist, nil
 }
