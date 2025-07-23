@@ -14,7 +14,7 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (email, username, password, phone_number, first_name, last_name)
 VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING id, email, username, password, is_verified, phone_number, first_name, last_name, status, language, created_at, updated_at
+RETURNING id, email, status
 `
 
 type CreateUserParams struct {
@@ -26,7 +26,13 @@ type CreateUserParams struct {
 	LastName    string
 }
 
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+type CreateUserRow struct {
+	ID     pgtype.UUID
+	Email  string
+	Status pgtype.Int4
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error) {
 	row := q.db.QueryRow(ctx, createUser,
 		arg.Email,
 		arg.Username,
@@ -35,21 +41,8 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.FirstName,
 		arg.LastName,
 	)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Email,
-		&i.Username,
-		&i.Password,
-		&i.IsVerified,
-		&i.PhoneNumber,
-		&i.FirstName,
-		&i.LastName,
-		&i.Status,
-		&i.Language,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
+	var i CreateUserRow
+	err := row.Scan(&i.ID, &i.Email, &i.Status)
 	return i, err
 }
 
@@ -106,6 +99,28 @@ func (q *Queries) GetUsernameExists(ctx context.Context, username string) (bool,
 	var exists bool
 	err := row.Scan(&exists)
 	return exists, err
+}
+
+const updateUserStatus = `-- name: UpdateUserStatus :one
+UPDATE users SET status = $1 WHERE id = $2 RETURNING id, email, status
+`
+
+type UpdateUserStatusParams struct {
+	Status pgtype.Int4
+	ID     pgtype.UUID
+}
+
+type UpdateUserStatusRow struct {
+	ID     pgtype.UUID
+	Email  string
+	Status pgtype.Int4
+}
+
+func (q *Queries) UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (UpdateUserStatusRow, error) {
+	row := q.db.QueryRow(ctx, updateUserStatus, arg.Status, arg.ID)
+	var i UpdateUserStatusRow
+	err := row.Scan(&i.ID, &i.Email, &i.Status)
+	return i, err
 }
 
 const verifyUser = `-- name: VerifyUser :exec

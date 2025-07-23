@@ -15,3 +15,8 @@ type EmailVerification struct {
 	Code      int    `json:"code"`
 	ExpiresAt int64  `json:"expires_at"`
 }
+
+type UpdateUserStatus struct {
+	ID     string `json:"id"`
+	Status int    `json:"status"`
+}

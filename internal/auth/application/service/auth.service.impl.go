@@ -7,6 +7,7 @@ import (
 	appDto "github.com/edynnt/veloras-api/internal/auth/application/service/dto"
 	"github.com/edynnt/veloras-api/internal/auth/domain/model/entity"
 	authRepo "github.com/edynnt/veloras-api/internal/auth/domain/repository"
+	"github.com/edynnt/veloras-api/internal/shared/constants"
 	"github.com/edynnt/veloras-api/utils"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -27,6 +28,16 @@ func (as *authService) VerifyUser(ctx context.Context, verificationEmailAppDTO a
 	now := utils.GetNowUnix()
 	if existsVerificationCode.ExpiresAt < now {
 		return false, fmt.Errorf("verification code expired")
+	}
+
+	userId, err := as.authRepo.UpdateUserStatus(ctx, verificationEmailAppDTO.UserID, constants.ACTIVE)
+
+	if err != nil {
+		return false, fmt.Errorf("failed to update user status: %w", err)
+	}
+
+	if userId == "" {
+		return false, fmt.Errorf("failed to update user status")
 	}
 
 	return true, nil

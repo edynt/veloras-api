@@ -1,7 +1,7 @@
 -- name: CreateUser :one
 INSERT INTO users (email, username, password, phone_number, first_name, last_name)
 VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING *;
+RETURNING id, email, status;
 
 -- name: GetUserByEmail :one
 SELECT * FROM users WHERE email = $1;
@@ -17,3 +17,6 @@ SELECT EXISTS(SELECT 1 FROM users WHERE email = $1);
 
 -- name: GetUsernameExists :one
 SELECT EXISTS(SELECT 1 FROM users WHERE username = $1);
+
+-- name: UpdateUserStatus :one
+UPDATE users SET status = $1 WHERE id = $2 RETURNING id, email, status;

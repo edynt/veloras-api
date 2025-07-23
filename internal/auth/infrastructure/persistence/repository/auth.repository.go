@@ -2,18 +2,51 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/edynnt/veloras-api/internal/auth/domain/model/entity"
 	"github.com/edynnt/veloras-api/internal/auth/domain/repository"
 	"github.com/edynnt/veloras-api/internal/shared/gen"
 	authsqlc "github.com/edynnt/veloras-api/internal/shared/gen"
 	"github.com/edynnt/veloras-api/utils"
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jinzhu/copier"
 )
 
 type authRepository struct {
 	db *authsqlc.Queries
+}
+
+// UpdateUserStatus implements repository.AuthRepository.
+func (a *authRepository) UpdateUserStatus(ctx context.Context, userID string, status int) (string, error) {
+	// Parse the userID string to UUID
+	parsedUUID, err := uuid.Parse(userID)
+	if err != nil {
+		return "", fmt.Errorf("invalid userID: %w", err)
+	}
+
+	// Construct the parameter object
+	params := gen.UpdateUserStatusParams{
+		ID: pgtype.UUID{
+			Bytes: parsedUUID,
+			Valid: true,
+		},
+		Status: pgtype.Int4{
+			Int32: int32(status),
+			Valid: true,
+		},
+	}
+
+	// Call the DB update function
+	result, err := a.db.UpdateUserStatus(ctx, params)
+	if err != nil {
+		return "", fmt.Errorf("failed to update user status: %w", err)
+	}
+
+	// Return the updated ID
+	return result.ID.String(), nil
 }
 
 // GetVerificationCode implements repository.AuthRepository.

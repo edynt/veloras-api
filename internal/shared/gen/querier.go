@@ -18,7 +18,7 @@ type Querier interface {
 	CreatePermission(ctx context.Context, arg CreatePermissionParams) (Permission, error)
 	CreateRole(ctx context.Context, arg CreateRoleParams) (Role, error)
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
-	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error)
 	DeleteSession(ctx context.Context, id int32) error
 	DeleteUser(ctx context.Context, id pgtype.UUID) error
 	GetEmailVerification(ctx context.Context, arg GetEmailVerificationParams) (EmailVerification, error)
@@ -31,6 +31,7 @@ type Querier interface {
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserEmailExists(ctx context.Context, email string) (bool, error)
 	GetUsernameExists(ctx context.Context, username string) (bool, error)
+	UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (UpdateUserStatusRow, error)
 	VerifyUser(ctx context.Context, id pgtype.UUID) error
 }
 
