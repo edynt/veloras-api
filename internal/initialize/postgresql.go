@@ -6,17 +6,22 @@ import (
 	"log"
 	"time"
 
+	"github.com/edynnt/veloras-api/pkg/config"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 var DB *pgxpool.Pool
 
-func InitDB(cfg *Config) (*pgxpool.Pool, error) {
+func InitDB(cfg *config.Config) (*pgxpool.Pool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		cfg.DBUser, cfg.DBPass, cfg.DBHost, cfg.DBPort, cfg.DBName)
+	cfpg := cfg.PostgreSQL
+
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
+		cfpg.Username, cfpg.Password, cfpg.Host, cfpg.Port, cfpg.Database, cfpg.SslMode)
+
+	fmt.Println("strs:::" + dsn)
 
 	poolConfig, err := pgxpool.ParseConfig(dsn)
 	if err != nil {

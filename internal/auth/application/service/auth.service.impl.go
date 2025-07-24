@@ -7,8 +7,8 @@ import (
 	appDto "github.com/edynnt/veloras-api/internal/auth/application/service/dto"
 	"github.com/edynnt/veloras-api/internal/auth/domain/model/entity"
 	authRepo "github.com/edynnt/veloras-api/internal/auth/domain/repository"
-	"github.com/edynnt/veloras-api/internal/shared/constants"
-	"github.com/edynnt/veloras-api/utils"
+	"github.com/edynnt/veloras-api/pkg/constants"
+	"github.com/edynnt/veloras-api/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 

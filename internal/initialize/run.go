@@ -21,8 +21,8 @@ func Run() (*gin.Engine, string) {
 	}
 
 	// 3> Initialize router
-	r := InitRouter(db, config.LogLevel)
+	r := InitRouter(db, config.Logger.Log_level)
 
 	// 4> Initialize other services if needed (e.g., cache, message queue, etc.)
-	return r, config.ServerPort
+	return r, config.Server.Port
 }

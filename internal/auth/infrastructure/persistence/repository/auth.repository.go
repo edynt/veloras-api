@@ -8,7 +8,7 @@ import (
 	"github.com/edynnt/veloras-api/internal/auth/domain/repository"
 	"github.com/edynnt/veloras-api/internal/shared/gen"
 	authsqlc "github.com/edynnt/veloras-api/internal/shared/gen"
-	"github.com/edynnt/veloras-api/utils"
+	"github.com/edynnt/veloras-api/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"

@@ -7,7 +7,7 @@ import (
 	appDto "github.com/edynnt/veloras-api/internal/auth/application/service/dto"
 	ctlDto "github.com/edynnt/veloras-api/internal/auth/controller/dto"
 	"github.com/edynnt/veloras-api/pkg/response"
-	"github.com/edynnt/veloras-api/utils"
+	"github.com/edynnt/veloras-api/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
 )

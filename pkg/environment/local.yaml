@@ -1,0 +1,29 @@
+server:
+  port: "8080"
+  mode: "development"
+postgresql:
+  host: ${DB_HOST}
+  port: "5432"
+  username: ${DB_USER}
+  password: ${DB_PASSWORD}
+  database: veloras
+  sslmode: disable
+  maxIdleConns: 10 # max pull connect
+  maxOpenConns: 100 #dat so luong ket noi toi da co the
+  connMaxLifetime: 3600 #thoi gian ket noi toi da
+logger:
+  log_level: debug
+  file_log_name: "./storage/logs/dev.001.log"
+  max_size: 500
+  max_backups: 3
+  max_age: 28
+  compress: true
+jwt:
+  token_hour_lifespan: 1
+  api_secret: "XXX.YYY.ZZZ"
+  jwt_expire: 1h
+mail:
+  smtp_host: smtp.gmail.com
+  smtp_port: "587"
+  smtp_user: ${SMTP_USER}
+  smtp_password: ${SMTP_PASSWORD}
