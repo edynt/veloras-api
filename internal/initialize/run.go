@@ -14,6 +14,8 @@ func Run() (*gin.Engine, string) {
 		log.Fatalf("Could not load config: %v", err)
 	}
 
+	InitLogger()
+
 	// 2> Initialize database connection
 	db, err := InitDB(&config)
 	if err != nil {

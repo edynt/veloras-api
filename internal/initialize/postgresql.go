@@ -7,7 +7,9 @@ import (
 	"time"
 
 	"github.com/edynnt/veloras-api/pkg/config"
+	"github.com/edynnt/veloras-api/pkg/global"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"go.uber.org/zap"
 )
 
 var DB *pgxpool.Pool
@@ -20,8 +22,6 @@ func InitDB(cfg *config.Config) (*pgxpool.Pool, error) {
 
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		cfpg.Username, cfpg.Password, cfpg.Host, cfpg.Port, cfpg.Database, cfpg.SslMode)
-
-	fmt.Println("strs:::" + dsn)
 
 	poolConfig, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
@@ -43,6 +43,7 @@ func InitDB(cfg *config.Config) (*pgxpool.Pool, error) {
 	}
 
 	log.Println("Database connection established successfully with pgxpool.")
+	global.Logger.Info("Initialize Postgresql successfully!!", zap.String("ok", "success"))
 
 	DB = db
 	return db, nil
