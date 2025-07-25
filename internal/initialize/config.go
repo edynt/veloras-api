@@ -2,6 +2,7 @@ package initialize
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -10,34 +11,34 @@ import (
 	"github.com/spf13/viper"
 )
 
+func MustLoadConfig() config.Config {
+	cfg, err := LoadConfig()
+	if err != nil {
+		log.Fatalf("fatal: cannot load config: %v", err)
+	}
+	return cfg
+}
+
 func LoadConfig() (cfg config.Config, err error) {
 	_ = godotenv.Load()
 
-	// Read raw YAML file
 	raw, err := os.ReadFile("pkg/environment/local.yaml")
 	if err != nil {
-		return cfg, fmt.Errorf("cannot read yaml: %w", err)
+		return cfg, fmt.Errorf("cannot read config file: %w", err)
 	}
-
-	// Replace ${ENV_VAR} with actual env
-	expanded := os.ExpandEnv(string(raw))
 
 	v := viper.New()
 	v.SetConfigType("yaml")
 	v.AutomaticEnv()
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
-	// Read config from expanded string
-	err = v.ReadConfig(strings.NewReader(expanded))
-	if err != nil {
+	if err := v.ReadConfig(strings.NewReader(os.ExpandEnv(string(raw)))); err != nil {
 		return cfg, fmt.Errorf("failed to read config: %w", err)
 	}
 
-	// Unmarshal into your struct
-	err = v.Unmarshal(&cfg)
-	if err != nil {
+	if err := v.Unmarshal(&cfg); err != nil {
 		return cfg, fmt.Errorf("failed to unmarshal config: %w", err)
 	}
 
-	return cfg, nil
+	return
 }

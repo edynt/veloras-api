@@ -3,28 +3,21 @@ package initialize
 import (
 	"log"
 
+	"github.com/edynnt/veloras-api/pkg/global"
 	"github.com/gin-gonic/gin"
 )
 
 func Run() (*gin.Engine, string) {
 
-	// 1> Read config -> environment variables
-	config, err := LoadConfig()
-	if err != nil {
-		log.Fatalf("Could not load config: %v", err)
-	}
+	global.Config = MustLoadConfig()
 
 	InitLogger()
 
-	// 2> Initialize database connection
-	db, err := InitDB(&config)
+	db, err := InitDB(&global.Config)
 	if err != nil {
-		log.Fatalf("Could not initialize database: %v", err)
+		log.Fatalf("failed to init DB: %v", err)
 	}
 
-	// 3> Initialize router
-	r := InitRouter(db, config.Logger.Log_level)
-
-	// 4> Initialize other services if needed (e.g., cache, message queue, etc.)
-	return r, config.Server.Port
+	r := InitRouter(db, global.Config.Logger.Log_level)
+	return r, global.Config.Server.Port
 }

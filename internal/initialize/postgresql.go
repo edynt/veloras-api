@@ -3,7 +3,6 @@ package initialize
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/edynnt/veloras-api/pkg/config"
@@ -42,7 +41,6 @@ func InitDB(cfg *config.Config) (*pgxpool.Pool, error) {
 		return nil, fmt.Errorf("failed to ping pgxpool: %w", err)
 	}
 
-	log.Println("Database connection established successfully with pgxpool.")
 	global.Logger.Info("Initialize Postgresql successfully!!", zap.String("ok", "success"))
 
 	DB = db

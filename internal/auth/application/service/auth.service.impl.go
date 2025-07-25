@@ -8,6 +8,7 @@ import (
 	"github.com/edynnt/veloras-api/internal/auth/domain/model/entity"
 	authRepo "github.com/edynnt/veloras-api/internal/auth/domain/repository"
 	"github.com/edynnt/veloras-api/pkg/constants"
+	"github.com/edynnt/veloras-api/pkg/global"
 	"github.com/edynnt/veloras-api/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -97,11 +98,18 @@ func (as *authService) CreateUser(ctx context.Context, accountDto appDto.Account
 		return "", fmt.Errorf("account creation failed to return a valid ID")
 	}
 
+	codeGen := utils.GenerateSixDigitCode()
 	as.authRepo.CreateVerificationCode(ctx, &entity.EmailVerification{
 		UserID:    newAccountId,
-		Code:      utils.GenerateSixDigitCode(),
+		Code:      codeGen,
 		ExpiresAt: utils.AddHours(1),
 	})
+
+	go utils.SendTemplateEmailOtp(
+		[]string{accountDto.Email}, global.Config.SMTP.User,
+		"otp-auth.html",
+		map[string]interface{}{"Otp": codeGen},
+	)
 
 	// 6. Return account ID
 	return newAccountId, nil
