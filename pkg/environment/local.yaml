@@ -3,10 +3,10 @@ server:
   mode: "development"
 postgresql:
   host: ${DB_HOST}
-  port: "5432"
+  port: ${DB_PORT}
   username: ${DB_USER}
   password: ${DB_PASSWORD}
-  database: veloras
+  database: ${DB_NAME}
   sslmode: disable
   maxIdleConns: 10 # max pull connect
   maxOpenConns: 100 #dat so luong ket noi toi da co the

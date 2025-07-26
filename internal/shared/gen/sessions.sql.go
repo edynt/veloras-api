@@ -22,7 +22,7 @@ type CreateSessionParams struct {
 	RefreshToken string
 	UserAgent    pgtype.Text
 	ClientIp     pgtype.Text
-	ExpiresAt    pgtype.Timestamptz
+	ExpiresAt    int64
 }
 
 func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error) {

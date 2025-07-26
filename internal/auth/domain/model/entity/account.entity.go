@@ -8,6 +8,7 @@ type Account struct {
 	PhoneNumber string `json:"phone_number"`
 	FirstName   string `json:"fisrt_name"`
 	LastName    string `json:"last_name"`
+	Status      int    `json:"status"`
 }
 
 type EmailVerification struct {

@@ -13,3 +13,8 @@ type UserRegisterReq struct {
 	Country     string `json:"country"`
 	Language    string `json:"language"`
 }
+
+type UserLoginReq struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}

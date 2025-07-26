@@ -17,9 +17,41 @@ type authService struct {
 	authRepo authRepo.AuthRepository
 }
 
+// LoginUser implements AuthService.
+func (as *authService) LoginUser(ctx context.Context, accountAppDTO appDto.AccountAppDTO) (appDto.UserOutPut, error) {
+	// 1. check exists
+	user, err := as.authRepo.GetUserByUsername(ctx, accountAppDTO.Username)
+
+	if err != nil {
+		return appDto.UserOutPut{}, fmt.Errorf("Failed to check username exists: %w", err)
+	}
+
+	if user == nil {
+		return appDto.UserOutPut{}, fmt.Errorf("Username not found")
+	}
+
+	// 2. check password
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(accountAppDTO.Password)); err != nil {
+		return appDto.UserOutPut{}, fmt.Errorf("Invalid password")
+	}
+
+	// 3. check status
+	if user.Status != constants.ACTIVE {
+		return appDto.UserOutPut{}, fmt.Errorf("User is not verified")
+	}
+
+	return appDto.UserOutPut{
+		ID:          user.ID,
+		Username:    user.Username,
+		Email:       user.Email,
+		PhoneNumber: user.PhoneNumber,
+		FirstName:   user.FirstName,
+		LastName:    user.LastName,
+	}, nil
+}
+
 // VerifyUser implements AuthService.
 func (as *authService) VerifyUser(ctx context.Context, verificationEmailAppDTO appDto.EmailVerification) (bool, error) {
-
 	existsVerificationCode, err := as.authRepo.GetVerificationCode(ctx, verificationEmailAppDTO.UserID, verificationEmailAppDTO.Code)
 
 	if err != nil {
@@ -31,14 +63,20 @@ func (as *authService) VerifyUser(ctx context.Context, verificationEmailAppDTO a
 		return false, fmt.Errorf("verification code expired")
 	}
 
-	userId, err := as.authRepo.UpdateUserStatus(ctx, verificationEmailAppDTO.UserID, constants.ACTIVE)
+	err = as.authRepo.UpdateUserStatus(ctx, verificationEmailAppDTO.UserID, constants.ACTIVE)
 
 	if err != nil {
 		return false, fmt.Errorf("failed to update user status: %w", err)
 	}
 
-	if userId == "" {
-		return false, fmt.Errorf("failed to update user status")
+	err = as.authRepo.ActiveUser(ctx, verificationEmailAppDTO.UserID)
+	if err != nil {
+		return false, fmt.Errorf("failed to update user status: %w", err)
+	}
+
+	err = as.authRepo.DeleteVerificationCode(ctx, verificationEmailAppDTO.UserID, verificationEmailAppDTO.Code)
+	if err != nil {
+		return false, fmt.Errorf("failed to delete verification code: %w", err)
 	}
 
 	return true, nil

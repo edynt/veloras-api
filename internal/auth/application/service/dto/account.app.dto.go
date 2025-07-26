@@ -14,3 +14,16 @@ type EmailVerification struct {
 	UserID string `json:"user_id"`
 	Code   int    `json:"code"`
 }
+
+type UserOutPut struct {
+	ID             string `json:"id"`
+	Username       string `json:"username"`
+	Email          string `json:"email"`
+	PhoneNumber    string `json:"phone_number"`
+	FirstName      string `json:"fisrt_name"`
+	LastName       string `json:"last_name"`
+	Status         int    `json:"status"`
+	AccessToken    string `json:"access_token"`
+	RefreshToken   string `json:"refresh_token"`
+	TokenExpiresAt int    `json:"token_expires_at"`
+}

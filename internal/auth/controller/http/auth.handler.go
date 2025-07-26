@@ -58,11 +58,11 @@ func (ah *AuthHandler) RegisterUser(ctx *gin.Context) (res interface{}, err erro
 
 func (ah *AuthHandler) VerifyUser(ctx *gin.Context) (res interface{}, err error) {
 
-	userID := ctx.Param("userId")
+	userId := ctx.Param("userId")
 	code := ctx.Param("code")
 
 	verificationEmail := appDto.EmailVerification{
-		UserID: userID,
+		UserID: userId,
 		Code:   utils.StringToInt(code),
 	}
 
@@ -73,4 +73,35 @@ func (ah *AuthHandler) VerifyUser(ctx *gin.Context) (res interface{}, err error)
 	}
 
 	return isExist, nil
+}
+
+func (ah *AuthHandler) LoginUser(ctx *gin.Context) (res interface{}, err error) {
+	var req ctlDto.UserLoginReq
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.NewAPIError(http.StatusBadRequest, "Invalid request", err.Error())
+	}
+
+	validation, exists := ctx.Get("validation")
+
+	if !exists {
+		return nil, response.NewAPIError(http.StatusBadRequest, "Invalid request", "Validation not found in context")
+	}
+
+	if apiErr := utils.ValidateStruct(req, validation.(*validator.Validate)); apiErr != nil {
+		return nil, apiErr
+	}
+
+	requestAccount := appDto.AccountAppDTO{
+		Username: req.Username,
+		Password: req.Password,
+	}
+
+	account, err := ah.service.LoginUser(ctx, requestAccount)
+
+	if err != nil {
+		return nil, response.NewAPIError(http.StatusUnauthorized, "Login failed", err.Error())
+	}
+
+	return account, nil
 }

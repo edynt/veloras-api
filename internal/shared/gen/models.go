@@ -49,7 +49,7 @@ type Session struct {
 	RefreshToken string
 	UserAgent    pgtype.Text
 	ClientIp     pgtype.Text
-	ExpiresAt    pgtype.Timestamptz
+	ExpiresAt    int64
 	CreatedAt    pgtype.Int8
 }
 

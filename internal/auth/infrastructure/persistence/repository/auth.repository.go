@@ -9,7 +9,6 @@ import (
 	"github.com/edynnt/veloras-api/internal/shared/gen"
 	authsqlc "github.com/edynnt/veloras-api/internal/shared/gen"
 	"github.com/edynnt/veloras-api/pkg/utils"
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jinzhu/copier"
@@ -19,20 +18,67 @@ type authRepository struct {
 	db *authsqlc.Queries
 }
 
-// UpdateUserStatus implements repository.AuthRepository.
-func (a *authRepository) UpdateUserStatus(ctx context.Context, userID string, status int) (string, error) {
-	// Parse the userID string to UUID
-	parsedUUID, err := uuid.Parse(userID)
+// DeleteVerificationCode implements repository.AuthRepository.
+func (a *authRepository) DeleteVerificationCode(ctx context.Context, userId string, code int) error {
+	// Parse the userId string to UUID
+	convertId, err := utils.ConvertUUID(userId)
+
 	if err != nil {
-		return "", fmt.Errorf("invalid userID: %w", err)
+		return fmt.Errorf("invalid userId: %w", err)
+	}
+
+	// Call the DB update function
+	err = a.db.DeleteVerificationCode(ctx, convertId)
+	if err != nil {
+		return fmt.Errorf("failed to update user status: %w", err)
+	}
+
+	return nil
+}
+
+// ActiveUser implements repository.AuthRepository.
+func (a *authRepository) ActiveUser(ctx context.Context, userId string) error {
+	// Parse the userId string to UUID
+	convertId, err := utils.ConvertUUID(userId)
+
+	if err != nil {
+		return fmt.Errorf("invalid userId: %w", err)
+	}
+
+	// Call the DB update function
+	_, err = a.db.ActiveUser(ctx, convertId)
+	if err != nil {
+		return fmt.Errorf("failed to update user status: %w", err)
+	}
+
+	return nil
+}
+
+// GetUserByUsername implements repository.AuthRepository.
+func (a *authRepository) GetUserByUsername(ctx context.Context, userName string) (*entity.Account, error) {
+	res, err := a.db.GetUserByUsername(ctx, userName)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var entityResult entity.Account
+	copier.Copy(&entityResult, &res)
+
+	return &entityResult, nil
+}
+
+// UpdateUserStatus implements repository.AuthRepository.
+func (a *authRepository) UpdateUserStatus(ctx context.Context, userId string, status int) error {
+	// Parse the userId string to UUID
+	convertId, err := utils.ConvertUUID(userId)
+	if err != nil {
+		return fmt.Errorf("invalid userId: %w", err)
 	}
 
 	// Construct the parameter object
 	params := gen.UpdateUserStatusParams{
-		ID: pgtype.UUID{
-			Bytes: parsedUUID,
-			Valid: true,
-		},
+		ID: convertId,
 		Status: pgtype.Int4{
 			Int32: int32(status),
 			Valid: true,
@@ -40,19 +86,18 @@ func (a *authRepository) UpdateUserStatus(ctx context.Context, userID string, st
 	}
 
 	// Call the DB update function
-	result, err := a.db.UpdateUserStatus(ctx, params)
+	_, err = a.db.UpdateUserStatus(ctx, params)
 	if err != nil {
-		return "", fmt.Errorf("failed to update user status: %w", err)
+		return fmt.Errorf("failed to update user status: %w", err)
 	}
 
-	// Return the updated ID
-	return result.ID.String(), nil
+	return nil
 }
 
 // GetVerificationCode implements repository.AuthRepository.
-func (a *authRepository) GetVerificationCode(ctx context.Context, userID string, code int) (*entity.EmailVerification, error) {
+func (a *authRepository) GetVerificationCode(ctx context.Context, userId string, code int) (*entity.EmailVerification, error) {
 	var param gen.GetEmailVerificationParams
-	copier.Copy(&param, &entity.EmailVerification{UserID: userID, Code: code})
+	copier.Copy(&param, &entity.EmailVerification{UserID: userId, Code: code})
 
 	result, err := a.db.GetEmailVerification(ctx, param)
 
@@ -67,16 +112,16 @@ func (a *authRepository) GetVerificationCode(ctx context.Context, userID string,
 }
 
 // CreateVerificationCode implements repository.AuthRepository.
-func (a *authRepository) CreateVerificationCode(ctx context.Context, userVerification *entity.EmailVerification) (string, error) {
+func (a *authRepository) CreateVerificationCode(ctx context.Context, userVerification *entity.EmailVerification) error {
 	var param gen.CreateEmailVerificationParams
 	copier.Copy(&param, &userVerification)
-	createdEmailVerification, err := a.db.CreateEmailVerification(ctx, param)
+	_, err := a.db.CreateEmailVerification(ctx, param)
 
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	return utils.Int32ToString(createdEmailVerification.ID), nil
+	return nil
 
 }
 

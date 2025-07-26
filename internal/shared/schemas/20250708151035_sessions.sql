@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     refresh_token TEXT NOT NULL,
     user_agent TEXT,
     client_ip TEXT,
-    expires_at TIMESTAMPTZ NOT NULL,
+    expires_at BIGINT NOT NULL,
     created_at BIGINT DEFAULT extract(epoch from now())
 );
 -- +goose StatementEnd

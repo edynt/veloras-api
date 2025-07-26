@@ -11,6 +11,7 @@ import (
 )
 
 type Querier interface {
+	ActiveUser(ctx context.Context, id pgtype.UUID) (ActiveUserRow, error)
 	AssignPermissionToRole(ctx context.Context, arg AssignPermissionToRoleParams) error
 	AssignRoleToUser(ctx context.Context, arg AssignRoleToUserParams) error
 	CreateEmailVerification(ctx context.Context, arg CreateEmailVerificationParams) (EmailVerification, error)
@@ -21,6 +22,7 @@ type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error)
 	DeleteSession(ctx context.Context, id int32) error
 	DeleteUser(ctx context.Context, id pgtype.UUID) error
+	DeleteVerificationCode(ctx context.Context, userID pgtype.UUID) error
 	GetEmailVerification(ctx context.Context, arg GetEmailVerificationParams) (EmailVerification, error)
 	GetPasswordReset(ctx context.Context, arg GetPasswordResetParams) (PasswordReset, error)
 	GetPermissionByName(ctx context.Context, name string) (Permission, error)
@@ -29,6 +31,7 @@ type Querier interface {
 	GetRolesByUser(ctx context.Context, userID pgtype.UUID) ([]Role, error)
 	GetSession(ctx context.Context, id int32) (Session, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
+	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetUserEmailExists(ctx context.Context, email string) (bool, error)
 	GetUsernameExists(ctx context.Context, username string) (bool, error)
 	UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (UpdateUserStatusRow, error)
