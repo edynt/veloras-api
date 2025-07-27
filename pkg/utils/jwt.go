@@ -18,10 +18,35 @@ func GenTokenJWT(payload jwt.Claims) (string, error) {
 	return token.SignedString([]byte(global.Config.JWT.ApiSecret))
 }
 
-func CreateToken(uuidToken string) (string, error) {
-	timeEx := global.Config.JWT.JwtExpire
+func CreateAccessToken(uuidToken string) (string, error) {
+	timeEx := global.Config.JWT.AccessTokenExpire
 	if timeEx == "" {
 		timeEx = "1h"
+	}
+
+	expiration, err := time.ParseDuration(timeEx)
+	if err != nil {
+		return "", err
+	}
+
+	now := time.Now()
+	expiresAt := now.Add(expiration)
+
+	return GenTokenJWT(&PayloadClaims{
+		StandardClaims: jwt.StandardClaims{
+			Id:        uuid.New().String(),
+			ExpiresAt: expiresAt.Unix(),
+			IssuedAt:  now.Unix(),
+			Issuer:    "veloras-api",
+			Subject:   uuidToken,
+		},
+	})
+}
+
+func CreateRefreshToken(uuidToken string) (string, error) {
+	timeEx := global.Config.JWT.RefreshTokenExpire
+	if timeEx == "" {
+		timeEx = "1d"
 	}
 
 	expiration, err := time.ParseDuration(timeEx)

@@ -9,6 +9,7 @@ type Account struct {
 	FirstName   string `json:"fisrt_name"`
 	LastName    string `json:"last_name"`
 	Status      int    `json:"status"`
+	IsVerified  bool   `json:"is_verified"`
 }
 
 type EmailVerification struct {

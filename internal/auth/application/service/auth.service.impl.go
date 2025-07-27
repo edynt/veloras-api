@@ -35,18 +35,36 @@ func (as *authService) LoginUser(ctx context.Context, accountAppDTO appDto.Accou
 		return appDto.UserOutPut{}, fmt.Errorf("Invalid password")
 	}
 
-	// 3. check status
-	if user.Status != constants.ACTIVE {
+	// 3. check verified
+	if !user.IsVerified {
 		return appDto.UserOutPut{}, fmt.Errorf("User is not verified")
 	}
 
+	// 4. check status active
+	if user.Status != constants.ACTIVE {
+		return appDto.UserOutPut{}, fmt.Errorf("User is not actived")
+	}
+
+	// 5. Generate accessToken and refreshToken
+	accessToken, err := utils.CreateAccessToken(user.ID)
+
+	if err != nil {
+		return appDto.UserOutPut{}, fmt.Errorf("Failed to create token: %w", err)
+	}
+
+	refreshToken, err := utils.CreateRefreshToken(user.ID)
+
+	// 6. Save refresh token
+
 	return appDto.UserOutPut{
-		ID:          user.ID,
-		Username:    user.Username,
-		Email:       user.Email,
-		PhoneNumber: user.PhoneNumber,
-		FirstName:   user.FirstName,
-		LastName:    user.LastName,
+		ID:           user.ID,
+		Username:     user.Username,
+		Email:        user.Email,
+		PhoneNumber:  user.PhoneNumber,
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 	}, nil
 }
 

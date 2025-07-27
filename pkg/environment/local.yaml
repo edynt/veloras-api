@@ -21,7 +21,8 @@ logger:
 jwt:
   token_hour_lifespan: 1
   api_secret: "XXX.YYY.ZZZ"
-  jwt_expire: 1h
+  access_token_expire: 1h
+  refresh_token_expire: 30d
 mail:
   smtp_host: smtp.gmail.com
   smtp_port: "587"

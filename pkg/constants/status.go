@@ -1,6 +1,11 @@
 package constants
 
 const (
-	ACTIVE   int = 1
 	INACTIVE int = 0
+	ACTIVE   int = 1
+)
+
+const (
+	VERIFIRED    bool = true
+	NOT_VERIFIED bool = false
 )

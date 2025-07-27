@@ -47,8 +47,6 @@ type Session struct {
 	ID           int32
 	UserID       pgtype.UUID
 	RefreshToken string
-	UserAgent    pgtype.Text
-	ClientIp     pgtype.Text
 	ExpiresAt    int64
 	CreatedAt    pgtype.Int8
 }
