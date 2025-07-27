@@ -18,40 +18,24 @@ func GenTokenJWT(payload jwt.Claims) (string, error) {
 	return token.SignedString([]byte(global.Config.JWT.ApiSecret))
 }
 
-func CreateAccessToken(uuidToken string) (string, error) {
-	timeEx := global.Config.JWT.AccessTokenExpire
-	if timeEx == "" {
-		timeEx = "1h"
-	}
+func CreateToken(uuidToken string, isRefreshToken bool) (string, error) {
+	var (
+		expireValue int
+		expiration  time.Duration
+	)
 
-	expiration, err := time.ParseDuration(timeEx)
-	if err != nil {
-		return "", err
-	}
-
-	now := time.Now()
-	expiresAt := now.Add(expiration)
-
-	return GenTokenJWT(&PayloadClaims{
-		StandardClaims: jwt.StandardClaims{
-			Id:        uuid.New().String(),
-			ExpiresAt: expiresAt.Unix(),
-			IssuedAt:  now.Unix(),
-			Issuer:    "veloras-api",
-			Subject:   uuidToken,
-		},
-	})
-}
-
-func CreateRefreshToken(uuidToken string) (string, error) {
-	timeEx := global.Config.JWT.RefreshTokenExpire
-	if timeEx == "" {
-		timeEx = "1d"
-	}
-
-	expiration, err := time.ParseDuration(timeEx)
-	if err != nil {
-		return "", err
+	if isRefreshToken {
+		expireValue = global.Config.JWT.RefreshTokenExpire
+		if expireValue <= 0 {
+			expireValue = 1
+		}
+		expiration = time.Duration(expireValue) * 24 * time.Hour // days → duration
+	} else {
+		expireValue = global.Config.JWT.AccessTokenExpire
+		if expireValue <= 0 {
+			expireValue = 1
+		}
+		expiration = time.Duration(expireValue) * time.Hour // hours → duration
 	}
 
 	now := time.Now()

@@ -11,11 +11,25 @@ import (
 	"github.com/edynnt/veloras-api/pkg/utils"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/jinzhu/copier"
 )
 
 type authRepository struct {
 	db *authsqlc.Queries
+}
+
+// SaveToken implements repository.AuthRepository.
+func (a *authRepository) SaveToken(ctx context.Context, token *entity.Session) error {
+	var param gen.CreateSessionParams
+	if err := utils.SafeCopy(&param, token); err != nil {
+		return err
+	}
+
+	_, err := a.db.CreateSession(ctx, param)
+	if err != nil {
+		return fmt.Errorf("failed to create session: %w", err)
+	}
+
+	return nil
 }
 
 // DeleteVerificationCode implements repository.AuthRepository.
@@ -63,7 +77,9 @@ func (a *authRepository) GetUserByUsername(ctx context.Context, userName string)
 	}
 
 	var entityResult entity.Account
-	copier.Copy(&entityResult, &res)
+	if err := utils.SafeCopy(&entityResult, &res); err != nil {
+		return nil, err
+	}
 
 	return &entityResult, nil
 }
@@ -97,7 +113,9 @@ func (a *authRepository) UpdateUserStatus(ctx context.Context, userId string, st
 // GetVerificationCode implements repository.AuthRepository.
 func (a *authRepository) GetVerificationCode(ctx context.Context, userId string, code int) (*entity.EmailVerification, error) {
 	var param gen.GetEmailVerificationParams
-	copier.Copy(&param, &entity.EmailVerification{UserID: userId, Code: code})
+	if err := utils.SafeCopy(&param, &entity.EmailVerification{UserID: userId, Code: code}); err != nil {
+		return nil, err
+	}
 
 	result, err := a.db.GetEmailVerification(ctx, param)
 
@@ -106,7 +124,9 @@ func (a *authRepository) GetVerificationCode(ctx context.Context, userId string,
 	}
 
 	var entityResult entity.EmailVerification
-	copier.Copy(&entityResult, &result)
+	if err := utils.SafeCopy(&entityResult, &result); err != nil {
+		return nil, err
+	}
 
 	return &entityResult, nil
 }
@@ -114,7 +134,10 @@ func (a *authRepository) GetVerificationCode(ctx context.Context, userId string,
 // CreateVerificationCode implements repository.AuthRepository.
 func (a *authRepository) CreateVerificationCode(ctx context.Context, userVerification *entity.EmailVerification) error {
 	var param gen.CreateEmailVerificationParams
-	copier.Copy(&param, &userVerification)
+	if err := utils.SafeCopy(&param, &userVerification); err != nil {
+		return err
+	}
+
 	_, err := a.db.CreateEmailVerification(ctx, param)
 
 	if err != nil {
@@ -134,7 +157,9 @@ func (a *authRepository) EmailExists(ctx context.Context, email string) (bool, e
 func (a *authRepository) CreateUser(ctx context.Context, account *entity.Account) (string, error) {
 
 	var param gen.CreateUserParams
-	copier.Copy(&param, &account)
+	if err := utils.SafeCopy(&param, &account); err != nil {
+		return "", err
+	}
 
 	createdAccount, err := a.db.CreateUser(ctx, param)
 

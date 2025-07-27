@@ -22,7 +22,7 @@ func MustLoadConfig() config.Config {
 func LoadConfig() (cfg config.Config, err error) {
 	_ = godotenv.Load()
 
-	raw, err := os.ReadFile("pkg/environment/local.yaml")
+	raw, err := os.ReadFile("pkg/environment/config.yaml")
 	if err != nil {
 		return cfg, fmt.Errorf("cannot read config file: %w", err)
 	}

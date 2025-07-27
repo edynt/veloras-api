@@ -16,4 +16,5 @@ type AuthRepository interface {
 	GetUserByUsername(ctx context.Context, userName string) (*entity.Account, error)
 	ActiveUser(ctx context.Context, userId string) error
 	DeleteVerificationCode(ctx context.Context, userId string, code int) error
+	SaveToken(ctx context.Context, token *entity.Session) error
 }

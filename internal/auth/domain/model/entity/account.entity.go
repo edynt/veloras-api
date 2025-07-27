@@ -22,3 +22,10 @@ type UpdateUserStatus struct {
 	ID     string `json:"id"`
 	Status int    `json:"status"`
 }
+
+type Session struct {
+	UserID       string `json:"user_id"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	ExpiresAt    int64  `json:"expires_at"`
+}

@@ -46,25 +46,43 @@ func (as *authService) LoginUser(ctx context.Context, accountAppDTO appDto.Accou
 	}
 
 	// 5. Generate accessToken and refreshToken
-	accessToken, err := utils.CreateAccessToken(user.ID)
+	accessToken, err := utils.CreateToken(user.ID, false)
 
 	if err != nil {
-		return appDto.UserOutPut{}, fmt.Errorf("Failed to create token: %w", err)
+		return appDto.UserOutPut{}, fmt.Errorf("Failed to create access token: %w", err)
 	}
 
-	refreshToken, err := utils.CreateRefreshToken(user.ID)
+	refreshToken, err := utils.CreateToken(user.ID, true)
+
+	if err != nil {
+		return appDto.UserOutPut{}, fmt.Errorf("Failed to create refresh token: %w", err)
+	}
 
 	// 6. Save refresh token
+	tokenExpiresAt := utils.AddDays(global.Config.JWT.RefreshTokenExpire)
+
+	err = as.authRepo.SaveToken(ctx, &entity.Session{
+		UserID:       user.ID,
+		RefreshToken: refreshToken,
+		ExpiresAt:    tokenExpiresAt,
+	})
+
+	if err != nil {
+		return appDto.UserOutPut{}, fmt.Errorf("Failed to save refresh token: %w", err)
+	}
 
 	return appDto.UserOutPut{
-		ID:           user.ID,
-		Username:     user.Username,
-		Email:        user.Email,
-		PhoneNumber:  user.PhoneNumber,
-		FirstName:    user.FirstName,
-		LastName:     user.LastName,
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
+		ID:             user.ID,
+		Username:       user.Username,
+		Email:          user.Email,
+		PhoneNumber:    user.PhoneNumber,
+		FirstName:      user.FirstName,
+		LastName:       user.LastName,
+		IsVerified:     user.IsVerified,
+		Status:         user.Status,
+		AccessToken:    accessToken,
+		RefreshToken:   refreshToken,
+		TokenExpiresAt: tokenExpiresAt,
 	}, nil
 }
 

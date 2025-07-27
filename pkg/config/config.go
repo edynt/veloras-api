@@ -37,8 +37,8 @@ type PostgreSQLSetting struct {
 type JWTSetting struct {
 	TokenHourLifespan  uint   `mapstructure:"token_hour_lifespan"`
 	ApiSecret          string `mapstructure:"api_secret"`
-	AccessTokenExpire  string `mapstructure:"access_token_expire"`
-	RefreshTokenExpire string `mapstructure:"refresh_token_expire"`
+	AccessTokenExpire  int    `mapstructure:"access_token_expire"`
+	RefreshTokenExpire int    `mapstructure:"refresh_token_expire"`
 }
 
 type SMTPSetting struct {
