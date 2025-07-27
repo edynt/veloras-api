@@ -6,6 +6,7 @@ type Account struct {
 	Username    string `json:"username"`
 	Password    string `json:"password"`
 	PhoneNumber string `json:"phone_number"`
+	Language    string `json:"language"`
 	FirstName   string `json:"fisrt_name"`
 	LastName    string `json:"last_name"`
 	Status      int    `json:"status"`

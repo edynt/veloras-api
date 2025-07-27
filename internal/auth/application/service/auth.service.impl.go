@@ -80,6 +80,7 @@ func (as *authService) LoginUser(ctx context.Context, accountAppDTO appDto.Accou
 		LastName:       user.LastName,
 		IsVerified:     user.IsVerified,
 		Status:         user.Status,
+		Language:       user.Language,
 		AccessToken:    accessToken,
 		RefreshToken:   refreshToken,
 		TokenExpiresAt: tokenExpiresAt,
