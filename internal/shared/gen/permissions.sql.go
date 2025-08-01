@@ -11,8 +11,8 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createPermission = `-- name: CreatePermission :one
-INSERT INTO permissions (name, description) VALUES ($1, $2) RETURNING id, name, description, created_at
+const createPermission = `-- name: CreatePermission :exec
+INSERT INTO permissions (name, description) VALUES ($1, $2)
 `
 
 type CreatePermissionParams struct {
@@ -20,8 +20,26 @@ type CreatePermissionParams struct {
 	Description pgtype.Text
 }
 
-func (q *Queries) CreatePermission(ctx context.Context, arg CreatePermissionParams) (Permission, error) {
-	row := q.db.QueryRow(ctx, createPermission, arg.Name, arg.Description)
+func (q *Queries) CreatePermission(ctx context.Context, arg CreatePermissionParams) error {
+	_, err := q.db.Exec(ctx, createPermission, arg.Name, arg.Description)
+	return err
+}
+
+const deletePermission = `-- name: DeletePermission :exec
+DELETE FROM permissions WHERE id = $1
+`
+
+func (q *Queries) DeletePermission(ctx context.Context, id pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, deletePermission, id)
+	return err
+}
+
+const getPermissionById = `-- name: GetPermissionById :one
+SELECT id, name, description, created_at FROM permissions WHERE id = $1
+`
+
+func (q *Queries) GetPermissionById(ctx context.Context, id pgtype.UUID) (Permission, error) {
+	row := q.db.QueryRow(ctx, getPermissionById, id)
 	var i Permission
 	err := row.Scan(
 		&i.ID,
@@ -32,18 +50,46 @@ func (q *Queries) CreatePermission(ctx context.Context, arg CreatePermissionPara
 	return i, err
 }
 
-const getPermissionByName = `-- name: GetPermissionByName :one
-SELECT id, name, description, created_at FROM permissions WHERE name = $1
+const getPermissions = `-- name: GetPermissions :many
+SELECT id, name, description, created_at FROM permissions
 `
 
-func (q *Queries) GetPermissionByName(ctx context.Context, name string) (Permission, error) {
-	row := q.db.QueryRow(ctx, getPermissionByName, name)
-	var i Permission
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Description,
-		&i.CreatedAt,
-	)
-	return i, err
+func (q *Queries) GetPermissions(ctx context.Context) ([]Permission, error) {
+	rows, err := q.db.Query(ctx, getPermissions)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Permission{}
+	for rows.Next() {
+		var i Permission
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updatePermission = `-- name: UpdatePermission :exec
+UPDATE permissions SET name = $1, description = $2 WHERE id = $3
+`
+
+type UpdatePermissionParams struct {
+	Name        string
+	Description pgtype.Text
+	ID          pgtype.UUID
+}
+
+func (q *Queries) UpdatePermission(ctx context.Context, arg UpdatePermissionParams) error {
+	_, err := q.db.Exec(ctx, updatePermission, arg.Name, arg.Description, arg.ID)
+	return err
 }

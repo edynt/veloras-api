@@ -11,10 +11,9 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createPasswordReset = `-- name: CreatePasswordReset :one
+const createPasswordReset = `-- name: CreatePasswordReset :exec
 INSERT INTO password_resets (user_id, reset_token, expires_at)
 VALUES ($1, $2, $3)
-RETURNING id, user_id, reset_token, expires_at, created_at
 `
 
 type CreatePasswordResetParams struct {
@@ -23,17 +22,23 @@ type CreatePasswordResetParams struct {
 	ExpiresAt  int64
 }
 
-func (q *Queries) CreatePasswordReset(ctx context.Context, arg CreatePasswordResetParams) (PasswordReset, error) {
-	row := q.db.QueryRow(ctx, createPasswordReset, arg.UserID, arg.ResetToken, arg.ExpiresAt)
-	var i PasswordReset
-	err := row.Scan(
-		&i.ID,
-		&i.UserID,
-		&i.ResetToken,
-		&i.ExpiresAt,
-		&i.CreatedAt,
-	)
-	return i, err
+func (q *Queries) CreatePasswordReset(ctx context.Context, arg CreatePasswordResetParams) error {
+	_, err := q.db.Exec(ctx, createPasswordReset, arg.UserID, arg.ResetToken, arg.ExpiresAt)
+	return err
+}
+
+const deletePasswordReset = `-- name: DeletePasswordReset :exec
+DELETE FROM password_resets WHERE user_id = $1 AND reset_token = $2
+`
+
+type DeletePasswordResetParams struct {
+	UserID     pgtype.UUID
+	ResetToken string
+}
+
+func (q *Queries) DeletePasswordReset(ctx context.Context, arg DeletePasswordResetParams) error {
+	_, err := q.db.Exec(ctx, deletePasswordReset, arg.UserID, arg.ResetToken)
+	return err
 }
 
 const getPasswordReset = `-- name: GetPasswordReset :one

@@ -11,8 +11,8 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createRole = `-- name: CreateRole :one
-INSERT INTO roles (name, description) VALUES ($1, $2) RETURNING id, name, description, created_at
+const createRole = `-- name: CreateRole :exec
+INSERT INTO roles (name, description) VALUES ($1, $2)
 `
 
 type CreateRoleParams struct {
@@ -20,8 +20,26 @@ type CreateRoleParams struct {
 	Description pgtype.Text
 }
 
-func (q *Queries) CreateRole(ctx context.Context, arg CreateRoleParams) (Role, error) {
-	row := q.db.QueryRow(ctx, createRole, arg.Name, arg.Description)
+func (q *Queries) CreateRole(ctx context.Context, arg CreateRoleParams) error {
+	_, err := q.db.Exec(ctx, createRole, arg.Name, arg.Description)
+	return err
+}
+
+const deleteRole = `-- name: DeleteRole :exec
+DELETE FROM roles WHERE id = $1
+`
+
+func (q *Queries) DeleteRole(ctx context.Context, id pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, deleteRole, id)
+	return err
+}
+
+const getRoleById = `-- name: GetRoleById :one
+SELECT id, name, description, created_at FROM roles WHERE id = $1
+`
+
+func (q *Queries) GetRoleById(ctx context.Context, id pgtype.UUID) (Role, error) {
+	row := q.db.QueryRow(ctx, getRoleById, id)
 	var i Role
 	err := row.Scan(
 		&i.ID,
@@ -32,18 +50,46 @@ func (q *Queries) CreateRole(ctx context.Context, arg CreateRoleParams) (Role, e
 	return i, err
 }
 
-const getRoleByName = `-- name: GetRoleByName :one
-SELECT id, name, description, created_at FROM roles WHERE name = $1
+const getRoles = `-- name: GetRoles :many
+SELECT id, name, description, created_at FROM roles
 `
 
-func (q *Queries) GetRoleByName(ctx context.Context, name string) (Role, error) {
-	row := q.db.QueryRow(ctx, getRoleByName, name)
-	var i Role
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Description,
-		&i.CreatedAt,
-	)
-	return i, err
+func (q *Queries) GetRoles(ctx context.Context) ([]Role, error) {
+	rows, err := q.db.Query(ctx, getRoles)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Role{}
+	for rows.Next() {
+		var i Role
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateRole = `-- name: UpdateRole :exec
+UPDATE roles SET name = $1, description = $2 WHERE id = $3
+`
+
+type UpdateRoleParams struct {
+	Name        string
+	Description pgtype.Text
+	ID          pgtype.UUID
+}
+
+func (q *Queries) UpdateRole(ctx context.Context, arg UpdateRoleParams) error {
+	_, err := q.db.Exec(ctx, updateRole, arg.Name, arg.Description, arg.ID)
+	return err
 }

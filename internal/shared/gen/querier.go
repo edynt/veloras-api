@@ -15,25 +15,32 @@ type Querier interface {
 	AssignPermissionToRole(ctx context.Context, arg AssignPermissionToRoleParams) error
 	AssignRoleToUser(ctx context.Context, arg AssignRoleToUserParams) error
 	CreateEmailVerification(ctx context.Context, arg CreateEmailVerificationParams) (EmailVerification, error)
-	CreatePasswordReset(ctx context.Context, arg CreatePasswordResetParams) (PasswordReset, error)
-	CreatePermission(ctx context.Context, arg CreatePermissionParams) (Permission, error)
-	CreateRole(ctx context.Context, arg CreateRoleParams) (Role, error)
+	CreatePasswordReset(ctx context.Context, arg CreatePasswordResetParams) error
+	CreatePermission(ctx context.Context, arg CreatePermissionParams) error
+	CreateRole(ctx context.Context, arg CreateRoleParams) error
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error)
+	DeletePasswordReset(ctx context.Context, arg DeletePasswordResetParams) error
+	DeletePermission(ctx context.Context, id pgtype.UUID) error
+	DeleteRole(ctx context.Context, id pgtype.UUID) error
 	DeleteSession(ctx context.Context, id int32) error
 	DeleteUser(ctx context.Context, id pgtype.UUID) error
 	DeleteVerificationCode(ctx context.Context, userID pgtype.UUID) error
 	GetEmailVerification(ctx context.Context, arg GetEmailVerificationParams) (EmailVerification, error)
 	GetPasswordReset(ctx context.Context, arg GetPasswordResetParams) (PasswordReset, error)
-	GetPermissionByName(ctx context.Context, name string) (Permission, error)
+	GetPermissionById(ctx context.Context, id pgtype.UUID) (Permission, error)
+	GetPermissions(ctx context.Context) ([]Permission, error)
 	GetPermissionsByRole(ctx context.Context, roleID pgtype.UUID) ([]Permission, error)
-	GetRoleByName(ctx context.Context, name string) (Role, error)
+	GetRoleById(ctx context.Context, id pgtype.UUID) (Role, error)
+	GetRoles(ctx context.Context) ([]Role, error)
 	GetRolesByUser(ctx context.Context, userID pgtype.UUID) ([]Role, error)
 	GetSession(ctx context.Context, id int32) (Session, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetUserEmailExists(ctx context.Context, email string) (bool, error)
 	GetUsernameExists(ctx context.Context, username string) (bool, error)
+	UpdatePermission(ctx context.Context, arg UpdatePermissionParams) error
+	UpdateRole(ctx context.Context, arg UpdateRoleParams) error
 	UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (UpdateUserStatusRow, error)
 	VerifyUser(ctx context.Context, id pgtype.UUID) error
 }

@@ -13,8 +13,28 @@ type permissionRepository struct {
 	db *permissionSqlc.Queries
 }
 
+// DeletePermission implements repository.PermissisonRepository.
+func (p *permissionRepository) DeletePermission(ctx context.Context, permission *entity.Permission) error {
+	panic("unimplemented")
+}
+
+// GetPermissionById implements repository.PermissisonRepository.
+func (p *permissionRepository) GetPermissionById(ctx context.Context, id string) (*entity.Permission, error) {
+	panic("unimplemented")
+}
+
+// UpdatePermission implements repository.PermissisonRepository.
+func (p *permissionRepository) UpdatePermission(ctx context.Context, permission *entity.Permission) error {
+	panic("unimplemented")
+}
+
+// CreatePermission implements repository.PermissisonRepository.
+func (p *permissionRepository) CreatePermission(ctx context.Context, permission *entity.Permission) error {
+	panic("unimplemented")
+}
+
 // GetPermissions implements repository.PermissisonRepository.
-func (p *permissionRepository) GetPermissions(ctx context.Context) (*entity.Permission, error) {
+func (p *permissionRepository) GetPermissions(ctx context.Context) ([]*entity.Permission, error) {
 	panic("unimplemented")
 }
 
