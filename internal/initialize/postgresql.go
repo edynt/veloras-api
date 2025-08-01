@@ -7,6 +7,7 @@ import (
 
 	"github.com/edynnt/veloras-api/pkg/config"
 	"github.com/edynnt/veloras-api/pkg/global"
+	"github.com/edynnt/veloras-api/pkg/response/msg"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 )
@@ -24,7 +25,7 @@ func InitDB(cfg *config.Config) (*pgxpool.Pool, error) {
 
 	poolConfig, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse pgxpool config: %w", err)
+		return nil, fmt.Errorf("%s: %w", msg.CannotConnectPgxpool, err)
 	}
 
 	// Customize pool if needed
@@ -33,12 +34,12 @@ func InitDB(cfg *config.Config) (*pgxpool.Pool, error) {
 
 	db, err := pgxpool.NewWithConfig(ctx, poolConfig)
 	if err != nil {
-		return nil, fmt.Errorf("cannot connect to pgxpool: %w", err)
+		return nil, fmt.Errorf("%s: %w", msg.CannotConnectPgxpool, err)
 	}
 
 	// Kiểm tra kết nối
 	if err := db.Ping(ctx); err != nil {
-		return nil, fmt.Errorf("failed to ping pgxpool: %w", err)
+		return nil, fmt.Errorf("%s: %w", msg.CannotPingPgxpool, err)
 	}
 
 	global.Logger.Info("Initialize Postgresql successfully!!", zap.String("ok", "success"))

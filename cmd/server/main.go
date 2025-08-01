@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/edynnt/veloras-api/internal/initialize"
+	"github.com/edynnt/veloras-api/pkg/response/msg"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -33,6 +34,6 @@ func main() {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	if err := r.Run(":" + port); err != nil {
-		log.Fatalf("failed to start server: %v", err)
+		log.Fatalf("%s: %v", msg.FailedToStartServer, err)
 	}
 }

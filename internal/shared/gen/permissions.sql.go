@@ -50,6 +50,22 @@ func (q *Queries) GetPermissionById(ctx context.Context, id pgtype.UUID) (Permis
 	return i, err
 }
 
+const getPermissionByName = `-- name: GetPermissionByName :one
+SELECT id, name, description, created_at FROM permissions WHERE name = $1
+`
+
+func (q *Queries) GetPermissionByName(ctx context.Context, name string) (Permission, error) {
+	row := q.db.QueryRow(ctx, getPermissionByName, name)
+	var i Permission
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getPermissions = `-- name: GetPermissions :many
 SELECT id, name, description, created_at FROM permissions
 `

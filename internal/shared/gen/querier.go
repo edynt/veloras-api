@@ -29,6 +29,7 @@ type Querier interface {
 	GetEmailVerification(ctx context.Context, arg GetEmailVerificationParams) (EmailVerification, error)
 	GetPasswordReset(ctx context.Context, arg GetPasswordResetParams) (PasswordReset, error)
 	GetPermissionById(ctx context.Context, id pgtype.UUID) (Permission, error)
+	GetPermissionByName(ctx context.Context, name string) (Permission, error)
 	GetPermissions(ctx context.Context) ([]Permission, error)
 	GetPermissionsByRole(ctx context.Context, roleID pgtype.UUID) ([]Permission, error)
 	GetRoleById(ctx context.Context, id pgtype.UUID) (Role, error)

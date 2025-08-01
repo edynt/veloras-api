@@ -3,6 +3,7 @@ package response
 import (
 	"net/http"
 
+	"github.com/edynnt/veloras-api/pkg/response/msg"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,7 +19,7 @@ type APIResponse struct {
 func SuccessResponse(c *gin.Context, data interface{}) {
 	c.JSON(200, APIResponse{
 		Code:      200,
-		Message:   "success",
+		Message:   msg.Success,
 		Data:      data,
 		ErrorFlag: false,
 	})

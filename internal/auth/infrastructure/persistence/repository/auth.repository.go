@@ -8,6 +8,7 @@ import (
 	"github.com/edynnt/veloras-api/internal/auth/domain/repository"
 	"github.com/edynnt/veloras-api/internal/shared/gen"
 	authsqlc "github.com/edynnt/veloras-api/internal/shared/gen"
+	"github.com/edynnt/veloras-api/pkg/response/msg"
 	"github.com/edynnt/veloras-api/pkg/utils"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -26,7 +27,7 @@ func (a *authRepository) SaveToken(ctx context.Context, token *entity.Session) e
 
 	_, err := a.db.CreateSession(ctx, param)
 	if err != nil {
-		return fmt.Errorf("failed to create session: %w", err)
+		return fmt.Errorf("%s: %w", msg.FailedToCreateSession, err)
 	}
 
 	return nil
@@ -38,13 +39,13 @@ func (a *authRepository) DeleteVerificationCode(ctx context.Context, userId stri
 	convertId, err := utils.ConvertUUID(userId)
 
 	if err != nil {
-		return fmt.Errorf("invalid userId: %w", err)
+		return fmt.Errorf("%s: %w", msg.UserIdInvalid, err)
 	}
 
 	// Call the DB update function
 	err = a.db.DeleteVerificationCode(ctx, convertId)
 	if err != nil {
-		return fmt.Errorf("failed to update user status: %w", err)
+		return fmt.Errorf("%s: %w", msg.FailedToUpdateUserStatus, err)
 	}
 
 	return nil
@@ -62,7 +63,7 @@ func (a *authRepository) ActiveUser(ctx context.Context, userId string) error {
 	// Call the DB update function
 	_, err = a.db.ActiveUser(ctx, convertId)
 	if err != nil {
-		return fmt.Errorf("failed to update user status: %w", err)
+		return fmt.Errorf("%s: %w", msg.FailedToActiveUser, err)
 	}
 
 	return nil
@@ -89,7 +90,7 @@ func (a *authRepository) UpdateUserStatus(ctx context.Context, userId string, st
 	// Parse the userId string to UUID
 	convertId, err := utils.ConvertUUID(userId)
 	if err != nil {
-		return fmt.Errorf("invalid userId: %w", err)
+		return fmt.Errorf("%s: %w", msg.UserIdInvalid, err)
 	}
 
 	// Construct the parameter object
@@ -104,7 +105,7 @@ func (a *authRepository) UpdateUserStatus(ctx context.Context, userId string, st
 	// Call the DB update function
 	_, err = a.db.UpdateUserStatus(ctx, params)
 	if err != nil {
-		return fmt.Errorf("failed to update user status: %w", err)
+		return fmt.Errorf("%s: %w", msg.FailedToUpdateUserStatus, err)
 	}
 
 	return nil

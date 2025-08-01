@@ -10,5 +10,8 @@ DELETE FROM permissions WHERE id = $1;
 -- name: GetPermissionById :one
 SELECT * FROM permissions WHERE id = $1;
 
+-- name: GetPermissionByName :one
+SELECT * FROM permissions WHERE name = $1;
+
 -- name: GetPermissions :many
 SELECT * FROM permissions;

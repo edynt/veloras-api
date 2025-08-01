@@ -9,6 +9,7 @@ import (
 	authRepo "github.com/edynnt/veloras-api/internal/auth/domain/repository"
 	"github.com/edynnt/veloras-api/pkg/constants"
 	"github.com/edynnt/veloras-api/pkg/global"
+	"github.com/edynnt/veloras-api/pkg/response/msg"
 	"github.com/edynnt/veloras-api/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -23,11 +24,11 @@ func (as *authService) LoginUser(ctx context.Context, accountAppDTO appDto.Accou
 	user, err := as.authRepo.GetUserByUsername(ctx, accountAppDTO.Username)
 
 	if err != nil {
-		return appDto.UserOutPut{}, fmt.Errorf("Failed to check username exists: %w", err)
+		return appDto.UserOutPut{}, fmt.Errorf("%s: %w", msg.FailedToCheckUserNameExists, err)
 	}
 
 	if user == nil {
-		return appDto.UserOutPut{}, fmt.Errorf("Username not found")
+		return appDto.UserOutPut{}, fmt.Errorf(msg.UsernameNotFound)
 	}
 
 	// 2. check password
@@ -37,25 +38,25 @@ func (as *authService) LoginUser(ctx context.Context, accountAppDTO appDto.Accou
 
 	// 3. check verified
 	if !user.IsVerified {
-		return appDto.UserOutPut{}, fmt.Errorf("User is not verified")
+		return appDto.UserOutPut{}, fmt.Errorf(msg.UserIsNotVerified)
 	}
 
 	// 4. check status active
 	if user.Status != constants.ACTIVE {
-		return appDto.UserOutPut{}, fmt.Errorf("User is not actived")
+		return appDto.UserOutPut{}, fmt.Errorf(msg.UserIsNotActive)
 	}
 
 	// 5. Generate accessToken and refreshToken
 	accessToken, err := utils.CreateToken(user.ID, false)
 
 	if err != nil {
-		return appDto.UserOutPut{}, fmt.Errorf("Failed to create access token: %w", err)
+		return appDto.UserOutPut{}, fmt.Errorf("%s: %w", msg.FailedToCreateToken, err)
 	}
 
 	refreshToken, err := utils.CreateToken(user.ID, true)
 
 	if err != nil {
-		return appDto.UserOutPut{}, fmt.Errorf("Failed to create refresh token: %w", err)
+		return appDto.UserOutPut{}, fmt.Errorf("%s: %w", msg.FailedToCreateToken, err)
 	}
 
 	// 6. Save refresh token
@@ -68,7 +69,7 @@ func (as *authService) LoginUser(ctx context.Context, accountAppDTO appDto.Accou
 	})
 
 	if err != nil {
-		return appDto.UserOutPut{}, fmt.Errorf("Failed to save refresh token: %w", err)
+		return appDto.UserOutPut{}, fmt.Errorf("%s: %w", msg.FailedToSaveToken, err)
 	}
 
 	return appDto.UserOutPut{
@@ -92,28 +93,28 @@ func (as *authService) VerifyUser(ctx context.Context, verificationEmailAppDTO a
 	existsVerificationCode, err := as.authRepo.GetVerificationCode(ctx, verificationEmailAppDTO.UserID, verificationEmailAppDTO.Code)
 
 	if err != nil {
-		return false, fmt.Errorf("failed to get verification code: %w", err)
+		return false, fmt.Errorf("%s: %w", msg.FailedToGetVerificationCode, err)
 	}
 
 	now := utils.GetNowUnix()
 	if existsVerificationCode.ExpiresAt < now {
-		return false, fmt.Errorf("verification code expired")
+		return false, fmt.Errorf(msg.CodeExpired)
 	}
 
 	err = as.authRepo.UpdateUserStatus(ctx, verificationEmailAppDTO.UserID, constants.ACTIVE)
 
 	if err != nil {
-		return false, fmt.Errorf("failed to update user status: %w", err)
+		return false, fmt.Errorf("%s: %w", msg.FailedToUpdateUserStatus, err)
 	}
 
 	err = as.authRepo.ActiveUser(ctx, verificationEmailAppDTO.UserID)
 	if err != nil {
-		return false, fmt.Errorf("failed to update user status: %w", err)
+		return false, fmt.Errorf("%s: %w", msg.FailedToActiveUser, err)
 	}
 
 	err = as.authRepo.DeleteVerificationCode(ctx, verificationEmailAppDTO.UserID, verificationEmailAppDTO.Code)
 	if err != nil {
-		return false, fmt.Errorf("failed to delete verification code: %w", err)
+		return false, fmt.Errorf("%s: %w", msg.FailedToDeleteVerificationCode, err)
 	}
 
 	return true, nil
@@ -127,27 +128,27 @@ func (as *authService) CreateUser(ctx context.Context, accountDto appDto.Account
 	exists, err := as.authRepo.UsernameExists(ctx, accountDto.Username)
 
 	if err != nil {
-		return "", fmt.Errorf("failed to check username exist: %w", err)
+		return "", fmt.Errorf("%s: %w", msg.FailedToCheckUserNameExists, err)
 	}
 	if exists {
-		return "", fmt.Errorf("username already exists")
+		return "", fmt.Errorf(msg.UsernameExists)
 	}
 
 	// 3. Check email exists
 	exists, err = as.authRepo.EmailExists(ctx, accountDto.Email)
 	if err != nil {
-		return "", fmt.Errorf("failed to check email exist: %w", err)
+		return "", fmt.Errorf("%s: %w", msg.FailedToCheckEmailExists, err)
 	}
 
 	if exists {
-		return "", fmt.Errorf("email already exists")
+		return "", fmt.Errorf(msg.EmailExists)
 	}
 
 	// 4. GenerateFromPassword
 	hashedPasswordBytes, err := bcrypt.GenerateFromPassword([]byte(accountDto.Password), bcrypt.DefaultCost)
 	if err != nil {
 		// log.Printf("Error hashing password for user %s: %v", accountDto.Username, err)
-		return "", fmt.Errorf("failed to secure password: %w", err) // Không lộ chi tiết lỗi hash
+		return "", fmt.Errorf("%s: %w", msg.FailedToSecurePassword, err) // Không lộ chi tiết lỗi hash
 	}
 	hashedPassword := string(hashedPasswordBytes)
 
@@ -164,13 +165,11 @@ func (as *authService) CreateUser(ctx context.Context, accountDto appDto.Account
 	})
 
 	if err != nil {
-		// log.Printf("Error creating user %s in database: %v", accountToCreate.Username, err)
-		return "", fmt.Errorf("could not create account: %w", err)
+		return "", fmt.Errorf("%s: %w", msg.CouldNotCreateAccount, err)
 	}
 
 	if newAccountId == "" {
-		// log.Printf("Repository returned invalid account ID %d for user %s", newAccountId, accountToCreate.Username)
-		return "", fmt.Errorf("account creation failed to return a valid ID")
+		return "", fmt.Errorf(msg.CouldNotCreateAccount)
 	}
 
 	codeGen := utils.GenerateSixDigitCode()
