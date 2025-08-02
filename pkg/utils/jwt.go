@@ -26,15 +26,9 @@ func CreateToken(uuidToken string, isRefreshToken bool) (string, error) {
 
 	if isRefreshToken {
 		expireValue = global.Config.JWT.RefreshTokenExpire
-		if expireValue <= 0 {
-			expireValue = 1
-		}
 		expiration = time.Duration(expireValue) * 24 * time.Hour // days → duration
 	} else {
 		expireValue = global.Config.JWT.AccessTokenExpire
-		if expireValue <= 0 {
-			expireValue = 1
-		}
 		expiration = time.Duration(expireValue) * time.Hour // hours → duration
 	}
 
