@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/edynnt/veloras-api/pkg/response"
+	"github.com/edynnt/veloras-api/pkg/response/msg"
 	"github.com/go-playground/validator"
 )
 
@@ -17,7 +18,7 @@ func ValidateStruct(data interface{}, validate *validator.Validate) *response.AP
 
 	validationErrs, ok := err.(validator.ValidationErrors)
 	if !ok {
-		return response.NewAPIError(http.StatusBadRequest, "Validation failed", err.Error())
+		return response.NewAPIError(http.StatusBadRequest, msg.ValidationFailed, err.Error())
 	}
 
 	errorMessages := make(map[string]string)
@@ -31,5 +32,5 @@ func ValidateStruct(data interface{}, validate *validator.Validate) *response.AP
 		)
 	}
 
-	return response.NewAPIError(http.StatusBadRequest, "Validation failed", errorMessages)
+	return response.NewAPIError(http.StatusBadRequest, msg.ValidationFailed, errorMessages)
 }

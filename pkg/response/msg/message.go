@@ -4,6 +4,7 @@ const (
 	FailedToStartServer            = "Failed to start server"
 	Success                        = "Success"
 	InvalidRequest                 = "Invalid request"
+	ValidationFailed               = "Validation failed"
 	EmailInvalid                   = "Email is invalid"
 	PasswordInvalid                = "Password is invalid"
 	UsernameInvalid                = "Username is invalid"
@@ -39,4 +40,8 @@ const (
 	RegistrationFailed             = "Registration failed"
 	LoginFailed                    = "Login failed"
 	NoPermissionsFound             = "No permissions found"
+	VerifyTokenFailed              = "Verify token failed"
+	InvalidToken                   = "Invalid Token"
+	Unauthorized                   = "Unauthorized"
+	HeaderAuthenticationNotFound   = "Header Authorization not found"
 )
