@@ -44,4 +44,7 @@ const (
 	InvalidToken                   = "Invalid Token"
 	Unauthorized                   = "Unauthorized"
 	HeaderAuthenticationNotFound   = "Header Authorization not found"
+	PermissionNotFound             = "Permission not found"
+	CouldNotUpdatePermission       = "Could not update permission"
+	CouldNotDeletePermission       = "Could not delete permission"
 )

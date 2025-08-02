@@ -32,18 +32,50 @@ func (p *permissionRepository) GetPermissionByName(ctx context.Context, name str
 }
 
 // DeletePermission implements repository.PermissisonRepository.
-func (p *permissionRepository) DeletePermission(ctx context.Context, permission *entity.Permission) error {
-	panic("unimplemented")
+func (p *permissionRepository) DeletePermission(ctx context.Context, id string) error {
+	convertId, err := utils.ConvertUUID(id)
+
+	if err != nil {
+		return err
+	}
+
+	return p.db.DeletePermission(ctx, convertId)
 }
 
 // GetPermissionById implements repository.PermissisonRepository.
 func (p *permissionRepository) GetPermissionById(ctx context.Context, id string) (*entity.Permission, error) {
-	panic("unimplemented")
+	convertId, err := utils.ConvertUUID(id)
+
+	if err != nil {
+		return nil, err
+	}
+	permission, err := p.db.GetPermissionById(ctx, convertId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var entityResult entity.Permission
+	if err := utils.SafeCopy(&entityResult, &permission); err != nil {
+		return nil, err
+	}
+
+	return &entityResult, nil
 }
 
 // UpdatePermission implements repository.PermissisonRepository.
 func (p *permissionRepository) UpdatePermission(ctx context.Context, permission *entity.Permission) error {
-	panic("unimplemented")
+	var param gen.UpdatePermissionParams
+	if err := utils.SafeCopy(&param, permission); err != nil {
+		return err
+	}
+
+	err := p.db.UpdatePermission(ctx, param)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // CreatePermission implements repository.PermissisonRepository.

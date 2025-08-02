@@ -12,4 +12,5 @@ func RegisterPermissionRoutes(rg *gin.RouterGroup, handler *PermissionHandler) {
 	permission.Use(middleware.AuthenMiddleware())
 	permission.GET("/", response.Wrap(handler.GetPermissions))
 	permission.POST("/", response.Wrap(handler.CreatePermission))
+	permission.PUT("/:id", response.Wrap(handler.UpdatePermission))
 }

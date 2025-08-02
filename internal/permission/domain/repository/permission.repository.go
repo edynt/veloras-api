@@ -12,5 +12,5 @@ type PermissisonRepository interface {
 	GetPermissionByName(ctx context.Context, name string) (*entity.Permission, error)
 	CreatePermission(ctx context.Context, permission *entity.Permission) error
 	UpdatePermission(ctx context.Context, permission *entity.Permission) error
-	DeletePermission(ctx context.Context, permission *entity.Permission) error
+	DeletePermission(ctx context.Context, id string) error
 }

@@ -15,6 +15,27 @@ type permissionService struct {
 	permissionRepo permissionRepo.PermissisonRepository
 }
 
+// UpdatePermission implements PermissionService.
+func (p *permissionService) UpdatePermission(ctx context.Context, permissionAppDto appDto.PermissionAppDTO) (string, error) {
+	exists, _ := p.permissionRepo.GetPermissionById(ctx, permissionAppDto.ID)
+
+	if exists == nil {
+		return "", fmt.Errorf(msg.PermissionNotFound)
+	}
+
+	err := p.permissionRepo.UpdatePermission(ctx, &entity.Permission{
+		ID:          permissionAppDto.ID,
+		Name:        permissionAppDto.Name,
+		Description: permissionAppDto.Description,
+	})
+
+	if err != nil {
+		return "", fmt.Errorf("%s: %w", msg.CouldNotUpdatePermission, err)
+	}
+
+	return msg.Success, nil
+}
+
 // CreatePermission implements PermissionService.
 func (p *permissionService) CreatePermission(ctx context.Context, permissionAppDto appDto.PermissionAppDTO) (string, error) {
 
