@@ -7,6 +7,7 @@ import (
 	appDto "github.com/edynnt/veloras-api/internal/auth/application/service/dto"
 	ctlDto "github.com/edynnt/veloras-api/internal/auth/controller/dto"
 	"github.com/edynnt/veloras-api/pkg/response"
+	"github.com/edynnt/veloras-api/pkg/response/msg"
 	"github.com/edynnt/veloras-api/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
@@ -24,13 +25,13 @@ func (ah *AuthHandler) RegisterUser(ctx *gin.Context) (res interface{}, err erro
 	var req ctlDto.UserRegisterReq
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		return nil, response.NewAPIError(http.StatusBadRequest, "Invalid request", err.Error())
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
 	}
 
 	validation, exists := ctx.Get("validation")
 
 	if !exists {
-		return nil, response.NewAPIError(http.StatusBadRequest, "Invalid request", "Validation not found in context")
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, msg.ValidationNotFoundInContext)
 	}
 
 	if apiErr := utils.ValidateStruct(req, validation.(*validator.Validate)); apiErr != nil {
@@ -50,7 +51,7 @@ func (ah *AuthHandler) RegisterUser(ctx *gin.Context) (res interface{}, err erro
 	accountId, err := ah.service.CreateUser(ctx, account)
 
 	if err != nil {
-		return nil, response.NewAPIError(http.StatusConflict, "Registration failed", err.Error())
+		return nil, response.NewAPIError(http.StatusConflict, msg.RegistrationFailed, err.Error())
 	}
 
 	return accountId, nil
@@ -69,7 +70,7 @@ func (ah *AuthHandler) VerifyUser(ctx *gin.Context) (res interface{}, err error)
 	isExist, err := ah.service.VerifyUser(ctx, verificationEmail)
 
 	if err != nil {
-		return nil, response.NewAPIError(http.StatusBadRequest, "Invalid request", err.Error())
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
 	}
 
 	return isExist, nil
@@ -79,13 +80,13 @@ func (ah *AuthHandler) LoginUser(ctx *gin.Context) (res interface{}, err error) 
 	var req ctlDto.UserLoginReq
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		return nil, response.NewAPIError(http.StatusBadRequest, "Invalid request", err.Error())
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
 	}
 
 	validation, exists := ctx.Get("validation")
 
 	if !exists {
-		return nil, response.NewAPIError(http.StatusBadRequest, "Invalid request", "Validation not found in context")
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, msg.ValidationNotFoundInContext)
 	}
 
 	if apiErr := utils.ValidateStruct(req, validation.(*validator.Validate)); apiErr != nil {
@@ -100,7 +101,7 @@ func (ah *AuthHandler) LoginUser(ctx *gin.Context) (res interface{}, err error) 
 	account, err := ah.service.LoginUser(ctx, requestAccount)
 
 	if err != nil {
-		return nil, response.NewAPIError(http.StatusUnauthorized, "Login failed", err.Error())
+		return nil, response.NewAPIError(http.StatusUnauthorized, msg.LoginFailed, err.Error())
 	}
 
 	return account, nil

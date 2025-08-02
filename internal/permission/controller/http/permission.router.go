@@ -9,4 +9,5 @@ func RegisterPermissionRoutes(rg *gin.RouterGroup, handler *PermissionHandler) {
 	permission := rg.Group("/permissions")
 
 	permission.GET("/", response.Wrap(handler.GetPermissions))
+	permission.POST("/", response.Wrap(handler.CreatePermission))
 }

@@ -3,6 +3,7 @@ package msg
 const (
 	FailedToStartServer            = "Failed to start server"
 	Success                        = "Success"
+	InvalidRequest                 = "Invalid request"
 	EmailInvalid                   = "Email is invalid"
 	PasswordInvalid                = "Password is invalid"
 	UsernameInvalid                = "Username is invalid"
@@ -34,4 +35,7 @@ const (
 	CannotConnectPgxpool           = "Cannot connect to pgxpool"
 	CannotPingPgxpool              = "Cannot ping pgxpool"
 	FailedToInitDB                 = "Failed to init database"
+	ValidationNotFoundInContext    = "Validation not found in context"
+	RegistrationFailed             = "Registration failed"
+	LoginFailed                    = "Login failed"
 )

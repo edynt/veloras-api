@@ -17,17 +17,13 @@ type permissionService struct {
 // CreatePermission implements PermissionService.
 func (p *permissionService) CreatePermission(ctx context.Context, permissionAppDto dto.PermissionAppDTO) (string, error) {
 
-	exists, err := p.permissionRepo.GetPermissionByName(ctx, permissionAppDto.Name)
-
-	if err != nil {
-		return "", fmt.Errorf("%s: %w", msg.FailedToGetPermissionByName, err)
-	}
+	exists, _ := p.permissionRepo.GetPermissionByName(ctx, permissionAppDto.Name)
 
 	if exists != nil {
 		return "", fmt.Errorf(msg.PermissionExists)
 	}
 
-	err = p.permissionRepo.CreatePermission(ctx, &entity.Permission{
+	err := p.permissionRepo.CreatePermission(ctx, &entity.Permission{
 		Name:        permissionAppDto.Name,
 		Description: permissionAppDto.Description,
 	})
