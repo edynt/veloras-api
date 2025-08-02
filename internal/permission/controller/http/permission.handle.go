@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/edynnt/veloras-api/internal/permission/application/service"
@@ -23,9 +22,13 @@ func NewPermissionHandler(service service.PermissionService) *PermissionHandler 
 }
 
 func (ph *PermissionHandler) GetPermissions(ctx *gin.Context) (res interface{}, err error) {
-	a := 0
-	fmt.Println(a)
-	return nil, nil
+	permissions, err := ph.service.GetPermissions(ctx)
+
+	if err != nil {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
+	}
+
+	return permissions, nil
 }
 
 func (ph *PermissionHandler) CreatePermission(ctx *gin.Context) (res interface{}, err error) {

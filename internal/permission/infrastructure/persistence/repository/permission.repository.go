@@ -63,7 +63,17 @@ func (p *permissionRepository) CreatePermission(ctx context.Context, permission 
 
 // GetPermissions implements repository.PermissisonRepository.
 func (p *permissionRepository) GetPermissions(ctx context.Context) ([]*entity.Permission, error) {
-	panic("unimplemented")
+	permissions, err := p.db.GetPermissions(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var entityResult []*entity.Permission
+	if err := utils.SafeCopy(&entityResult, &permissions); err != nil {
+		return nil, err
+	}
+
+	return entityResult, nil
 }
 
 func NewPermissionRepository(db *pgxpool.Pool) repository.PermissisonRepository {

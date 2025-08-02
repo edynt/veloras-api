@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/edynnt/veloras-api/internal/permission/application/service/dto"
+	appDto "github.com/edynnt/veloras-api/internal/permission/application/service/dto"
 	"github.com/edynnt/veloras-api/internal/permission/domain/model/entity"
 	permissionRepo "github.com/edynnt/veloras-api/internal/permission/domain/repository"
 	"github.com/edynnt/veloras-api/pkg/response/msg"
+	"github.com/edynnt/veloras-api/pkg/utils"
 )
 
 type permissionService struct {
@@ -15,7 +16,7 @@ type permissionService struct {
 }
 
 // CreatePermission implements PermissionService.
-func (p *permissionService) CreatePermission(ctx context.Context, permissionAppDto dto.PermissionAppDTO) (string, error) {
+func (p *permissionService) CreatePermission(ctx context.Context, permissionAppDto appDto.PermissionAppDTO) (string, error) {
 
 	exists, _ := p.permissionRepo.GetPermissionByName(ctx, permissionAppDto.Name)
 
@@ -36,8 +37,19 @@ func (p *permissionService) CreatePermission(ctx context.Context, permissionAppD
 }
 
 // GetPermissions implements PermissionService.
-func (p *permissionService) GetPermissions(ctx context.Context, permissionAppDto dto.PermissionAppDTO) (string, error) {
-	panic("unimplemented")
+func (p *permissionService) GetPermissions(ctx context.Context) ([]appDto.PermissionOutPut, error) {
+	permissions, _ := p.permissionRepo.GetPermissions(ctx)
+
+	if len(permissions) == 0 {
+		return nil, fmt.Errorf(msg.NoPermissionsFound)
+	}
+
+	var permissionsOutPut []appDto.PermissionOutPut
+	if err := utils.SafeCopy(&permissionsOutPut, &permissions); err != nil {
+		return nil, err
+	}
+
+	return permissionsOutPut, nil
 }
 
 func NewPermissionService(

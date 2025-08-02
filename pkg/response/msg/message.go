@@ -38,4 +38,5 @@ const (
 	ValidationNotFoundInContext    = "Validation not found in context"
 	RegistrationFailed             = "Registration failed"
 	LoginFailed                    = "Login failed"
+	NoPermissionsFound             = "No permissions found"
 )
