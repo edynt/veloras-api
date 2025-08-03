@@ -15,6 +15,23 @@ type permissionService struct {
 	permissionRepo permissionRepo.PermissisonRepository
 }
 
+// DeletePermission implements PermissionService.
+func (p *permissionService) DeletePermission(ctx context.Context, id string) error {
+	exists, _ := p.permissionRepo.GetPermissionById(ctx, id)
+
+	if exists == nil {
+		return fmt.Errorf(msg.PermissionNotFound)
+	}
+
+	err := p.permissionRepo.DeletePermission(ctx, id)
+
+	if err != nil {
+		return fmt.Errorf("%s: %w", msg.CouldNotDeletePermission, err)
+	}
+
+	return nil
+}
+
 // UpdatePermission implements PermissionService.
 func (p *permissionService) UpdatePermission(ctx context.Context, permissionAppDto appDto.PermissionAppDTO) (string, error) {
 	exists, _ := p.permissionRepo.GetPermissionById(ctx, permissionAppDto.ID)

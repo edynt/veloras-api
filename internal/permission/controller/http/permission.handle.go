@@ -93,3 +93,14 @@ func (ph *PermissionHandler) UpdatePermission(ctx *gin.Context) (res interface{}
 
 	return res, nil
 }
+
+func (ph *PermissionHandler) DeletePermission(ctx *gin.Context) (res interface{}, err error) {
+
+	err = ph.service.DeletePermission(ctx, ctx.Param("id"))
+
+	if err != nil {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
+	}
+
+	return res, nil
+}
