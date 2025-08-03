@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 
-	"github.com/edynnt/veloras-api/internal/permission/domain/model/entity"
-	"github.com/edynnt/veloras-api/internal/permission/domain/repository"
+	"github.com/edynnt/veloras-api/internal/auth/domain/model/entity"
+	"github.com/edynnt/veloras-api/internal/auth/domain/repository"
 	"github.com/edynnt/veloras-api/internal/shared/gen"
 	permissionSqlc "github.com/edynnt/veloras-api/internal/shared/gen"
 	"github.com/edynnt/veloras-api/pkg/utils"

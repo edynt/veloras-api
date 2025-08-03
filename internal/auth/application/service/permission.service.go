@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	appDto "github.com/edynnt/veloras-api/internal/permission/application/service/dto"
+	appDto "github.com/edynnt/veloras-api/internal/auth/application/service/dto"
 )
 
 type PermissionService interface {

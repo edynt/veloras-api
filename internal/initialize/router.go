@@ -2,10 +2,9 @@ package initialize
 
 import (
 	authHttp "github.com/edynnt/veloras-api/internal/auth/controller/http"
-	authInitialize "github.com/edynnt/veloras-api/internal/initialize/auth"
-	permissionInitialize "github.com/edynnt/veloras-api/internal/initialize/permission"
+	permissionHttp "github.com/edynnt/veloras-api/internal/auth/controller/http"
+	initialize "github.com/edynnt/veloras-api/internal/initialize/auth"
 	"github.com/edynnt/veloras-api/internal/middleware"
-	permissionHttp "github.com/edynnt/veloras-api/internal/permission/controller/http"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -27,10 +26,10 @@ func InitRouter(db *pgxpool.Pool, logLevel string) *gin.Engine {
 
 	v1 := r.Group("/api/v1")
 
-	authHandler := authInitialize.InitAuth(db)
+	authHandler := initialize.InitAuth(db)
 	authHttp.RegisterAuthRoutes(v1, authHandler)
 
-	permissionHandler := permissionInitialize.InitPermission(db)
+	permissionHandler := initialize.InitPermission(db)
 	permissionHttp.RegisterPermissionRoutes(v1, permissionHandler)
 
 	return r

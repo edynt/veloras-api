@@ -3,9 +3,9 @@ package http
 import (
 	"net/http"
 
-	"github.com/edynnt/veloras-api/internal/permission/application/service"
-	"github.com/edynnt/veloras-api/internal/permission/application/service/dto"
-	ctlDto "github.com/edynnt/veloras-api/internal/permission/controller/dto"
+	"github.com/edynnt/veloras-api/internal/auth/application/service"
+	"github.com/edynnt/veloras-api/internal/auth/application/service/dto"
+	ctlDto "github.com/edynnt/veloras-api/internal/auth/controller/dto"
 	"github.com/edynnt/veloras-api/pkg/response"
 	"github.com/edynnt/veloras-api/pkg/response/msg"
 	"github.com/edynnt/veloras-api/pkg/utils"
