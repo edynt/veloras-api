@@ -14,6 +14,27 @@ type roleService struct {
 	roleRepo roleRepo.RoleRepository
 }
 
+// UpdateRole implements RoleService.
+func (r *roleService) UpdateRole(ctx context.Context, roleAppDTO dto.RoleAppDTO) (string, error) {
+	exists, _ := r.roleRepo.GetRoleById(ctx, roleAppDTO.ID)
+
+	if exists == nil {
+		return "", fmt.Errorf(msg.RoleNotExists)
+	}
+
+	err := r.roleRepo.UpdateRole(ctx, &entity.Role{
+		ID:          roleAppDTO.ID,
+		Name:        roleAppDTO.Name,
+		Description: roleAppDTO.Description,
+	})
+
+	if err != nil {
+		return "", fmt.Errorf("%s: %w", msg.CouldNotCreateRole, err)
+	}
+
+	return msg.Success, nil
+}
+
 // CreateRole implements RoleService.
 func (r *roleService) CreateRole(ctx context.Context, roleAppDTO dto.RoleAppDTO) (string, error) {
 	exists, _ := r.roleRepo.GetRoleByName(ctx, roleAppDTO.Name)

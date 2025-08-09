@@ -96,7 +96,11 @@ func (q *Queries) GetPermissions(ctx context.Context) ([]Permission, error) {
 }
 
 const updatePermission = `-- name: UpdatePermission :exec
-UPDATE permissions SET name = $1, description = $2 WHERE id = $3
+UPDATE permissions
+SET
+    name = COALESCE($1, name),
+    description = COALESCE($2, description)
+WHERE id = $3
 `
 
 type UpdatePermissionParams struct {

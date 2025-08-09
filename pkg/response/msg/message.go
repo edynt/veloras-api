@@ -49,4 +49,6 @@ const (
 	CouldNotDeletePermission       = "Could not delete permission"
 	RoleExists                     = "Role already exists"
 	CouldNotCreateRole             = "Could not create role"
+	CouldNotUpdateRole             = "Could not update role"
+	RoleNotExists                  = "Role not exists"
 )

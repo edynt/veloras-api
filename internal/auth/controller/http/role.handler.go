@@ -48,6 +48,38 @@ func (rh *RoleHandler) CreateRole(ctx *gin.Context) (res interface{}, err error)
 	return res, nil
 }
 
+func (rh *RoleHandler) UpdateRole(ctx *gin.Context) (res interface{}, err error) {
+	var req ctlDto.RoleReq
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
+	}
+
+	validation, exists := ctx.Get("validation")
+
+	if !exists {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, msg.ValidationNotFoundInContext)
+	}
+
+	if apiErr := utils.ValidateStruct(req, validation.(*validator.Validate)); apiErr != nil {
+		return nil, apiErr
+	}
+
+	requestRole := dto.RoleAppDTO{
+		ID:          ctx.Param("id"),
+		Name:        req.Name,
+		Description: req.Description,
+	}
+
+	res, err = rh.service.UpdateRole(ctx, requestRole)
+
+	if err != nil {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
+	}
+
+	return res, nil
+}
+
 func NewRoleHandler(service service.RoleService) *RoleHandler {
 	return &RoleHandler{service: service}
 }

@@ -96,7 +96,11 @@ func (q *Queries) GetRoles(ctx context.Context) ([]Role, error) {
 }
 
 const updateRole = `-- name: UpdateRole :exec
-UPDATE roles SET name = $1, description = $2 WHERE id = $3
+UPDATE roles
+SET
+    name = COALESCE($1, name),
+    description = COALESCE($2, description)
+WHERE id = $3
 `
 
 type UpdateRoleParams struct {

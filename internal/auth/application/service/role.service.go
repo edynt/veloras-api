@@ -8,4 +8,5 @@ import (
 
 type RoleService interface {
 	CreateRole(ctx context.Context, roleAppDTO appDto.RoleAppDTO) (string, error)
+	UpdateRole(ctx context.Context, roleAppDTO appDto.RoleAppDTO) (string, error)
 }

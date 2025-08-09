@@ -11,4 +11,5 @@ func RegisterRoleRoutes(rg *gin.RouterGroup, handler *RoleHandler) {
 
 	role.Use(middleware.AuthenMiddleware())
 	role.POST("/", response.Wrap(handler.CreateRole))
+	role.PUT("/:id", response.Wrap(handler.UpdateRole))
 }
