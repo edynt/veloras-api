@@ -10,5 +10,8 @@ DELETE FROM roles WHERE id = $1;
 -- name: GetRoleById :one
 SELECT * FROM roles WHERE id = $1;
 
+-- name: GetRoleByName :one
+SELECT * FROM roles WHERE name = $1;
+
 -- name: GetRoles :many
 SELECT * FROM roles;

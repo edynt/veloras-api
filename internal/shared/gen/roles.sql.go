@@ -50,6 +50,22 @@ func (q *Queries) GetRoleById(ctx context.Context, id pgtype.UUID) (Role, error)
 	return i, err
 }
 
+const getRoleByName = `-- name: GetRoleByName :one
+SELECT id, name, description, created_at FROM roles WHERE name = $1
+`
+
+func (q *Queries) GetRoleByName(ctx context.Context, name string) (Role, error) {
+	row := q.db.QueryRow(ctx, getRoleByName, name)
+	var i Role
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getRoles = `-- name: GetRoles :many
 SELECT id, name, description, created_at FROM roles
 `

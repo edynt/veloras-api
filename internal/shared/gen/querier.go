@@ -33,6 +33,7 @@ type Querier interface {
 	GetPermissions(ctx context.Context) ([]Permission, error)
 	GetPermissionsByRole(ctx context.Context, roleID pgtype.UUID) ([]Permission, error)
 	GetRoleById(ctx context.Context, id pgtype.UUID) (Role, error)
+	GetRoleByName(ctx context.Context, name string) (Role, error)
 	GetRoles(ctx context.Context) ([]Role, error)
 	GetRolesByUser(ctx context.Context, userID pgtype.UUID) ([]Role, error)
 	GetSession(ctx context.Context, id int32) (Session, error)

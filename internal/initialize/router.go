@@ -32,6 +32,9 @@ func InitRouter(db *pgxpool.Pool, logLevel string) *gin.Engine {
 	permissionHandler := initialize.InitPermission(db)
 	permissionHttp.RegisterPermissionRoutes(v1, permissionHandler)
 
+	roleHandler := initialize.InitRole(db)
+	authHttp.RegisterRoleRoutes(v1, roleHandler)
+
 	return r
 
 }
