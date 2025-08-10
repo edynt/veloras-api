@@ -51,4 +51,5 @@ const (
 	CouldNotCreateRole             = "Could not create role"
 	CouldNotUpdateRole             = "Could not update role"
 	RoleNotExists                  = "Role not exists"
+	CouldNotDeleteRole             = "Could not delete role"
 )

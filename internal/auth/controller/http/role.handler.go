@@ -80,6 +80,17 @@ func (rh *RoleHandler) UpdateRole(ctx *gin.Context) (res interface{}, err error)
 	return res, nil
 }
 
+func (rh *RoleHandler) DeleteRole(ctx *gin.Context) (res interface{}, err error) {
+
+	err = rh.service.DeleteRole(ctx, ctx.Param("id"))
+
+	if err != nil {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
+	}
+
+	return res, nil
+}
+
 func NewRoleHandler(service service.RoleService) *RoleHandler {
 	return &RoleHandler{service: service}
 }

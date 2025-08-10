@@ -14,6 +14,23 @@ type roleService struct {
 	roleRepo roleRepo.RoleRepository
 }
 
+// DeleteRole implements RoleService.
+func (r *roleService) DeleteRole(ctx context.Context, id string) error {
+	exists, _ := r.roleRepo.GetRoleById(ctx, id)
+
+	if exists == nil {
+		return fmt.Errorf(msg.RoleNotExists)
+	}
+
+	err := r.roleRepo.DeleteRole(ctx, id)
+
+	if err != nil {
+		return fmt.Errorf("%s: %w", msg.CouldNotDeleteRole, err)
+	}
+
+	return nil
+}
+
 // UpdateRole implements RoleService.
 func (r *roleService) UpdateRole(ctx context.Context, roleAppDTO dto.RoleAppDTO) (string, error) {
 	exists, _ := r.roleRepo.GetRoleById(ctx, roleAppDTO.ID)
