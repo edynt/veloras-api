@@ -52,4 +52,5 @@ const (
 	CouldNotUpdateRole             = "Could not update role"
 	RoleNotExists                  = "Role not exists"
 	CouldNotDeleteRole             = "Could not delete role"
+	NotFound                       = "Not found"
 )

@@ -10,4 +10,6 @@ type RoleService interface {
 	CreateRole(ctx context.Context, roleAppDTO appDto.RoleAppDTO) (string, error)
 	UpdateRole(ctx context.Context, roleAppDTO appDto.RoleAppDTO) (string, error)
 	DeleteRole(ctx context.Context, id string) error
+	GetRoles(ctx context.Context) ([]appDto.RoleOutPut, error)
+	GetRoleById(ctx context.Context, id string) (appDto.RoleOutPut, error)
 }

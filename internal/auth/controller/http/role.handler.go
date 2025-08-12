@@ -91,6 +91,26 @@ func (rh *RoleHandler) DeleteRole(ctx *gin.Context) (res interface{}, err error)
 	return res, nil
 }
 
+func (rh *RoleHandler) GetRoles(ctx *gin.Context) (res interface{}, err error) {
+	roles, err := rh.service.GetRoles(ctx)
+
+	if err != nil {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
+	}
+
+	return roles, nil
+}
+
+func (rh *RoleHandler) GetRole(ctx *gin.Context) (res interface{}, err error) {
+	role, err := rh.service.GetRoleById(ctx, ctx.Param("id"))
+
+	if err != nil {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
+	}
+
+	return role, nil
+}
+
 func NewRoleHandler(service service.RoleService) *RoleHandler {
 	return &RoleHandler{service: service}
 }

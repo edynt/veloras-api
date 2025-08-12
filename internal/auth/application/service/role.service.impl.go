@@ -5,13 +5,46 @@ import (
 	"fmt"
 
 	"github.com/edynnt/veloras-api/internal/auth/application/service/dto"
+	appDto "github.com/edynnt/veloras-api/internal/auth/application/service/dto"
 	"github.com/edynnt/veloras-api/internal/auth/domain/model/entity"
 	roleRepo "github.com/edynnt/veloras-api/internal/auth/domain/repository"
 	"github.com/edynnt/veloras-api/pkg/response/msg"
+	"github.com/edynnt/veloras-api/pkg/utils"
 )
 
 type roleService struct {
 	roleRepo roleRepo.RoleRepository
+}
+
+// GetRoleById implements RoleService.
+func (r *roleService) GetRoleById(ctx context.Context, id string) (dto.RoleOutPut, error) {
+	exists, _ := r.roleRepo.GetRoleById(ctx, id)
+
+	if exists == nil {
+		return dto.RoleOutPut{}, fmt.Errorf(msg.RoleNotExists)
+	}
+
+	return dto.RoleOutPut{
+		ID:          exists.ID,
+		Name:        exists.Name,
+		Description: exists.Description,
+	}, nil
+}
+
+// GetRoles implements RoleService.
+func (r *roleService) GetRoles(ctx context.Context) ([]dto.RoleOutPut, error) {
+	roles, _ := r.roleRepo.GetRoles(ctx)
+
+	if len(roles) == 0 {
+		return nil, fmt.Errorf(msg.NoPermissionsFound)
+	}
+
+	var rolesOutPut []appDto.RoleOutPut
+	if err := utils.SafeCopy(&rolesOutPut, &roles); err != nil {
+		return nil, err
+	}
+
+	return rolesOutPut, nil
 }
 
 // DeleteRole implements RoleService.
