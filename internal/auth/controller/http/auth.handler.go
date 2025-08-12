@@ -21,6 +21,17 @@ func NewAuthHandler(service service.AuthService) *AuthHandler {
 	return &AuthHandler{service: service}
 }
 
+// RegisterUser
+// @Summary Register a new user
+// @Description Create a new account with username, password, email, and other details
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body ctlDto.UserRegisterReq true "User registration request"
+// @Success 200 {object} map[string]interface{} "Returns created account ID"
+// @Failure 400 {object} response.APIError "Invalid request"
+// @Failure 409 {object} response.APIError "Registration failed due to conflict"
+// @Router /auth/register [post]
 func (ah *AuthHandler) RegisterUser(ctx *gin.Context) (res interface{}, err error) {
 	var req ctlDto.UserRegisterReq
 
@@ -29,7 +40,6 @@ func (ah *AuthHandler) RegisterUser(ctx *gin.Context) (res interface{}, err erro
 	}
 
 	validation, exists := ctx.Get("validation")
-
 	if !exists {
 		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, msg.ValidationNotFoundInContext)
 	}
@@ -49,7 +59,6 @@ func (ah *AuthHandler) RegisterUser(ctx *gin.Context) (res interface{}, err erro
 	}
 
 	accountId, err := ah.service.CreateUser(ctx, account)
-
 	if err != nil {
 		return nil, response.NewAPIError(http.StatusConflict, msg.RegistrationFailed, err.Error())
 	}

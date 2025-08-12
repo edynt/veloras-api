@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"log"
 
+	_ "github.com/edynnt/veloras-api/cmd/swag/docs"
 	"github.com/edynnt/veloras-api/internal/initialize"
 	"github.com/edynnt/veloras-api/pkg/response/msg"
+
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -22,8 +24,8 @@ import (
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host localhost:8800
-// @BasePath /v1/2025
+// @host localhost:8080
+// @BasePath /api/v1
 
 // @externalDocs.description OpenAPI
 // @externalDocs.url https://swagger.io/resources/open-api/

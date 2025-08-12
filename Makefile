@@ -62,7 +62,7 @@ sqlc:
 # swagger
 swag:
 	@echo "Generating Swagger documentation..."
-	swag init -g $(MAIN_RUN) -o $(SWAG_DOCS)
+	swag init -g $(MAIN_RUN) -o $(SWAG_DOCS) --parseDependency --parseInternal --dir .
 
 # migrations
 create-migration:
@@ -80,4 +80,4 @@ migrate-down:
 	@GOOSE_DRIVER=$(GOOSE_DRIVER) GOOSE_DBSTRING=$(GOOSE_DBSTRING) \
 	goose -dir=$(MIGRATIONS_DIR) down
 
-.PHONY: all build clean build-linux build-windows build-mac build-all install start
+.PHONY: all build clean build-linux build-windows build-mac build-all install start swag
