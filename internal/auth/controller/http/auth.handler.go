@@ -66,6 +66,17 @@ func (ah *AuthHandler) RegisterUser(ctx *gin.Context) (res interface{}, err erro
 	return accountId, nil
 }
 
+// VerifyUser
+// @Summary Verify user email
+// @Description Verify a user's email address using the provided verification code
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param userId path string true "User ID"
+// @Param code path string true "Verification code"
+// @Success 200 {object} map[string]interface{} "Returns verification status"
+// @Failure 400 {object} response.APIError "Invalid request or verification failed"
+// @Router /auth/verify/{userId}/{code} [get]
 func (ah *AuthHandler) VerifyUser(ctx *gin.Context) (res interface{}, err error) {
 
 	userId := ctx.Param("userId")
@@ -85,6 +96,17 @@ func (ah *AuthHandler) VerifyUser(ctx *gin.Context) (res interface{}, err error)
 	return isExist, nil
 }
 
+// LoginUser
+// @Summary User login
+// @Description Authenticate a user with username and password credentials
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body ctlDto.UserLoginReq true "User login request"
+// @Success 200 {object} map[string]interface{} "Returns authenticated user account information"
+// @Failure 400 {object} response.APIError "Invalid request format or validation errors"
+// @Failure 401 {object} response.APIError "Login failed due to invalid credentials"
+// @Router /auth/login [post]
 func (ah *AuthHandler) LoginUser(ctx *gin.Context) (res interface{}, err error) {
 	var req ctlDto.UserLoginReq
 

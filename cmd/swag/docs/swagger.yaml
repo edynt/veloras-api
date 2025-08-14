@@ -1,5 +1,26 @@
 basePath: /api/v1
 definitions:
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.PermissionReq:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.RoleReq:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.UserLoginReq:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   github_com_edynnt_veloras-api_internal_auth_controller_dto.UserRegisterReq:
     properties:
       address:
@@ -52,6 +73,37 @@ info:
   title: Go Drunk Backend API by DDD
   version: "1.0"
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user with username and password credentials
+      parameters:
+      - description: User login request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.UserLoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns authenticated user account information
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request format or validation errors
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+        "401":
+          description: Login failed due to invalid credentials
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: User login
+      tags:
+      - Auth
   /auth/register:
     post:
       consumes:
@@ -84,4 +136,270 @@ paths:
       summary: Register a new user
       tags:
       - Auth
+  /auth/verify/{userId}/{code}:
+    get:
+      consumes:
+      - application/json
+      description: Verify a user's email address using the provided verification code
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Verification code
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns verification status
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or verification failed
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Verify user email
+      tags:
+      - Auth
+  /permissions:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all available permissions in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns list of permissions
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Get all permissions
+      tags:
+      - Permissions
+    post:
+      consumes:
+      - application/json
+      description: Create a new permission with name and description
+      parameters:
+      - description: Permission creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.PermissionReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns created permission
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or validation errors
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Create a new permission
+      tags:
+      - Permissions
+  /permissions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a permission by ID
+      parameters:
+      - description: Permission ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Permission deleted successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or permission not found
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Delete a permission
+      tags:
+      - Permissions
+    put:
+      consumes:
+      - application/json
+      description: Update a permission's name and description by ID
+      parameters:
+      - description: Permission ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Permission update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.PermissionReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns updated permission
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or validation errors
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Update an existing permission
+      tags:
+      - Permissions
+  /roles:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all available roles in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns list of roles
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Get all roles
+      tags:
+      - Roles
+    post:
+      consumes:
+      - application/json
+      description: Create a new role with name and description
+      parameters:
+      - description: Role creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.RoleReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns created role
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or validation errors
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Create a new role
+      tags:
+      - Roles
+  /roles/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a role by ID
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Role deleted successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or role not found
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Delete a role
+      tags:
+      - Roles
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a specific role by its ID
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns role details
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or role not found
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Get a role by ID
+      tags:
+      - Roles
+    put:
+      consumes:
+      - application/json
+      description: Update a role's name and description by ID
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Role update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.RoleReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns updated role
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or validation errors
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Update an existing role
+      tags:
+      - Roles
 swagger: "2.0"
