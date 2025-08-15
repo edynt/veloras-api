@@ -14,35 +14,83 @@ type Querier interface {
 	ActiveUser(ctx context.Context, id pgtype.UUID) (ActiveUserRow, error)
 	AssignPermissionToRole(ctx context.Context, arg AssignPermissionToRoleParams) error
 	AssignRoleToUser(ctx context.Context, arg AssignRoleToUserParams) error
+	AssignUserToOrganization(ctx context.Context, arg AssignUserToOrganizationParams) error
+	CheckUserPermission(ctx context.Context, arg CheckUserPermissionParams) (bool, error)
+	Create2FACode(ctx context.Context, arg Create2FACodeParams) (TwoFaCode, error)
+	CreateAuditLog(ctx context.Context, arg CreateAuditLogParams) (AuditLog, error)
 	CreateEmailVerification(ctx context.Context, arg CreateEmailVerificationParams) (EmailVerification, error)
+	CreateOrganization(ctx context.Context, arg CreateOrganizationParams) (Organization, error)
 	CreatePasswordReset(ctx context.Context, arg CreatePasswordResetParams) error
 	CreatePermission(ctx context.Context, arg CreatePermissionParams) error
+	CreateRateLimitRecord(ctx context.Context, arg CreateRateLimitRecordParams) (RateLimit, error)
 	CreateRole(ctx context.Context, arg CreateRoleParams) error
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error)
+	Delete2FACode(ctx context.Context, arg Delete2FACodeParams) error
+	DeleteAllUserSessions(ctx context.Context, userID pgtype.UUID) error
+	DeleteExpired2FACodes(ctx context.Context, expiresAt int64) error
+	DeleteExpiredRateLimits(ctx context.Context, windowStart int64) error
+	DeleteExpiredSessions(ctx context.Context, expiresAt int64) error
+	DeleteOldAuditLogs(ctx context.Context, createdAt pgtype.Int8) error
+	DeleteOrganization(ctx context.Context, id pgtype.UUID) error
 	DeletePasswordReset(ctx context.Context, arg DeletePasswordResetParams) error
 	DeletePermission(ctx context.Context, id pgtype.UUID) error
 	DeleteRole(ctx context.Context, id pgtype.UUID) error
 	DeleteSession(ctx context.Context, id int32) error
+	DeleteSessionByRefreshToken(ctx context.Context, refreshToken string) error
 	DeleteUser(ctx context.Context, id pgtype.UUID) error
 	DeleteVerificationCode(ctx context.Context, userID pgtype.UUID) error
+	Get2FACode(ctx context.Context, arg Get2FACodeParams) (TwoFaCode, error)
+	GetAuditLogsByAction(ctx context.Context, arg GetAuditLogsByActionParams) ([]AuditLog, error)
+	GetAuditLogsByDateRange(ctx context.Context, arg GetAuditLogsByDateRangeParams) ([]AuditLog, error)
+	GetAuditLogsByResource(ctx context.Context, arg GetAuditLogsByResourceParams) ([]AuditLog, error)
+	GetAuditLogsByUser(ctx context.Context, arg GetAuditLogsByUserParams) ([]AuditLog, error)
 	GetEmailVerification(ctx context.Context, arg GetEmailVerificationParams) (EmailVerification, error)
+	GetOrganizationById(ctx context.Context, id pgtype.UUID) (Organization, error)
+	GetOrganizationUsers(ctx context.Context, organizationID pgtype.UUID) ([]User, error)
+	GetOrganizationsByParent(ctx context.Context, parentID pgtype.UUID) ([]Organization, error)
 	GetPasswordReset(ctx context.Context, arg GetPasswordResetParams) (PasswordReset, error)
 	GetPermissionById(ctx context.Context, id pgtype.UUID) (Permission, error)
 	GetPermissionByName(ctx context.Context, name string) (Permission, error)
 	GetPermissions(ctx context.Context) ([]Permission, error)
+	GetPermissionsByAction(ctx context.Context, resourceAction pgtype.Text) ([]Permission, error)
+	GetPermissionsByOrganization(ctx context.Context, organizationID pgtype.UUID) ([]Permission, error)
+	GetPermissionsByResourceType(ctx context.Context, resourceType pgtype.Text) ([]Permission, error)
 	GetPermissionsByRole(ctx context.Context, roleID pgtype.UUID) ([]Permission, error)
+	GetRateLimitByIP(ctx context.Context, arg GetRateLimitByIPParams) (RateLimit, error)
+	GetRateLimitRecord(ctx context.Context, arg GetRateLimitRecordParams) (RateLimit, error)
 	GetRoleById(ctx context.Context, id pgtype.UUID) (Role, error)
 	GetRoleByName(ctx context.Context, name string) (Role, error)
 	GetRoles(ctx context.Context) ([]Role, error)
 	GetRolesByUser(ctx context.Context, userID pgtype.UUID) ([]Role, error)
 	GetSession(ctx context.Context, id int32) (Session, error)
+	GetSessionByRefreshToken(ctx context.Context, refreshToken string) (Session, error)
+	GetSessionsByUser(ctx context.Context, userID pgtype.UUID) ([]Session, error)
+	GetUser2FACodes(ctx context.Context, arg GetUser2FACodesParams) ([]TwoFaCode, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
+	GetUserById(ctx context.Context, id pgtype.UUID) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetUserEmailExists(ctx context.Context, email string) (bool, error)
+	GetUserOrganization(ctx context.Context, id pgtype.UUID) (Organization, error)
+	GetUserPermissions(ctx context.Context, userID pgtype.UUID) ([]Permission, error)
 	GetUsernameExists(ctx context.Context, username string) (bool, error)
+	GetUsersByOrganization(ctx context.Context, organizationID pgtype.UUID) ([]User, error)
+	GetUsersByRole(ctx context.Context, roleID pgtype.UUID) ([]User, error)
+	IncrementFailedLoginAttempts(ctx context.Context, id pgtype.UUID) error
+	LockUserAccount(ctx context.Context, arg LockUserAccountParams) error
+	ResetFailedLoginAttempts(ctx context.Context, id pgtype.UUID) error
+	ResetRateLimit(ctx context.Context, arg ResetRateLimitParams) error
+	Update2FAEnabled(ctx context.Context, arg Update2FAEnabledParams) error
+	UpdateLastLogin(ctx context.Context, arg UpdateLastLoginParams) error
+	UpdateOrganization(ctx context.Context, arg UpdateOrganizationParams) error
 	UpdatePermission(ctx context.Context, arg UpdatePermissionParams) error
+	UpdateRateLimitAttempts(ctx context.Context, arg UpdateRateLimitAttemptsParams) error
 	UpdateRole(ctx context.Context, arg UpdateRoleParams) error
+	UpdateSessionExpiry(ctx context.Context, arg UpdateSessionExpiryParams) error
+	UpdateUser2FAEnabled(ctx context.Context, arg UpdateUser2FAEnabledParams) error
+	UpdateUser2FASecret(ctx context.Context, arg UpdateUser2FASecretParams) error
+	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error
+	UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) error
 	UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (UpdateUserStatusRow, error)
 	VerifyUser(ctx context.Context, id pgtype.UUID) error
 }

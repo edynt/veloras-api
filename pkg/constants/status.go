@@ -3,6 +3,7 @@ package constants
 const (
 	INACTIVE int = 0
 	ACTIVE   int = 1
+	LOCKED   int = 2
 )
 
 const (

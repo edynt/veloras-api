@@ -14,7 +14,7 @@ import (
 const createSession = `-- name: CreateSession :one
 INSERT INTO sessions (user_id, refresh_token, expires_at)
 VALUES ($1, $2, $3)
-RETURNING id, user_id, refresh_token, expires_at, created_at
+RETURNING id, user_id, refresh_token, expires_at, created_at, ip_address, user_agent, is_active, last_activity
 `
 
 type CreateSessionParams struct {
@@ -32,8 +32,30 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (S
 		&i.RefreshToken,
 		&i.ExpiresAt,
 		&i.CreatedAt,
+		&i.IpAddress,
+		&i.UserAgent,
+		&i.IsActive,
+		&i.LastActivity,
 	)
 	return i, err
+}
+
+const deleteAllUserSessions = `-- name: DeleteAllUserSessions :exec
+DELETE FROM sessions WHERE user_id = $1
+`
+
+func (q *Queries) DeleteAllUserSessions(ctx context.Context, userID pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, deleteAllUserSessions, userID)
+	return err
+}
+
+const deleteExpiredSessions = `-- name: DeleteExpiredSessions :exec
+DELETE FROM sessions WHERE expires_at < $1
+`
+
+func (q *Queries) DeleteExpiredSessions(ctx context.Context, expiresAt int64) error {
+	_, err := q.db.Exec(ctx, deleteExpiredSessions, expiresAt)
+	return err
 }
 
 const deleteSession = `-- name: DeleteSession :exec
@@ -45,8 +67,17 @@ func (q *Queries) DeleteSession(ctx context.Context, id int32) error {
 	return err
 }
 
+const deleteSessionByRefreshToken = `-- name: DeleteSessionByRefreshToken :exec
+DELETE FROM sessions WHERE refresh_token = $1
+`
+
+func (q *Queries) DeleteSessionByRefreshToken(ctx context.Context, refreshToken string) error {
+	_, err := q.db.Exec(ctx, deleteSessionByRefreshToken, refreshToken)
+	return err
+}
+
 const getSession = `-- name: GetSession :one
-SELECT id, user_id, refresh_token, expires_at, created_at FROM sessions WHERE id = $1
+SELECT id, user_id, refresh_token, expires_at, created_at, ip_address, user_agent, is_active, last_activity FROM sessions WHERE id = $1
 `
 
 func (q *Queries) GetSession(ctx context.Context, id int32) (Session, error) {
@@ -58,6 +89,79 @@ func (q *Queries) GetSession(ctx context.Context, id int32) (Session, error) {
 		&i.RefreshToken,
 		&i.ExpiresAt,
 		&i.CreatedAt,
+		&i.IpAddress,
+		&i.UserAgent,
+		&i.IsActive,
+		&i.LastActivity,
 	)
 	return i, err
+}
+
+const getSessionByRefreshToken = `-- name: GetSessionByRefreshToken :one
+SELECT id, user_id, refresh_token, expires_at, created_at, ip_address, user_agent, is_active, last_activity FROM sessions WHERE refresh_token = $1
+`
+
+func (q *Queries) GetSessionByRefreshToken(ctx context.Context, refreshToken string) (Session, error) {
+	row := q.db.QueryRow(ctx, getSessionByRefreshToken, refreshToken)
+	var i Session
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.RefreshToken,
+		&i.ExpiresAt,
+		&i.CreatedAt,
+		&i.IpAddress,
+		&i.UserAgent,
+		&i.IsActive,
+		&i.LastActivity,
+	)
+	return i, err
+}
+
+const getSessionsByUser = `-- name: GetSessionsByUser :many
+SELECT id, user_id, refresh_token, expires_at, created_at, ip_address, user_agent, is_active, last_activity FROM sessions WHERE user_id = $1
+`
+
+func (q *Queries) GetSessionsByUser(ctx context.Context, userID pgtype.UUID) ([]Session, error) {
+	rows, err := q.db.Query(ctx, getSessionsByUser, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Session{}
+	for rows.Next() {
+		var i Session
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.RefreshToken,
+			&i.ExpiresAt,
+			&i.CreatedAt,
+			&i.IpAddress,
+			&i.UserAgent,
+			&i.IsActive,
+			&i.LastActivity,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateSessionExpiry = `-- name: UpdateSessionExpiry :exec
+UPDATE sessions SET expires_at = $1 WHERE id = $2
+`
+
+type UpdateSessionExpiryParams struct {
+	ExpiresAt int64
+	ID        int32
+}
+
+func (q *Queries) UpdateSessionExpiry(ctx context.Context, arg UpdateSessionExpiryParams) error {
+	_, err := q.db.Exec(ctx, updateSessionExpiry, arg.ExpiresAt, arg.ID)
+	return err
 }

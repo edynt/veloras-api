@@ -105,6 +105,88 @@ func (r *roleService) CreateRole(ctx context.Context, roleAppDTO dto.RoleAppDTO)
 	return msg.Success, nil
 }
 
+// GetPermissionsByRole implements RoleService.
+func (r *roleService) GetPermissionsByRole(ctx context.Context, roleId string) ([]appDto.PermissionOutPut, error) {
+	permissions, err := r.roleRepo.GetPermissionsByRole(ctx, roleId)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", msg.FailedToGetPermissionsByRole, err)
+	}
+
+	var permissionsOutPut []appDto.PermissionOutPut
+	if err := utils.SafeCopy(&permissionsOutPut, &permissions); err != nil {
+		return nil, err
+	}
+
+	return permissionsOutPut, nil
+}
+
+// AssignPermissionToRole implements RoleService.
+func (r *roleService) AssignPermissionToRole(ctx context.Context, roleId, permissionId string) error {
+	err := r.roleRepo.AssignPermissionToRole(ctx, roleId, permissionId)
+	if err != nil {
+		return fmt.Errorf("%s: %w", msg.FailedToAssignPermissionToRole, err)
+	}
+
+	return nil
+}
+
+// RemovePermissionFromRole implements RoleService.
+func (r *roleService) RemovePermissionFromRole(ctx context.Context, roleId, permissionId string) error {
+	// TODO: Implement this method
+	return fmt.Errorf("not implemented")
+}
+
+// AssignRoleToUser implements RoleService.
+func (r *roleService) AssignRoleToUser(ctx context.Context, userId, roleId string) error {
+	err := r.roleRepo.AssignRoleToUser(ctx, userId, roleId)
+	if err != nil {
+		return fmt.Errorf("%s: %w", msg.FailedToAssignRoleToUser, err)
+	}
+
+	return nil
+}
+
+// RemoveRoleFromUser implements RoleService.
+func (r *roleService) RemoveRoleFromUser(ctx context.Context, userId, roleId string) error {
+	// TODO: Implement this method
+	return fmt.Errorf("not implemented")
+}
+
+// GetUserRoles implements RoleService.
+func (r *roleService) GetUserRoles(ctx context.Context, userId string) ([]appDto.RoleOutPut, error) {
+	roles, err := r.roleRepo.GetRolesByUser(ctx, userId)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", msg.FailedToGetRolesByUser, err)
+	}
+
+	var rolesOutPut []appDto.RoleOutPut
+	if err := utils.SafeCopy(&rolesOutPut, &roles); err != nil {
+		return nil, err
+	}
+
+	return rolesOutPut, nil
+}
+
+// GetRoleWithPermissions implements RoleService.
+func (r *roleService) GetRoleWithPermissions(ctx context.Context, roleId string) (*appDto.RoleWithPermissions, error) {
+	// Get role
+	role, err := r.GetRoleById(ctx, roleId)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get permissions for role
+	permissions, err := r.GetPermissionsByRole(ctx, roleId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &appDto.RoleWithPermissions{
+		Role:        role,
+		Permissions: permissions,
+	}, nil
+}
+
 // CreateUser implements RoleService.
 func NewRoleService(
 	roleRepo roleRepo.RoleRepository,

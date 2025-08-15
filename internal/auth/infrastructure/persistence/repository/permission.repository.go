@@ -6,13 +6,13 @@ import (
 	"github.com/edynnt/veloras-api/internal/auth/domain/model/entity"
 	"github.com/edynnt/veloras-api/internal/auth/domain/repository"
 	"github.com/edynnt/veloras-api/internal/shared/gen"
-	permissionSqlc "github.com/edynnt/veloras-api/internal/shared/gen"
 	"github.com/edynnt/veloras-api/pkg/utils"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type permissionRepository struct {
-	db *permissionSqlc.Queries
+	db *gen.Queries
 }
 
 // GetPermissionByName implements repository.PermissisonRepository.
@@ -108,7 +108,84 @@ func (p *permissionRepository) GetPermissions(ctx context.Context) ([]*entity.Pe
 	return entityResult, nil
 }
 
+// GetPermissionsByResourceType implements repository.PermissisonRepository.
+func (p *permissionRepository) GetPermissionsByResourceType(ctx context.Context, resourceType string) ([]*entity.Permission, error) {
+	param := pgtype.Text{String: resourceType, Valid: true}
+	permissions, err := p.db.GetPermissionsByResourceType(ctx, param)
+	if err != nil {
+		return nil, err
+	}
+
+	var entityResult []*entity.Permission
+	if err := utils.SafeCopy(&entityResult, &permissions); err != nil {
+		return nil, err
+	}
+
+	return entityResult, nil
+}
+
+// GetPermissionsByOrganization implements repository.PermissisonRepository.
+func (p *permissionRepository) GetPermissionsByOrganization(ctx context.Context, organizationId string) ([]*entity.Permission, error) {
+	convertId, err := utils.ConvertUUID(organizationId)
+	if err != nil {
+		return nil, err
+	}
+
+	permissions, err := p.db.GetPermissionsByOrganization(ctx, convertId)
+	if err != nil {
+		return nil, err
+	}
+
+	var entityResult []*entity.Permission
+	if err := utils.SafeCopy(&entityResult, &permissions); err != nil {
+		return nil, err
+	}
+
+	return entityResult, nil
+}
+
+// CheckUserPermission implements repository.PermissisonRepository.
+func (p *permissionRepository) CheckUserPermission(ctx context.Context, userId, resourceType, resourceAction string) (bool, error) {
+	convertUserId, err := utils.ConvertUUID(userId)
+	if err != nil {
+		return false, err
+	}
+
+	param := gen.CheckUserPermissionParams{
+		UserID:         convertUserId,
+		ResourceType:   pgtype.Text{String: resourceType, Valid: true},
+		ResourceAction: pgtype.Text{String: resourceAction, Valid: true},
+	}
+
+	hasPermission, err := p.db.CheckUserPermission(ctx, param)
+	if err != nil {
+		return false, err
+	}
+
+	return hasPermission, nil
+}
+
+// GetUserPermissions implements repository.PermissisonRepository.
+func (p *permissionRepository) GetUserPermissions(ctx context.Context, userId string) ([]*entity.Permission, error) {
+	convertUserId, err := utils.ConvertUUID(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	permissions, err := p.db.GetUserPermissions(ctx, convertUserId)
+	if err != nil {
+		return nil, err
+	}
+
+	var entityResult []*entity.Permission
+	if err := utils.SafeCopy(&entityResult, &permissions); err != nil {
+		return nil, err
+	}
+
+	return entityResult, nil
+}
+
 func NewPermissionRepository(db *pgxpool.Pool) repository.PermissisonRepository {
-	queries := permissionSqlc.New(db) // db is *pgxpool.Pool
+	queries := gen.New(db) // db is *pgxpool.Pool
 	return &permissionRepository{db: queries}
 }

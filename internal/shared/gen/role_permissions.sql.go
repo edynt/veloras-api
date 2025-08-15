@@ -26,7 +26,7 @@ func (q *Queries) AssignPermissionToRole(ctx context.Context, arg AssignPermissi
 }
 
 const getPermissionsByRole = `-- name: GetPermissionsByRole :many
-SELECT p.id, p.name, p.description, p.created_at FROM permissions p
+SELECT p.id, p.name, p.description, p.created_at, p.resource_type, p.resource_action, p.organization_id FROM permissions p
 JOIN role_permissions rp ON rp.permission_id = p.permission_id
 WHERE rp.role_id = $1
 `
@@ -45,6 +45,9 @@ func (q *Queries) GetPermissionsByRole(ctx context.Context, roleID pgtype.UUID) 
 			&i.Name,
 			&i.Description,
 			&i.CreatedAt,
+			&i.ResourceType,
+			&i.ResourceAction,
+			&i.OrganizationID,
 		); err != nil {
 			return nil, err
 		}

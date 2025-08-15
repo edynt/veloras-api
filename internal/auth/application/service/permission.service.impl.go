@@ -90,6 +90,61 @@ func (p *permissionService) GetPermissions(ctx context.Context) ([]appDto.Permis
 	return permissionsOutPut, nil
 }
 
+// GetPermissionsByResourceType implements PermissionService.
+func (p *permissionService) GetPermissionsByResourceType(ctx context.Context, resourceType string) ([]appDto.PermissionOutPut, error) {
+	permissions, err := p.permissionRepo.GetPermissionsByResourceType(ctx, resourceType)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", msg.FailedToGetPermissionsByRole, err)
+	}
+
+	var permissionsOutPut []appDto.PermissionOutPut
+	if err := utils.SafeCopy(&permissionsOutPut, &permissions); err != nil {
+		return nil, err
+	}
+
+	return permissionsOutPut, nil
+}
+
+// GetPermissionsByOrganization implements PermissionService.
+func (p *permissionService) GetPermissionsByOrganization(ctx context.Context, organizationId string) ([]appDto.PermissionOutPut, error) {
+	permissions, err := p.permissionRepo.GetPermissionsByOrganization(ctx, organizationId)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", msg.FailedToGetPermissionsByRole, err)
+	}
+
+	var permissionsOutPut []appDto.PermissionOutPut
+	if err := utils.SafeCopy(&permissionsOutPut, &permissions); err != nil {
+		return nil, err
+	}
+
+	return permissionsOutPut, nil
+}
+
+// CheckUserPermission implements PermissionService.
+func (p *permissionService) CheckUserPermission(ctx context.Context, userId, resourceType, resourceAction string) (bool, error) {
+	hasPermission, err := p.permissionRepo.CheckUserPermission(ctx, userId, resourceType, resourceAction)
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", msg.FailedToGetPermissionsByRole, err)
+	}
+
+	return hasPermission, nil
+}
+
+// GetUserPermissions implements PermissionService.
+func (p *permissionService) GetUserPermissions(ctx context.Context, userId string) ([]appDto.PermissionOutPut, error) {
+	permissions, err := p.permissionRepo.GetUserPermissions(ctx, userId)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", msg.FailedToGetPermissionsByRole, err)
+	}
+
+	var permissionsOutPut []appDto.PermissionOutPut
+	if err := utils.SafeCopy(&permissionsOutPut, &permissions); err != nil {
+		return nil, err
+	}
+
+	return permissionsOutPut, nil
+}
+
 func NewPermissionService(
 	permissionRepo permissionRepo.PermissisonRepository,
 ) PermissionService {

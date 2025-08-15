@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/edynnt/veloras-api/internal/auth/domain/model/entity"
 	"github.com/edynnt/veloras-api/internal/auth/domain/repository"
@@ -107,6 +108,98 @@ func (r *roleRepository) UpdateRole(ctx context.Context, Role *entity.Role) erro
 	}
 
 	return nil
+}
+
+// GetPermissionsByRole implements repository.RoleRepository.
+func (r *roleRepository) GetPermissionsByRole(ctx context.Context, roleId string) ([]*entity.Permission, error) {
+	convertId, err := utils.ConvertUUID(roleId)
+	if err != nil {
+		return nil, err
+	}
+
+	permissions, err := r.db.GetPermissionsByRole(ctx, convertId)
+	if err != nil {
+		return nil, err
+	}
+
+	var entityResult []*entity.Permission
+	if err := utils.SafeCopy(&entityResult, &permissions); err != nil {
+		return nil, err
+	}
+
+	return entityResult, nil
+}
+
+// AssignPermissionToRole implements repository.RoleRepository.
+func (r *roleRepository) AssignPermissionToRole(ctx context.Context, roleId, permissionId string) error {
+	convertRoleId, err := utils.ConvertUUID(roleId)
+	if err != nil {
+		return err
+	}
+
+	convertPermissionId, err := utils.ConvertUUID(permissionId)
+	if err != nil {
+		return err
+	}
+
+	param := gen.AssignPermissionToRoleParams{
+		RoleID:       convertRoleId,
+		PermissionID: convertPermissionId,
+	}
+
+	return r.db.AssignPermissionToRole(ctx, param)
+}
+
+// RemovePermissionFromRole implements repository.RoleRepository.
+func (r *roleRepository) RemovePermissionFromRole(ctx context.Context, roleId, permissionId string) error {
+	// TODO: Implement this method
+	return fmt.Errorf("not implemented")
+}
+
+// AssignRoleToUser implements repository.RoleRepository.
+func (r *roleRepository) AssignRoleToUser(ctx context.Context, userId, roleId string) error {
+	convertUserId, err := utils.ConvertUUID(userId)
+	if err != nil {
+		return err
+	}
+
+	convertRoleId, err := utils.ConvertUUID(roleId)
+	if err != nil {
+		return err
+	}
+
+	param := gen.AssignRoleToUserParams{
+		UserID: convertUserId,
+		RoleID: convertRoleId,
+	}
+
+	return r.db.AssignRoleToUser(ctx, param)
+}
+
+// RemoveRoleFromUser implements repository.RoleRepository.
+func (r *roleRepository) RemoveRoleFromUser(ctx context.Context, userId, roleId string) error {
+	// TODO: Implement this method
+	return fmt.Errorf("not implemented")
+}
+
+// GetRolesByUser implements repository.RoleRepository.
+func (r *roleRepository) GetRolesByUser(ctx context.Context, userId string) ([]*entity.Role, error) {
+	convertUserId, err := utils.ConvertUUID(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	roles, err := r.db.GetRolesByUser(ctx, convertUserId)
+	if err != nil {
+		return nil, err
+	}
+
+	var entityResult []*entity.Role
+	if err := utils.SafeCopy(&entityResult, &roles); err != nil {
+		return nil, err
+	}
+
+	return entityResult, nil
 }
 
 func NewRoleRepository(db *pgxpool.Pool) repository.RoleRepository {

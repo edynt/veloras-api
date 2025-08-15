@@ -24,6 +24,296 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/auth/2fa/disable": {
+            "post": {
+                "description": "Disable two-factor authentication for user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Disable 2FA",
+                "parameters": [
+                    {
+                        "description": "2FA disable request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFADisableReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns success message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request format",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/2fa/enable": {
+            "post": {
+                "description": "Enable two-factor authentication for user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Enable 2FA",
+                "parameters": [
+                    {
+                        "description": "2FA enable request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFAEnableReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns success message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request format",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/2fa/setup": {
+            "post": {
+                "description": "Setup two-factor authentication for user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Setup 2FA",
+                "parameters": [
+                    {
+                        "description": "2FA setup request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFASetupReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns 2FA setup details",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_application_service_dto.TwoFASetupResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request format",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/2fa/status": {
+            "post": {
+                "description": "Get two-factor authentication status for user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get 2FA status",
+                "parameters": [
+                    {
+                        "description": "2FA status request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFAStatusReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns 2FA status",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_application_service_dto.TwoFAStatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request format",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/2fa/verify": {
+            "post": {
+                "description": "Verify a 2FA code for user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Verify 2FA code",
+                "parameters": [
+                    {
+                        "description": "2FA verification request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFAVerifyReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns verification result",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_application_service_dto.TwoFAVerifyResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request format",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/change-password": {
+            "post": {
+                "description": "Change user password (requires current password)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Change password",
+                "parameters": [
+                    {
+                        "description": "Change password request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.ChangePasswordReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns success message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request format",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid current password",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/forgot-password": {
+            "post": {
+                "description": "Send password reset email to user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Forgot password",
+                "parameters": [
+                    {
+                        "description": "Forgot password request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.ForgotPasswordReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns success message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request format",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "description": "Authenticate a user with username and password credentials",
@@ -64,6 +354,93 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Login failed due to invalid credentials",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "description": "Logout a user by invalidating their refresh token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "User logout",
+                "parameters": [
+                    {
+                        "description": "Logout request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.LogoutReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns success message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request format",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "description": "Get a new access token using a valid refresh token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refresh access token",
+                "parameters": [
+                    {
+                        "description": "Refresh token request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.RefreshTokenReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns new access token",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_application_service_dto.RefreshTokenResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request format",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid or expired refresh token",
                         "schema": {
                             "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
                         }
@@ -118,6 +495,131 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/reset-password": {
+            "post": {
+                "description": "Reset user password using reset token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Reset password",
+                "parameters": [
+                    {
+                        "description": "Reset password request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.ResetPasswordReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns success message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request format",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid or expired reset token",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/sessions/{userId}": {
+            "get": {
+                "description": "Get all active sessions for a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get user sessions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns list of user sessions",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_application_service_dto.SessionInfo"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid user ID",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete all active sessions for a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Delete all user sessions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns success message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid user ID",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/verify/{userId}/{code}": {
             "get": {
                 "description": "Verify a user's email address using the provided verification code",
@@ -157,6 +659,315 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Invalid request or verification failed",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations": {
+            "post": {
+                "description": "Create a new organization with the provided details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Create a new organization",
+                "parameters": [
+                    {
+                        "description": "Organization creation request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.CreateOrganizationReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Returns created organization ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request format or validation errors",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/assign-user": {
+            "post": {
+                "description": "Assign a user to a specific organization",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Assign user to organization",
+                "parameters": [
+                    {
+                        "description": "User assignment request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.AssignUserToOrganizationReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns success message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request format or validation errors",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/parent/{parentId}": {
+            "get": {
+                "description": "Retrieve all organizations that have the specified parent organization",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Get organizations by parent ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Parent Organization ID",
+                        "name": "parentId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns list of organizations",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_application_service_dto.OrganizationResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parent organization ID",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{id}": {
+            "get": {
+                "description": "Retrieve organization details by organization ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Get organization by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Organization ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns organization details",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_application_service_dto.OrganizationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid organization ID",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    },
+                    "404": {
+                        "description": "Organization not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update organization details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Update organization",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Organization ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Organization update request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.UpdateOrganizationReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns success message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request format or validation errors",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    },
+                    "404": {
+                        "description": "Organization not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete an organization by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Delete organization",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Organization ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns success message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid organization ID",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    },
+                    "404": {
+                        "description": "Organization not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{organizationId}/users": {
+            "get": {
+                "description": "Retrieve all users belonging to a specific organization",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Get organization users",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Organization ID",
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns list of users",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_edynnt_veloras-api_internal_auth_application_service_dto.UserResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid organization ID",
                         "schema": {
                             "$ref": "#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError"
                         }
@@ -517,8 +1328,259 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "github_com_edynnt_veloras-api_internal_auth_application_service_dto.OrganizationResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "integer"
+                },
+                "created_by": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_application_service_dto.RefreshTokenResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expires_in": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_application_service_dto.SessionInfo": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ip_address": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "last_activity": {
+                    "type": "integer"
+                },
+                "user_agent": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_application_service_dto.TwoFASetupResponse": {
+            "type": "object",
+            "properties": {
+                "qr_code": {
+                    "type": "string"
+                },
+                "secret": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_application_service_dto.TwoFAStatusResponse": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "secret": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_application_service_dto.TwoFAVerifyResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_application_service_dto.UserResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_verified": {
+                    "type": "boolean"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "organization_id": {
+                    "type": "string"
+                },
+                "two_fa_enabled": {
+                    "type": "boolean"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_controller_dto.AssignUserToOrganizationReq": {
+            "type": "object",
+            "required": [
+                "organization_id",
+                "user_id"
+            ],
+            "properties": {
+                "organization_id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_controller_dto.ChangePasswordReq": {
+            "type": "object",
+            "required": [
+                "current_password",
+                "new_password"
+            ],
+            "properties": {
+                "current_password": {
+                    "type": "string"
+                },
+                "new_password": {
+                    "type": "string",
+                    "minLength": 8
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_controller_dto.CreateOrganizationReq": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_controller_dto.ForgotPasswordReq": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_controller_dto.LogoutReq": {
+            "type": "object",
+            "required": [
+                "refresh_token"
+            ],
+            "properties": {
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_edynnt_veloras-api_internal_auth_controller_dto.PermissionReq": {
             "type": "object",
+            "required": [
+                "name",
+                "resource_action",
+                "resource_type"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "organization_id": {
+                    "type": "string"
+                },
+                "resource_action": {
+                    "type": "string"
+                },
+                "resource_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_controller_dto.RefreshTokenReq": {
+            "type": "object",
+            "required": [
+                "refresh_token"
+            ],
+            "properties": {
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_controller_dto.ResetPasswordReq": {
+            "type": "object",
+            "required": [
+                "email",
+                "new_password",
+                "reset_token"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "new_password": {
+                    "type": "string",
+                    "minLength": 8
+                },
+                "reset_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_controller_dto.RoleReq": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
             "properties": {
                 "description": {
                     "type": "string"
@@ -528,10 +1590,92 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_edynnt_veloras-api_internal_auth_controller_dto.RoleReq": {
+        "github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFADisableReq": {
             "type": "object",
+            "required": [
+                "code",
+                "user_id"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFAEnableReq": {
+            "type": "object",
+            "required": [
+                "code",
+                "secret",
+                "user_id"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "secret": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFASetupReq": {
+            "type": "object",
+            "required": [
+                "user_id"
+            ],
+            "properties": {
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFAStatusReq": {
+            "type": "object",
+            "required": [
+                "user_id"
+            ],
+            "properties": {
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFAVerifyReq": {
+            "type": "object",
+            "required": [
+                "code",
+                "type",
+                "user_id"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_edynnt_veloras-api_internal_auth_controller_dto.UpdateOrganizationReq": {
+            "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
             "properties": {
                 "description": {
+                    "type": "string"
+                },
+                "id": {
                     "type": "string"
                 },
                 "name": {
@@ -541,8 +1685,15 @@ const docTemplate = `{
         },
         "github_com_edynnt_veloras-api_internal_auth_controller_dto.UserLoginReq": {
             "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
             "properties": {
                 "password": {
+                    "type": "string"
+                },
+                "two_fa_code": {
                     "type": "string"
                 },
                 "username": {
@@ -552,6 +1703,15 @@ const docTemplate = `{
         },
         "github_com_edynnt_veloras-api_internal_auth_controller_dto.UserRegisterReq": {
             "type": "object",
+            "required": [
+                "email",
+                "first_name",
+                "language",
+                "last_name",
+                "password",
+                "phone_number",
+                "username"
+            ],
             "properties": {
                 "address": {
                     "type": "string"
@@ -578,13 +1738,16 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 8
                 },
                 "phone_number": {
                     "type": "string"
                 },
                 "username": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 3
                 }
             }
         },

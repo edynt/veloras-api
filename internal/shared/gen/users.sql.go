@@ -82,7 +82,7 @@ func (q *Queries) DeleteVerificationCode(ctx context.Context, userID pgtype.UUID
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, username, password, is_verified, phone_number, first_name, last_name, status, language, created_at, updated_at FROM users WHERE email = $1
+SELECT id, email, username, password, is_verified, phone_number, first_name, last_name, status, language, created_at, updated_at, two_fa_secret, two_fa_enabled, failed_login_attempts, locked_until, organization_id, last_login_at FROM users WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -101,12 +101,48 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.Language,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.TwoFaSecret,
+		&i.TwoFaEnabled,
+		&i.FailedLoginAttempts,
+		&i.LockedUntil,
+		&i.OrganizationID,
+		&i.LastLoginAt,
+	)
+	return i, err
+}
+
+const getUserById = `-- name: GetUserById :one
+SELECT id, email, username, password, is_verified, phone_number, first_name, last_name, status, language, created_at, updated_at, two_fa_secret, two_fa_enabled, failed_login_attempts, locked_until, organization_id, last_login_at FROM users WHERE id = $1
+`
+
+func (q *Queries) GetUserById(ctx context.Context, id pgtype.UUID) (User, error) {
+	row := q.db.QueryRow(ctx, getUserById, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Username,
+		&i.Password,
+		&i.IsVerified,
+		&i.PhoneNumber,
+		&i.FirstName,
+		&i.LastName,
+		&i.Status,
+		&i.Language,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.TwoFaSecret,
+		&i.TwoFaEnabled,
+		&i.FailedLoginAttempts,
+		&i.LockedUntil,
+		&i.OrganizationID,
+		&i.LastLoginAt,
 	)
 	return i, err
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, email, username, password, is_verified, phone_number, first_name, last_name, status, language, created_at, updated_at FROM users WHERE username = $1
+SELECT id, email, username, password, is_verified, phone_number, first_name, last_name, status, language, created_at, updated_at, two_fa_secret, two_fa_enabled, failed_login_attempts, locked_until, organization_id, last_login_at FROM users WHERE username = $1
 `
 
 func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
@@ -125,6 +161,12 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 		&i.Language,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.TwoFaSecret,
+		&i.TwoFaEnabled,
+		&i.FailedLoginAttempts,
+		&i.LockedUntil,
+		&i.OrganizationID,
+		&i.LastLoginAt,
 	)
 	return i, err
 }
@@ -149,6 +191,206 @@ func (q *Queries) GetUsernameExists(ctx context.Context, username string) (bool,
 	var exists bool
 	err := row.Scan(&exists)
 	return exists, err
+}
+
+const getUsersByOrganization = `-- name: GetUsersByOrganization :many
+SELECT id, email, username, password, is_verified, phone_number, first_name, last_name, status, language, created_at, updated_at, two_fa_secret, two_fa_enabled, failed_login_attempts, locked_until, organization_id, last_login_at FROM users WHERE organization_id = $1
+`
+
+func (q *Queries) GetUsersByOrganization(ctx context.Context, organizationID pgtype.UUID) ([]User, error) {
+	rows, err := q.db.Query(ctx, getUsersByOrganization, organizationID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []User{}
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.Email,
+			&i.Username,
+			&i.Password,
+			&i.IsVerified,
+			&i.PhoneNumber,
+			&i.FirstName,
+			&i.LastName,
+			&i.Status,
+			&i.Language,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.TwoFaSecret,
+			&i.TwoFaEnabled,
+			&i.FailedLoginAttempts,
+			&i.LockedUntil,
+			&i.OrganizationID,
+			&i.LastLoginAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUsersByRole = `-- name: GetUsersByRole :many
+SELECT u.id, u.email, u.username, u.password, u.is_verified, u.phone_number, u.first_name, u.last_name, u.status, u.language, u.created_at, u.updated_at, u.two_fa_secret, u.two_fa_enabled, u.failed_login_attempts, u.locked_until, u.organization_id, u.last_login_at FROM users u
+JOIN user_roles ur ON u.id = ur.user_id
+WHERE ur.role_id = $1
+`
+
+func (q *Queries) GetUsersByRole(ctx context.Context, roleID pgtype.UUID) ([]User, error) {
+	rows, err := q.db.Query(ctx, getUsersByRole, roleID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []User{}
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.Email,
+			&i.Username,
+			&i.Password,
+			&i.IsVerified,
+			&i.PhoneNumber,
+			&i.FirstName,
+			&i.LastName,
+			&i.Status,
+			&i.Language,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.TwoFaSecret,
+			&i.TwoFaEnabled,
+			&i.FailedLoginAttempts,
+			&i.LockedUntil,
+			&i.OrganizationID,
+			&i.LastLoginAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const incrementFailedLoginAttempts = `-- name: IncrementFailedLoginAttempts :exec
+UPDATE users SET failed_login_attempts = failed_login_attempts + 1 WHERE id = $1
+`
+
+func (q *Queries) IncrementFailedLoginAttempts(ctx context.Context, id pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, incrementFailedLoginAttempts, id)
+	return err
+}
+
+const lockUserAccount = `-- name: LockUserAccount :exec
+UPDATE users SET status = $1, locked_until = $2 WHERE id = $3
+`
+
+type LockUserAccountParams struct {
+	Status      pgtype.Int4
+	LockedUntil pgtype.Int8
+	ID          pgtype.UUID
+}
+
+func (q *Queries) LockUserAccount(ctx context.Context, arg LockUserAccountParams) error {
+	_, err := q.db.Exec(ctx, lockUserAccount, arg.Status, arg.LockedUntil, arg.ID)
+	return err
+}
+
+const resetFailedLoginAttempts = `-- name: ResetFailedLoginAttempts :exec
+UPDATE users SET failed_login_attempts = 0 WHERE id = $1
+`
+
+func (q *Queries) ResetFailedLoginAttempts(ctx context.Context, id pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, resetFailedLoginAttempts, id)
+	return err
+}
+
+const updateLastLogin = `-- name: UpdateLastLogin :exec
+UPDATE users SET last_login_at = $1 WHERE id = $2
+`
+
+type UpdateLastLoginParams struct {
+	LastLoginAt pgtype.Int8
+	ID          pgtype.UUID
+}
+
+func (q *Queries) UpdateLastLogin(ctx context.Context, arg UpdateLastLoginParams) error {
+	_, err := q.db.Exec(ctx, updateLastLogin, arg.LastLoginAt, arg.ID)
+	return err
+}
+
+const updateUser2FAEnabled = `-- name: UpdateUser2FAEnabled :exec
+UPDATE users SET two_fa_enabled = $1 WHERE id = $2
+`
+
+type UpdateUser2FAEnabledParams struct {
+	TwoFaEnabled pgtype.Bool
+	ID           pgtype.UUID
+}
+
+func (q *Queries) UpdateUser2FAEnabled(ctx context.Context, arg UpdateUser2FAEnabledParams) error {
+	_, err := q.db.Exec(ctx, updateUser2FAEnabled, arg.TwoFaEnabled, arg.ID)
+	return err
+}
+
+const updateUser2FASecret = `-- name: UpdateUser2FASecret :exec
+UPDATE users SET two_fa_secret = $1 WHERE id = $2
+`
+
+type UpdateUser2FASecretParams struct {
+	TwoFaSecret pgtype.Text
+	ID          pgtype.UUID
+}
+
+func (q *Queries) UpdateUser2FASecret(ctx context.Context, arg UpdateUser2FASecretParams) error {
+	_, err := q.db.Exec(ctx, updateUser2FASecret, arg.TwoFaSecret, arg.ID)
+	return err
+}
+
+const updateUserPassword = `-- name: UpdateUserPassword :exec
+UPDATE users SET password = $1 WHERE id = $2
+`
+
+type UpdateUserPasswordParams struct {
+	Password string
+	ID       pgtype.UUID
+}
+
+func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error {
+	_, err := q.db.Exec(ctx, updateUserPassword, arg.Password, arg.ID)
+	return err
+}
+
+const updateUserProfile = `-- name: UpdateUserProfile :exec
+UPDATE users SET first_name = $1, last_name = $2, phone_number = $3, language = $4 WHERE id = $5
+`
+
+type UpdateUserProfileParams struct {
+	FirstName   string
+	LastName    string
+	PhoneNumber string
+	Language    pgtype.Text
+	ID          pgtype.UUID
+}
+
+func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) error {
+	_, err := q.db.Exec(ctx, updateUserProfile,
+		arg.FirstName,
+		arg.LastName,
+		arg.PhoneNumber,
+		arg.Language,
+		arg.ID,
+	)
+	return err
 }
 
 const updateUserStatus = `-- name: UpdateUserStatus :one

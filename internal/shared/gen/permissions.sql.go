@@ -11,17 +11,49 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const checkUserPermission = `-- name: CheckUserPermission :one
+SELECT EXISTS(
+    SELECT 1 FROM permissions p
+    JOIN role_permissions rp ON p.id = rp.permission_id
+    JOIN user_roles ur ON rp.role_id = ur.role_id
+    WHERE ur.user_id = $1 AND p.resource_type = $2 AND p.resource_action = $3
+)
+`
+
+type CheckUserPermissionParams struct {
+	UserID         pgtype.UUID
+	ResourceType   pgtype.Text
+	ResourceAction pgtype.Text
+}
+
+func (q *Queries) CheckUserPermission(ctx context.Context, arg CheckUserPermissionParams) (bool, error) {
+	row := q.db.QueryRow(ctx, checkUserPermission, arg.UserID, arg.ResourceType, arg.ResourceAction)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const createPermission = `-- name: CreatePermission :exec
-INSERT INTO permissions (name, description) VALUES ($1, $2)
+INSERT INTO permissions (name, description, resource_type, resource_action, organization_id)
+VALUES ($1, $2, $3, $4, $5)
 `
 
 type CreatePermissionParams struct {
-	Name        string
-	Description pgtype.Text
+	Name           string
+	Description    pgtype.Text
+	ResourceType   pgtype.Text
+	ResourceAction pgtype.Text
+	OrganizationID pgtype.UUID
 }
 
 func (q *Queries) CreatePermission(ctx context.Context, arg CreatePermissionParams) error {
-	_, err := q.db.Exec(ctx, createPermission, arg.Name, arg.Description)
+	_, err := q.db.Exec(ctx, createPermission,
+		arg.Name,
+		arg.Description,
+		arg.ResourceType,
+		arg.ResourceAction,
+		arg.OrganizationID,
+	)
 	return err
 }
 
@@ -35,7 +67,7 @@ func (q *Queries) DeletePermission(ctx context.Context, id pgtype.UUID) error {
 }
 
 const getPermissionById = `-- name: GetPermissionById :one
-SELECT id, name, description, created_at FROM permissions WHERE id = $1
+SELECT id, name, description, created_at, resource_type, resource_action, organization_id FROM permissions WHERE id = $1
 `
 
 func (q *Queries) GetPermissionById(ctx context.Context, id pgtype.UUID) (Permission, error) {
@@ -46,12 +78,15 @@ func (q *Queries) GetPermissionById(ctx context.Context, id pgtype.UUID) (Permis
 		&i.Name,
 		&i.Description,
 		&i.CreatedAt,
+		&i.ResourceType,
+		&i.ResourceAction,
+		&i.OrganizationID,
 	)
 	return i, err
 }
 
 const getPermissionByName = `-- name: GetPermissionByName :one
-SELECT id, name, description, created_at FROM permissions WHERE name = $1
+SELECT id, name, description, created_at, resource_type, resource_action, organization_id FROM permissions WHERE name = $1
 `
 
 func (q *Queries) GetPermissionByName(ctx context.Context, name string) (Permission, error) {
@@ -62,12 +97,15 @@ func (q *Queries) GetPermissionByName(ctx context.Context, name string) (Permiss
 		&i.Name,
 		&i.Description,
 		&i.CreatedAt,
+		&i.ResourceType,
+		&i.ResourceAction,
+		&i.OrganizationID,
 	)
 	return i, err
 }
 
 const getPermissions = `-- name: GetPermissions :many
-SELECT id, name, description, created_at FROM permissions
+SELECT id, name, description, created_at, resource_type, resource_action, organization_id FROM permissions
 `
 
 func (q *Queries) GetPermissions(ctx context.Context) ([]Permission, error) {
@@ -84,6 +122,140 @@ func (q *Queries) GetPermissions(ctx context.Context) ([]Permission, error) {
 			&i.Name,
 			&i.Description,
 			&i.CreatedAt,
+			&i.ResourceType,
+			&i.ResourceAction,
+			&i.OrganizationID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPermissionsByAction = `-- name: GetPermissionsByAction :many
+SELECT id, name, description, created_at, resource_type, resource_action, organization_id FROM permissions WHERE resource_action = $1
+`
+
+func (q *Queries) GetPermissionsByAction(ctx context.Context, resourceAction pgtype.Text) ([]Permission, error) {
+	rows, err := q.db.Query(ctx, getPermissionsByAction, resourceAction)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Permission{}
+	for rows.Next() {
+		var i Permission
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.CreatedAt,
+			&i.ResourceType,
+			&i.ResourceAction,
+			&i.OrganizationID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPermissionsByOrganization = `-- name: GetPermissionsByOrganization :many
+SELECT id, name, description, created_at, resource_type, resource_action, organization_id FROM permissions WHERE organization_id = $1
+`
+
+func (q *Queries) GetPermissionsByOrganization(ctx context.Context, organizationID pgtype.UUID) ([]Permission, error) {
+	rows, err := q.db.Query(ctx, getPermissionsByOrganization, organizationID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Permission{}
+	for rows.Next() {
+		var i Permission
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.CreatedAt,
+			&i.ResourceType,
+			&i.ResourceAction,
+			&i.OrganizationID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPermissionsByResourceType = `-- name: GetPermissionsByResourceType :many
+SELECT id, name, description, created_at, resource_type, resource_action, organization_id FROM permissions WHERE resource_type = $1
+`
+
+func (q *Queries) GetPermissionsByResourceType(ctx context.Context, resourceType pgtype.Text) ([]Permission, error) {
+	rows, err := q.db.Query(ctx, getPermissionsByResourceType, resourceType)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Permission{}
+	for rows.Next() {
+		var i Permission
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.CreatedAt,
+			&i.ResourceType,
+			&i.ResourceAction,
+			&i.OrganizationID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUserPermissions = `-- name: GetUserPermissions :many
+SELECT DISTINCT p.id, p.name, p.description, p.created_at, p.resource_type, p.resource_action, p.organization_id FROM permissions p
+JOIN role_permissions rp ON p.id = rp.permission_id
+JOIN user_roles ur ON rp.role_id = ur.role_id
+WHERE ur.user_id = $1
+`
+
+func (q *Queries) GetUserPermissions(ctx context.Context, userID pgtype.UUID) ([]Permission, error) {
+	rows, err := q.db.Query(ctx, getUserPermissions, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Permission{}
+	for rows.Next() {
+		var i Permission
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.CreatedAt,
+			&i.ResourceType,
+			&i.ResourceAction,
+			&i.OrganizationID,
 		); err != nil {
 			return nil, err
 		}
@@ -96,16 +268,24 @@ func (q *Queries) GetPermissions(ctx context.Context) ([]Permission, error) {
 }
 
 const updatePermission = `-- name: UpdatePermission :exec
-UPDATE permissions SET name = $1, description = $2 WHERE id = $3
+UPDATE permissions SET name = $1, description = $2, resource_type = $3, resource_action = $4 WHERE id = $5
 `
 
 type UpdatePermissionParams struct {
-	Name        string
-	Description pgtype.Text
-	ID          pgtype.UUID
+	Name           string
+	Description    pgtype.Text
+	ResourceType   pgtype.Text
+	ResourceAction pgtype.Text
+	ID             pgtype.UUID
 }
 
 func (q *Queries) UpdatePermission(ctx context.Context, arg UpdatePermissionParams) error {
-	_, err := q.db.Exec(ctx, updatePermission, arg.Name, arg.Description, arg.ID)
+	_, err := q.db.Exec(ctx, updatePermission,
+		arg.Name,
+		arg.Description,
+		arg.ResourceType,
+		arg.ResourceAction,
+		arg.ID,
+	)
 	return err
 }

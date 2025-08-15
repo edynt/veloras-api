@@ -13,4 +13,12 @@ type RoleRepository interface {
 	CreateRole(ctx context.Context, Role *entity.Role) error
 	UpdateRole(ctx context.Context, Role *entity.Role) error
 	DeleteRole(ctx context.Context, id string) error
+	
+	// Enhanced RBAC
+	GetPermissionsByRole(ctx context.Context, roleId string) ([]*entity.Permission, error)
+	AssignPermissionToRole(ctx context.Context, roleId, permissionId string) error
+	RemovePermissionFromRole(ctx context.Context, roleId, permissionId string) error
+	AssignRoleToUser(ctx context.Context, userId, roleId string) error
+	RemoveRoleFromUser(ctx context.Context, userId, roleId string) error
+	GetRolesByUser(ctx context.Context, userId string) ([]*entity.Role, error)
 }

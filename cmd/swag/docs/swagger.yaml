@@ -1,11 +1,167 @@
 basePath: /api/v1
 definitions:
+  github_com_edynnt_veloras-api_internal_auth_application_service_dto.OrganizationResponse:
+    properties:
+      created_at:
+        type: integer
+      created_by:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      parent_id:
+        type: string
+      updated_at:
+        type: integer
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_application_service_dto.RefreshTokenResponse:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_application_service_dto.SessionInfo:
+    properties:
+      created_at:
+        type: integer
+      id:
+        type: integer
+      ip_address:
+        type: string
+      is_active:
+        type: boolean
+      last_activity:
+        type: integer
+      user_agent:
+        type: string
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_application_service_dto.TwoFASetupResponse:
+    properties:
+      qr_code:
+        type: string
+      secret:
+        type: string
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_application_service_dto.TwoFAStatusResponse:
+    properties:
+      enabled:
+        type: boolean
+      secret:
+        type: string
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_application_service_dto.TwoFAVerifyResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_application_service_dto.UserResponse:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      is_verified:
+        type: boolean
+      last_name:
+        type: string
+      organization_id:
+        type: string
+      two_fa_enabled:
+        type: boolean
+      username:
+        type: string
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.AssignUserToOrganizationReq:
+    properties:
+      organization_id:
+        type: string
+      user_id:
+        type: string
+    required:
+    - organization_id
+    - user_id
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.ChangePasswordReq:
+    properties:
+      current_password:
+        type: string
+      new_password:
+        minLength: 8
+        type: string
+    required:
+    - current_password
+    - new_password
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.CreateOrganizationReq:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      parent_id:
+        type: string
+    required:
+    - name
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.ForgotPasswordReq:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.LogoutReq:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
   github_com_edynnt_veloras-api_internal_auth_controller_dto.PermissionReq:
     properties:
       description:
         type: string
       name:
         type: string
+      organization_id:
+        type: string
+      resource_action:
+        type: string
+      resource_type:
+        type: string
+    required:
+    - name
+    - resource_action
+    - resource_type
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.RefreshTokenReq:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.ResetPasswordReq:
+    properties:
+      email:
+        type: string
+      new_password:
+        minLength: 8
+        type: string
+      reset_token:
+        type: string
+    required:
+    - email
+    - new_password
+    - reset_token
     type: object
   github_com_edynnt_veloras-api_internal_auth_controller_dto.RoleReq:
     properties:
@@ -13,13 +169,82 @@ definitions:
         type: string
       name:
         type: string
+    required:
+    - name
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFADisableReq:
+    properties:
+      code:
+        type: string
+      user_id:
+        type: string
+    required:
+    - code
+    - user_id
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFAEnableReq:
+    properties:
+      code:
+        type: string
+      secret:
+        type: string
+      user_id:
+        type: string
+    required:
+    - code
+    - secret
+    - user_id
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFASetupReq:
+    properties:
+      user_id:
+        type: string
+    required:
+    - user_id
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFAStatusReq:
+    properties:
+      user_id:
+        type: string
+    required:
+    - user_id
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFAVerifyReq:
+    properties:
+      code:
+        type: string
+      type:
+        type: string
+      user_id:
+        type: string
+    required:
+    - code
+    - type
+    - user_id
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.UpdateOrganizationReq:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    required:
+    - id
+    - name
     type: object
   github_com_edynnt_veloras-api_internal_auth_controller_dto.UserLoginReq:
     properties:
       password:
         type: string
+      two_fa_code:
+        type: string
       username:
         type: string
+    required:
+    - password
+    - username
     type: object
   github_com_edynnt_veloras-api_internal_auth_controller_dto.UserRegisterReq:
     properties:
@@ -40,11 +265,22 @@ definitions:
       last_name:
         type: string
       password:
+        minLength: 8
         type: string
       phone_number:
         type: string
       username:
+        maxLength: 50
+        minLength: 3
         type: string
+    required:
+    - email
+    - first_name
+    - language
+    - last_name
+    - password
+    - phone_number
+    - username
     type: object
   github_com_edynnt_veloras-api_pkg_response.APIError:
     properties:
@@ -73,6 +309,196 @@ info:
   title: Go Drunk Backend API by DDD
   version: "1.0"
 paths:
+  /auth/2fa/disable:
+    post:
+      consumes:
+      - application/json
+      description: Disable two-factor authentication for user
+      parameters:
+      - description: 2FA disable request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFADisableReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns success message
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request format
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Disable 2FA
+      tags:
+      - Auth
+  /auth/2fa/enable:
+    post:
+      consumes:
+      - application/json
+      description: Enable two-factor authentication for user
+      parameters:
+      - description: 2FA enable request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFAEnableReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns success message
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request format
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Enable 2FA
+      tags:
+      - Auth
+  /auth/2fa/setup:
+    post:
+      consumes:
+      - application/json
+      description: Setup two-factor authentication for user
+      parameters:
+      - description: 2FA setup request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFASetupReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns 2FA setup details
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_application_service_dto.TwoFASetupResponse'
+        "400":
+          description: Invalid request format
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Setup 2FA
+      tags:
+      - Auth
+  /auth/2fa/status:
+    post:
+      consumes:
+      - application/json
+      description: Get two-factor authentication status for user
+      parameters:
+      - description: 2FA status request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFAStatusReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns 2FA status
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_application_service_dto.TwoFAStatusResponse'
+        "400":
+          description: Invalid request format
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Get 2FA status
+      tags:
+      - Auth
+  /auth/2fa/verify:
+    post:
+      consumes:
+      - application/json
+      description: Verify a 2FA code for user
+      parameters:
+      - description: 2FA verification request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.TwoFAVerifyReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns verification result
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_application_service_dto.TwoFAVerifyResponse'
+        "400":
+          description: Invalid request format
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Verify 2FA code
+      tags:
+      - Auth
+  /auth/change-password:
+    post:
+      consumes:
+      - application/json
+      description: Change user password (requires current password)
+      parameters:
+      - description: Change password request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.ChangePasswordReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns success message
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request format
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+        "401":
+          description: Invalid current password
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Change password
+      tags:
+      - Auth
+  /auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: Send password reset email to user
+      parameters:
+      - description: Forgot password request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.ForgotPasswordReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns success message
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request format
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Forgot password
+      tags:
+      - Auth
   /auth/login:
     post:
       consumes:
@@ -102,6 +528,63 @@ paths:
           schema:
             $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
       summary: User login
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout a user by invalidating their refresh token
+      parameters:
+      - description: Logout request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.LogoutReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns success message
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request format
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: User logout
+      tags:
+      - Auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Get a new access token using a valid refresh token
+      parameters:
+      - description: Refresh token request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.RefreshTokenReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns new access token
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_application_service_dto.RefreshTokenResponse'
+        "400":
+          description: Invalid request format
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+        "401":
+          description: Invalid or expired refresh token
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Refresh access token
       tags:
       - Auth
   /auth/register:
@@ -136,6 +619,89 @@ paths:
       summary: Register a new user
       tags:
       - Auth
+  /auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Reset user password using reset token
+      parameters:
+      - description: Reset password request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.ResetPasswordReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns success message
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request format
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+        "401":
+          description: Invalid or expired reset token
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Reset password
+      tags:
+      - Auth
+  /auth/sessions/{userId}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete all active sessions for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns success message
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid user ID
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Delete all user sessions
+      tags:
+      - Auth
+    get:
+      consumes:
+      - application/json
+      description: Get all active sessions for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns list of user sessions
+          schema:
+            items:
+              $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_application_service_dto.SessionInfo'
+            type: array
+        "400":
+          description: Invalid user ID
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Get user sessions
+      tags:
+      - Auth
   /auth/verify/{userId}/{code}:
     get:
       consumes:
@@ -167,6 +733,211 @@ paths:
       summary: Verify user email
       tags:
       - Auth
+  /organizations:
+    post:
+      consumes:
+      - application/json
+      description: Create a new organization with the provided details
+      parameters:
+      - description: Organization creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.CreateOrganizationReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Returns created organization ID
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request format or validation errors
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Create a new organization
+      tags:
+      - Organizations
+  /organizations/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an organization by ID
+      parameters:
+      - description: Organization ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns success message
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid organization ID
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+        "404":
+          description: Organization not found
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Delete organization
+      tags:
+      - Organizations
+    get:
+      consumes:
+      - application/json
+      description: Retrieve organization details by organization ID
+      parameters:
+      - description: Organization ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns organization details
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_application_service_dto.OrganizationResponse'
+        "400":
+          description: Invalid organization ID
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+        "404":
+          description: Organization not found
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Get organization by ID
+      tags:
+      - Organizations
+    put:
+      consumes:
+      - application/json
+      description: Update organization details
+      parameters:
+      - description: Organization ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Organization update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.UpdateOrganizationReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns success message
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request format or validation errors
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+        "404":
+          description: Organization not found
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Update organization
+      tags:
+      - Organizations
+  /organizations/{organizationId}/users:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all users belonging to a specific organization
+      parameters:
+      - description: Organization ID
+        in: path
+        name: organizationId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns list of users
+          schema:
+            items:
+              $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_application_service_dto.UserResponse'
+            type: array
+        "400":
+          description: Invalid organization ID
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Get organization users
+      tags:
+      - Organizations
+  /organizations/assign-user:
+    post:
+      consumes:
+      - application/json
+      description: Assign a user to a specific organization
+      parameters:
+      - description: User assignment request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.AssignUserToOrganizationReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns success message
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request format or validation errors
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Assign user to organization
+      tags:
+      - Organizations
+  /organizations/parent/{parentId}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all organizations that have the specified parent organization
+      parameters:
+      - description: Parent Organization ID
+        in: path
+        name: parentId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns list of organizations
+          schema:
+            items:
+              $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_application_service_dto.OrganizationResponse'
+            type: array
+        "400":
+          description: Invalid parent organization ID
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Get organizations by parent ID
+      tags:
+      - Organizations
   /permissions:
     get:
       consumes:

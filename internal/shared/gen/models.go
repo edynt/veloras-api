@@ -5,8 +5,22 @@
 package gen
 
 import (
+	"net/netip"
+
 	"github.com/jackc/pgx/v5/pgtype"
 )
+
+type AuditLog struct {
+	ID           pgtype.UUID
+	UserID       pgtype.UUID
+	Action       string
+	ResourceType string
+	ResourceID   pgtype.Text
+	Details      []byte
+	IpAddress    *netip.Addr
+	UserAgent    pgtype.Text
+	CreatedAt    pgtype.Int8
+}
 
 type EmailVerification struct {
 	ID        int32
@@ -14,6 +28,16 @@ type EmailVerification struct {
 	Code      int32
 	ExpiresAt int64
 	CreatedAt pgtype.Int8
+}
+
+type Organization struct {
+	ID          pgtype.UUID
+	Name        string
+	Description pgtype.Text
+	ParentID    pgtype.UUID
+	CreatedBy   pgtype.UUID
+	CreatedAt   pgtype.Int8
+	UpdatedAt   pgtype.Int8
 }
 
 type PasswordReset struct {
@@ -25,10 +49,24 @@ type PasswordReset struct {
 }
 
 type Permission struct {
+	ID             pgtype.UUID
+	Name           string
+	Description    pgtype.Text
+	CreatedAt      pgtype.Int8
+	ResourceType   pgtype.Text
+	ResourceAction pgtype.Text
+	OrganizationID pgtype.UUID
+}
+
+type RateLimit struct {
 	ID          pgtype.UUID
-	Name        string
-	Description pgtype.Text
+	UserID      pgtype.UUID
+	Action      string
+	IpAddress   netip.Addr
+	Attempts    pgtype.Int4
+	WindowStart int64
 	CreatedAt   pgtype.Int8
+	UpdatedAt   pgtype.Int8
 }
 
 type Role struct {
@@ -49,21 +87,40 @@ type Session struct {
 	RefreshToken string
 	ExpiresAt    int64
 	CreatedAt    pgtype.Int8
+	IpAddress    *netip.Addr
+	UserAgent    pgtype.Text
+	IsActive     pgtype.Bool
+	LastActivity pgtype.Int8
+}
+
+type TwoFaCode struct {
+	ID        pgtype.UUID
+	UserID    pgtype.UUID
+	Code      string
+	ExpiresAt int64
+	Type      string
+	CreatedAt pgtype.Int8
 }
 
 type User struct {
-	ID          pgtype.UUID
-	Email       string
-	Username    string
-	Password    string
-	IsVerified  pgtype.Bool
-	PhoneNumber string
-	FirstName   string
-	LastName    string
-	Status      pgtype.Int4
-	Language    pgtype.Text
-	CreatedAt   pgtype.Int8
-	UpdatedAt   pgtype.Int8
+	ID                  pgtype.UUID
+	Email               string
+	Username            string
+	Password            string
+	IsVerified          pgtype.Bool
+	PhoneNumber         string
+	FirstName           string
+	LastName            string
+	Status              pgtype.Int4
+	Language            pgtype.Text
+	CreatedAt           pgtype.Int8
+	UpdatedAt           pgtype.Int8
+	TwoFaSecret         pgtype.Text
+	TwoFaEnabled        pgtype.Bool
+	FailedLoginAttempts pgtype.Int4
+	LockedUntil         pgtype.Int8
+	OrganizationID      pgtype.UUID
+	LastLoginAt         pgtype.Int8
 }
 
 type UserRole struct {

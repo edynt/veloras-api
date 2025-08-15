@@ -12,3 +12,16 @@ func GenerateSixDigitCode() int {
 
 	return code
 }
+
+// GenerateRandomString generates a random string of specified length
+func GenerateRandomString(length int) string {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	src := rand.NewSource(time.Now().UnixNano())
+	r := rand.New(src)
+
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[r.Intn(len(charset))]
+	}
+	return string(b)
+}
