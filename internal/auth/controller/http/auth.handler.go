@@ -310,10 +310,17 @@ func (ah *AuthHandler) ChangePassword(ctx *gin.Context) (res interface{}, err er
 		return nil, apiErr
 	}
 
-	// TODO: Get user ID from JWT token context
-	userId := "current-user-id" // Placeholder
+	// Get user ID from JWT token context
+	userId, exists := ctx.Get("subjectUUID")
+	if !exists {
+		return nil, response.NewAPIError(http.StatusUnauthorized, msg.Unauthorized, "User ID not found in context")
+	}
+	userIdStr, ok := userId.(string)
+	if !ok {
+		return nil, response.NewAPIError(http.StatusUnauthorized, msg.Unauthorized, "Invalid user ID format")
+	}
 
-	err = ah.service.ChangePassword(ctx, userId, req.CurrentPassword, req.NewPassword)
+	err = ah.service.ChangePassword(ctx, userIdStr, req.CurrentPassword, req.NewPassword)
 	if err != nil {
 		return nil, response.NewAPIError(http.StatusUnauthorized, msg.FailedToChangePassword, err.Error())
 	}

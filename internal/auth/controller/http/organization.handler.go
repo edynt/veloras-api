@@ -44,8 +44,15 @@ func (oh *OrganizationHandler) CreateOrganization(ctx *gin.Context) (res interfa
 		return nil, apiErr
 	}
 
-	// TODO: Get user ID from JWT token context
-	createdBy := "current-user-id" // Placeholder
+	// Get user ID from JWT token context
+	createdBy, exists := ctx.Get("subjectUUID")
+	if !exists {
+		return nil, response.NewAPIError(http.StatusUnauthorized, msg.Unauthorized, "User ID not found in context")
+	}
+	createdByStr, ok := createdBy.(string)
+	if !ok {
+		return nil, response.NewAPIError(http.StatusUnauthorized, msg.Unauthorized, "Invalid user ID format")
+	}
 
 	createReq := appDto.CreateOrganizationRequest{
 		Name:        req.Name,
@@ -53,7 +60,7 @@ func (oh *OrganizationHandler) CreateOrganization(ctx *gin.Context) (res interfa
 		ParentID:    req.ParentID,
 	}
 
-	orgId, err := oh.orgService.CreateOrganization(ctx, createReq, createdBy)
+	orgId, err := oh.orgService.CreateOrganization(ctx, createReq, createdByStr)
 	if err != nil {
 		return nil, response.NewAPIError(http.StatusInternalServerError, msg.FailedToCreateOrganization, err.Error())
 	}

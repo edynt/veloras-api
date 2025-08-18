@@ -38,6 +38,9 @@ type Session struct {
 	ExpiresAt    int64  `json:"expires_at"`
 	IPAddress    string `json:"ip_address"`
 	UserAgent    string `json:"user_agent"`
+	CreatedAt    int64  `json:"created_at"`
+	IsActive     bool   `json:"is_active"`
+	LastActivity int64  `json:"last_activity"`
 }
 
 type PasswordReset struct {

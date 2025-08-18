@@ -13,6 +13,7 @@ import (
 
 type twoFAService struct {
 	twoFARepo twoFARepo.TwoFARepository
+	authRepo  twoFARepo.AuthRepository
 }
 
 // Setup2FA implements TwoFAService.
@@ -61,8 +62,11 @@ func (t *twoFAService) Enable2FA(ctx context.Context, userId, secret, code strin
 		return fmt.Errorf(msg.TwoFACodeInvalid)
 	}
 
-	// TODO: Update user's 2FA enabled status in the user service
-	// This would typically call the auth service to update the user
+	// Update user's 2FA enabled status
+	err = t.authRepo.UpdateUser2FAEnabled(ctx, userId, true)
+	if err != nil {
+		return fmt.Errorf("failed to enable 2FA: %w", err)
+	}
 
 	return nil
 }
@@ -79,20 +83,26 @@ func (t *twoFAService) Disable2FA(ctx context.Context, userId, code string) erro
 		return fmt.Errorf(msg.TwoFACodeInvalid)
 	}
 
-	// TODO: Update user's 2FA enabled status in the user service
-	// This would typically call the auth service to update the user
+	// Update user's 2FA enabled status
+	err = t.authRepo.UpdateUser2FAEnabled(ctx, userId, false)
+	if err != nil {
+		return fmt.Errorf("failed to disable 2FA: %w", err)
+	}
 
 	return nil
 }
 
 // Get2FAStatus implements TwoFAService.
 func (t *twoFAService) Get2FAStatus(ctx context.Context, userId string) (*appDto.TwoFAStatusResponse, error) {
-	// TODO: Get user's 2FA status from the user service
-	// This would typically call the auth service to get the user
+	// Get user's 2FA status from the auth service
+	user, err := t.authRepo.GetUserById(ctx, userId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user: %w", err)
+	}
 
 	return &appDto.TwoFAStatusResponse{
-		Enabled: false, // Placeholder
-		Secret:  "",    // Placeholder
+		Enabled: user.TwoFAEnabled,
+		Secret:  user.TwoFASecret,
 	}, nil
 }
 
@@ -141,8 +151,9 @@ func (t *twoFAService) Validate2FACode(ctx context.Context, userId, code, codeTy
 	return true, nil
 }
 
-func NewTwoFAService(twoFARepo twoFARepo.TwoFARepository) TwoFAService {
+func NewTwoFAService(twoFARepo twoFARepo.TwoFARepository, authRepo twoFARepo.AuthRepository) TwoFAService {
 	return &twoFAService{
 		twoFARepo: twoFARepo,
+		authRepo:  authRepo,
 	}
 }

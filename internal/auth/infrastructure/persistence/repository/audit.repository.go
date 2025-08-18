@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"net"
 
 	"github.com/edynnt/veloras-api/internal/auth/domain/model/entity"
 	"github.com/edynnt/veloras-api/internal/auth/domain/repository"
@@ -30,7 +31,7 @@ func (a *auditRepository) CreateAuditLog(ctx context.Context, log *entity.AuditL
 		ResourceType: log.ResourceType,
 		ResourceID:   pgtype.Text{String: log.ResourceID, Valid: true},
 		Details:      []byte("{}"), // Convert map to JSON bytes
-		IpAddress:    nil,          // TODO: Parse IP address
+		IpAddress:    parseIPAddress(log.IPAddress),
 		UserAgent:    pgtype.Text{String: log.UserAgent, Valid: true},
 	}
 
@@ -152,6 +153,20 @@ func (a *auditRepository) DeleteOldAuditLogs(ctx context.Context, cutoffDate int
 	}
 
 	return nil
+}
+
+// parseIPAddress parses IP address string to net.IP
+func parseIPAddress(ipStr string) net.IP {
+	if ipStr == "" {
+		return nil
+	}
+	
+	ip := net.ParseIP(ipStr)
+	if ip == nil {
+		return nil
+	}
+	
+	return ip
 }
 
 func NewAuditRepository(db *pgxpool.Pool) repository.AuditRepository {

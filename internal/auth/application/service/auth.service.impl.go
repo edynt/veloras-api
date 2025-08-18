@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"log"
 
 	appDto "github.com/edynnt/veloras-api/internal/auth/application/service/dto"
 	"github.com/edynnt/veloras-api/internal/auth/domain/model/entity"
@@ -341,7 +342,11 @@ func (as *authService) ForgotPassword(ctx context.Context, email string) error {
 	}
 
 	// Send email with reset link
-	// TODO: Implement email sending with reset link
+	err = as.sendPasswordResetEmail(user.Email, resetToken)
+	if err != nil {
+		log.Printf("Failed to send password reset email: %v", err)
+		// Don't return error here as the reset token was created successfully
+	}
 
 	return nil
 }
@@ -399,7 +404,7 @@ func (as *authService) ChangePassword(ctx context.Context, userId, currentPasswo
 func (as *authService) Setup2FA(ctx context.Context, userId string) (*appDto.TwoFASetupResponse, error) {
 	// Generate 2FA secret
 	secret := utils.GenerateRandomString(32)
-	
+
 	// Store secret temporarily (not enabled yet)
 	err := as.authRepo.UpdateUser2FASecret(ctx, userId, secret)
 	if err != nil {
@@ -493,9 +498,9 @@ func (as *authService) GetUserSessions(ctx context.Context, userId string) ([]*a
 			ID:           session.ID,
 			IPAddress:    session.IPAddress,
 			UserAgent:    session.UserAgent,
-			CreatedAt:    session.ExpiresAt, // TODO: Fix this mapping
-			LastActivity: session.ExpiresAt, // TODO: Fix this mapping
-			IsActive:     true,              // TODO: Add this field to entity
+			CreatedAt:    session.CreatedAt,
+			LastActivity: session.LastActivity,
+			IsActive:     session.IsActive,
 		})
 	}
 
@@ -504,8 +509,7 @@ func (as *authService) GetUserSessions(ctx context.Context, userId string) ([]*a
 
 // DeleteSession implements AuthService.
 func (as *authService) DeleteSession(ctx context.Context, sessionId int32) error {
-	// TODO: Implement this method
-	return fmt.Errorf("not implemented")
+	return as.authRepo.DeleteSession(ctx, sessionId)
 }
 
 // DeleteAllUserSessions implements AuthService.
@@ -561,6 +565,14 @@ func (as *authService) Validate2FACode(ctx context.Context, userId, code, codeTy
 	as.authRepo.Delete2FACode(ctx, userId, codeType)
 
 	return true, nil
+}
+
+// sendPasswordResetEmail sends a password reset email to the user
+func (as *authService) sendPasswordResetEmail(email, resetToken string) error {
+	// TODO: Implement actual email sending logic
+	// For now, just log the reset token
+	log.Printf("Password reset email would be sent to %s with token: %s", email, resetToken)
+	return nil
 }
 
 func NewAuthService(

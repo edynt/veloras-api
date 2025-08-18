@@ -132,8 +132,11 @@ func (r *roleService) AssignPermissionToRole(ctx context.Context, roleId, permis
 
 // RemovePermissionFromRole implements RoleService.
 func (r *roleService) RemovePermissionFromRole(ctx context.Context, roleId, permissionId string) error {
-	// TODO: Implement this method
-	return fmt.Errorf("not implemented")
+	err := r.roleRepo.RemovePermissionFromRole(ctx, roleId, permissionId)
+	if err != nil {
+		return fmt.Errorf("%s: %w", msg.FailedToRemovePermissionFromRole, err)
+	}
+	return nil
 }
 
 // AssignRoleToUser implements RoleService.
@@ -148,8 +151,11 @@ func (r *roleService) AssignRoleToUser(ctx context.Context, userId, roleId strin
 
 // RemoveRoleFromUser implements RoleService.
 func (r *roleService) RemoveRoleFromUser(ctx context.Context, userId, roleId string) error {
-	// TODO: Implement this method
-	return fmt.Errorf("not implemented")
+	err := r.roleRepo.RemoveRoleFromUser(ctx, userId, roleId)
+	if err != nil {
+		return fmt.Errorf("%s: %w", msg.FailedToRemoveRoleFromUser, err)
+	}
+	return nil
 }
 
 // GetUserRoles implements RoleService.

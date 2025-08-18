@@ -152,8 +152,22 @@ func (r *roleRepository) AssignPermissionToRole(ctx context.Context, roleId, per
 
 // RemovePermissionFromRole implements repository.RoleRepository.
 func (r *roleRepository) RemovePermissionFromRole(ctx context.Context, roleId, permissionId string) error {
-	// TODO: Implement this method
-	return fmt.Errorf("not implemented")
+	convertRoleId, err := utils.ConvertUUID(roleId)
+	if err != nil {
+		return err
+	}
+
+	convertPermissionId, err := utils.ConvertUUID(permissionId)
+	if err != nil {
+		return err
+	}
+
+	param := gen.RemovePermissionFromRoleParams{
+		RoleID:       convertRoleId,
+		PermissionID: convertPermissionId,
+	}
+
+	return r.db.RemovePermissionFromRole(ctx, param)
 }
 
 // AssignRoleToUser implements repository.RoleRepository.
@@ -178,8 +192,22 @@ func (r *roleRepository) AssignRoleToUser(ctx context.Context, userId, roleId st
 
 // RemoveRoleFromUser implements repository.RoleRepository.
 func (r *roleRepository) RemoveRoleFromUser(ctx context.Context, userId, roleId string) error {
-	// TODO: Implement this method
-	return fmt.Errorf("not implemented")
+	convertUserId, err := utils.ConvertUUID(userId)
+	if err != nil {
+		return err
+	}
+
+	convertRoleId, err := utils.ConvertUUID(roleId)
+	if err != nil {
+		return err
+	}
+
+	param := gen.RemoveRoleFromUserParams{
+		UserID: convertUserId,
+		RoleID: convertRoleId,
+	}
+
+	return r.db.RemoveRoleFromUser(ctx, param)
 }
 
 // GetRolesByUser implements repository.RoleRepository.
