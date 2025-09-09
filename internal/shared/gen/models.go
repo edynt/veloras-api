@@ -25,10 +25,12 @@ type PasswordReset struct {
 }
 
 type Permission struct {
-	ID          int32
-	Name        string
-	Description pgtype.Text
-	CreatedAt   pgtype.Int8
+	ID             int32
+	Name           string
+	Description    pgtype.Text
+	CreatedAt      pgtype.Int8
+	ResourceType   pgtype.Text
+	ResourceAction pgtype.Text
 }
 
 type Role struct {

@@ -35,7 +35,7 @@ func (q *Queries) DeletePermission(ctx context.Context, id int32) error {
 }
 
 const getPermissionById = `-- name: GetPermissionById :one
-SELECT id, name, description, created_at FROM permissions WHERE id = $1
+SELECT id, name, description, created_at, resource_type, resource_action FROM permissions WHERE id = $1
 `
 
 func (q *Queries) GetPermissionById(ctx context.Context, id int32) (Permission, error) {
@@ -46,12 +46,14 @@ func (q *Queries) GetPermissionById(ctx context.Context, id int32) (Permission, 
 		&i.Name,
 		&i.Description,
 		&i.CreatedAt,
+		&i.ResourceType,
+		&i.ResourceAction,
 	)
 	return i, err
 }
 
 const getPermissionByName = `-- name: GetPermissionByName :one
-SELECT id, name, description, created_at FROM permissions WHERE name = $1
+SELECT id, name, description, created_at, resource_type, resource_action FROM permissions WHERE name = $1
 `
 
 func (q *Queries) GetPermissionByName(ctx context.Context, name string) (Permission, error) {
@@ -62,12 +64,14 @@ func (q *Queries) GetPermissionByName(ctx context.Context, name string) (Permiss
 		&i.Name,
 		&i.Description,
 		&i.CreatedAt,
+		&i.ResourceType,
+		&i.ResourceAction,
 	)
 	return i, err
 }
 
 const getPermissions = `-- name: GetPermissions :many
-SELECT id, name, description, created_at FROM permissions
+SELECT id, name, description, created_at, resource_type, resource_action FROM permissions
 `
 
 func (q *Queries) GetPermissions(ctx context.Context) ([]Permission, error) {
@@ -84,6 +88,8 @@ func (q *Queries) GetPermissions(ctx context.Context) ([]Permission, error) {
 			&i.Name,
 			&i.Description,
 			&i.CreatedAt,
+			&i.ResourceType,
+			&i.ResourceAction,
 		); err != nil {
 			return nil, err
 		}
