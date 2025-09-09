@@ -17,7 +17,7 @@ VALUES ($1, $2, $3)
 `
 
 type CreatePasswordResetParams struct {
-	UserID     pgtype.UUID
+	UserID     pgtype.Int4
 	ResetToken string
 	ExpiresAt  int64
 }
@@ -32,7 +32,7 @@ DELETE FROM password_resets WHERE user_id = $1 AND reset_token = $2
 `
 
 type DeletePasswordResetParams struct {
-	UserID     pgtype.UUID
+	UserID     pgtype.Int4
 	ResetToken string
 }
 
@@ -46,7 +46,7 @@ SELECT id, user_id, reset_token, expires_at, created_at FROM password_resets WHE
 `
 
 type GetPasswordResetParams struct {
-	UserID     pgtype.UUID
+	UserID     pgtype.Int4
 	ResetToken string
 }
 

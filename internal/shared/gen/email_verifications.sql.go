@@ -18,7 +18,7 @@ RETURNING id, user_id, code, expires_at, created_at
 `
 
 type CreateEmailVerificationParams struct {
-	UserID    pgtype.UUID
+	UserID    pgtype.Int4
 	Code      int32
 	ExpiresAt int64
 }
@@ -41,7 +41,7 @@ SELECT id, user_id, code, expires_at, created_at FROM email_verifications WHERE 
 `
 
 type GetEmailVerificationParams struct {
-	UserID pgtype.UUID
+	UserID pgtype.Int4
 	Code   int32
 }
 

@@ -7,8 +7,6 @@ package gen
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const assignPermissionToRole = `-- name: AssignPermissionToRole :exec
@@ -16,8 +14,8 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES ($1, $2)
 `
 
 type AssignPermissionToRoleParams struct {
-	RoleID       pgtype.UUID
-	PermissionID pgtype.UUID
+	RoleID       int32
+	PermissionID int32
 }
 
 func (q *Queries) AssignPermissionToRole(ctx context.Context, arg AssignPermissionToRoleParams) error {
@@ -31,7 +29,7 @@ JOIN role_permissions rp ON rp.permission_id = p.permission_id
 WHERE rp.role_id = $1
 `
 
-func (q *Queries) GetPermissionsByRole(ctx context.Context, roleID pgtype.UUID) ([]Permission, error) {
+func (q *Queries) GetPermissionsByRole(ctx context.Context, roleID int32) ([]Permission, error) {
 	rows, err := q.db.Query(ctx, getPermissionsByRole, roleID)
 	if err != nil {
 		return nil, err

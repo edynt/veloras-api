@@ -10,7 +10,7 @@ import (
 
 type EmailVerification struct {
 	ID        int32
-	UserID    pgtype.UUID
+	UserID    pgtype.Int4
 	Code      int32
 	ExpiresAt int64
 	CreatedAt pgtype.Int8
@@ -18,41 +18,41 @@ type EmailVerification struct {
 
 type PasswordReset struct {
 	ID         int32
-	UserID     pgtype.UUID
+	UserID     pgtype.Int4
 	ResetToken string
 	ExpiresAt  int64
 	CreatedAt  pgtype.Int8
 }
 
 type Permission struct {
-	ID          pgtype.UUID
+	ID          int32
 	Name        string
 	Description pgtype.Text
 	CreatedAt   pgtype.Int8
 }
 
 type Role struct {
-	ID          pgtype.UUID
+	ID          int32
 	Name        string
 	Description pgtype.Text
 	CreatedAt   pgtype.Int8
 }
 
 type RolePermission struct {
-	RoleID       pgtype.UUID
-	PermissionID pgtype.UUID
+	RoleID       int32
+	PermissionID int32
 }
 
 type Session struct {
 	ID           int32
-	UserID       pgtype.UUID
+	UserID       pgtype.Int4
 	RefreshToken string
 	ExpiresAt    int64
 	CreatedAt    pgtype.Int8
 }
 
 type User struct {
-	ID          pgtype.UUID
+	ID          int32
 	Email       string
 	Username    string
 	Password    string
@@ -67,6 +67,6 @@ type User struct {
 }
 
 type UserRole struct {
-	UserID pgtype.UUID
-	RoleID pgtype.UUID
+	UserID int32
+	RoleID int32
 }

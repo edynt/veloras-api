@@ -32,24 +32,13 @@ func (p *permissionRepository) GetPermissionByName(ctx context.Context, name str
 }
 
 // DeletePermission implements repository.PermissisonRepository.
-func (p *permissionRepository) DeletePermission(ctx context.Context, id string) error {
-	convertId, err := utils.ConvertUUID(id)
-
-	if err != nil {
-		return err
-	}
-
-	return p.db.DeletePermission(ctx, convertId)
+func (p *permissionRepository) DeletePermission(ctx context.Context, id int) error {
+	return p.db.DeletePermission(ctx, int32(id))
 }
 
 // GetPermissionById implements repository.PermissisonRepository.
-func (p *permissionRepository) GetPermissionById(ctx context.Context, id string) (*entity.Permission, error) {
-	convertId, err := utils.ConvertUUID(id)
-
-	if err != nil {
-		return nil, err
-	}
-	permission, err := p.db.GetPermissionById(ctx, convertId)
+func (p *permissionRepository) GetPermissionById(ctx context.Context, id int) (*entity.Permission, error) {
+	permission, err := p.db.GetPermissionById(ctx, int32(id))
 
 	if err != nil {
 		return nil, err

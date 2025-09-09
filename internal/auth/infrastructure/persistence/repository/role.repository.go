@@ -31,25 +31,13 @@ func (r *roleRepository) CreateRole(ctx context.Context, Role *entity.Role) erro
 }
 
 // DeleteRole implements repository.RoleRepository.
-func (r *roleRepository) DeleteRole(ctx context.Context, id string) error {
-	convertId, err := utils.ConvertUUID(id)
-
-	if err != nil {
-		return err
-	}
-
-	return r.db.DeleteRole(ctx, convertId)
+func (r *roleRepository) DeleteRole(ctx context.Context, id int) error {
+	return r.db.DeleteRole(ctx, int32(id))
 }
 
 // GetRoleById implements repository.RoleRepository.
-func (r *roleRepository) GetRoleById(ctx context.Context, id string) (*entity.Role, error) {
-	convertId, err := utils.ConvertUUID(id)
-
-	if err != nil {
-		return nil, err
-	}
-
-	role, err := r.db.GetRoleById(ctx, convertId)
+func (r *roleRepository) GetRoleById(ctx context.Context, id int) (*entity.Role, error) {
+	role, err := r.db.GetRoleById(ctx, int32(id))
 
 	if err != nil {
 		return nil, err

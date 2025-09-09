@@ -34,16 +34,12 @@ func (a *authRepository) SaveToken(ctx context.Context, token *entity.Session) e
 }
 
 // DeleteVerificationCode implements repository.AuthRepository.
-func (a *authRepository) DeleteVerificationCode(ctx context.Context, userId string, code int) error {
-	// Parse the userId string to UUID
-	convertId, err := utils.ConvertUUID(userId)
-
-	if err != nil {
-		return fmt.Errorf("%s: %w", msg.UserIdInvalid, err)
-	}
-
+func (a *authRepository) DeleteVerificationCode(ctx context.Context, userId int, code int) error {
 	// Call the DB update function
-	err = a.db.DeleteVerificationCode(ctx, convertId)
+	err := a.db.DeleteVerificationCode(ctx, pgtype.Int4{
+		Int32: int32(userId),
+		Valid: true,
+	})
 	if err != nil {
 		return fmt.Errorf("%s: %w", msg.FailedToUpdateUserStatus, err)
 	}
@@ -52,16 +48,9 @@ func (a *authRepository) DeleteVerificationCode(ctx context.Context, userId stri
 }
 
 // ActiveUser implements repository.AuthRepository.
-func (a *authRepository) ActiveUser(ctx context.Context, userId string) error {
-	// Parse the userId string to UUID
-	convertId, err := utils.ConvertUUID(userId)
-
-	if err != nil {
-		return fmt.Errorf("invalid userId: %w", err)
-	}
-
+func (a *authRepository) ActiveUser(ctx context.Context, userId int) error {
 	// Call the DB update function
-	_, err = a.db.ActiveUser(ctx, convertId)
+	_, err := a.db.ActiveUser(ctx, int32(userId))
 	if err != nil {
 		return fmt.Errorf("%s: %w", msg.FailedToActiveUser, err)
 	}
@@ -86,16 +75,10 @@ func (a *authRepository) GetUserByUsername(ctx context.Context, userName string)
 }
 
 // UpdateUserStatus implements repository.AuthRepository.
-func (a *authRepository) UpdateUserStatus(ctx context.Context, userId string, status int) error {
-	// Parse the userId string to UUID
-	convertId, err := utils.ConvertUUID(userId)
-	if err != nil {
-		return fmt.Errorf("%s: %w", msg.UserIdInvalid, err)
-	}
-
+func (a *authRepository) UpdateUserStatus(ctx context.Context, userId int, status int) error {
 	// Construct the parameter object
 	params := gen.UpdateUserStatusParams{
-		ID: convertId,
+		ID: int32(userId),
 		Status: pgtype.Int4{
 			Int32: int32(status),
 			Valid: true,
@@ -103,7 +86,7 @@ func (a *authRepository) UpdateUserStatus(ctx context.Context, userId string, st
 	}
 
 	// Call the DB update function
-	_, err = a.db.UpdateUserStatus(ctx, params)
+	_, err := a.db.UpdateUserStatus(ctx, params)
 	if err != nil {
 		return fmt.Errorf("%s: %w", msg.FailedToUpdateUserStatus, err)
 	}
@@ -112,7 +95,7 @@ func (a *authRepository) UpdateUserStatus(ctx context.Context, userId string, st
 }
 
 // GetVerificationCode implements repository.AuthRepository.
-func (a *authRepository) GetVerificationCode(ctx context.Context, userId string, code int) (*entity.EmailVerification, error) {
+func (a *authRepository) GetVerificationCode(ctx context.Context, userId int, code int) (*entity.EmailVerification, error) {
 	var param gen.GetEmailVerificationParams
 	if err := utils.SafeCopy(&param, &entity.EmailVerification{UserID: userId, Code: code}); err != nil {
 		return nil, err
@@ -155,20 +138,20 @@ func (a *authRepository) EmailExists(ctx context.Context, email string) (bool, e
 }
 
 // CreateUser implements repository.AuthRepository.
-func (a *authRepository) CreateUser(ctx context.Context, account *entity.Account) (string, error) {
+func (a *authRepository) CreateUser(ctx context.Context, account *entity.Account) (int, error) {
 
 	var param gen.CreateUserParams
 	if err := utils.SafeCopy(&param, &account); err != nil {
-		return "", err
+		return 0, err
 	}
 
 	createdAccount, err := a.db.CreateUser(ctx, param)
 
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 
-	return createdAccount.ID.String(), nil
+	return int(createdAccount.ID), nil
 }
 
 // UsernameExists implements repository.AuthRepository.

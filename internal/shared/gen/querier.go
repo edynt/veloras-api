@@ -11,7 +11,7 @@ import (
 )
 
 type Querier interface {
-	ActiveUser(ctx context.Context, id pgtype.UUID) (ActiveUserRow, error)
+	ActiveUser(ctx context.Context, id int32) (ActiveUserRow, error)
 	AssignPermissionToRole(ctx context.Context, arg AssignPermissionToRoleParams) error
 	AssignRoleToUser(ctx context.Context, arg AssignRoleToUserParams) error
 	CreateEmailVerification(ctx context.Context, arg CreateEmailVerificationParams) (EmailVerification, error)
@@ -21,21 +21,21 @@ type Querier interface {
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error)
 	DeletePasswordReset(ctx context.Context, arg DeletePasswordResetParams) error
-	DeletePermission(ctx context.Context, id pgtype.UUID) error
-	DeleteRole(ctx context.Context, id pgtype.UUID) error
+	DeletePermission(ctx context.Context, id int32) error
+	DeleteRole(ctx context.Context, id int32) error
 	DeleteSession(ctx context.Context, id int32) error
-	DeleteUser(ctx context.Context, id pgtype.UUID) error
-	DeleteVerificationCode(ctx context.Context, userID pgtype.UUID) error
+	DeleteUser(ctx context.Context, id int32) error
+	DeleteVerificationCode(ctx context.Context, userID pgtype.Int4) error
 	GetEmailVerification(ctx context.Context, arg GetEmailVerificationParams) (EmailVerification, error)
 	GetPasswordReset(ctx context.Context, arg GetPasswordResetParams) (PasswordReset, error)
-	GetPermissionById(ctx context.Context, id pgtype.UUID) (Permission, error)
+	GetPermissionById(ctx context.Context, id int32) (Permission, error)
 	GetPermissionByName(ctx context.Context, name string) (Permission, error)
 	GetPermissions(ctx context.Context) ([]Permission, error)
-	GetPermissionsByRole(ctx context.Context, roleID pgtype.UUID) ([]Permission, error)
-	GetRoleById(ctx context.Context, id pgtype.UUID) (Role, error)
+	GetPermissionsByRole(ctx context.Context, roleID int32) ([]Permission, error)
+	GetRoleById(ctx context.Context, id int32) (Role, error)
 	GetRoleByName(ctx context.Context, name string) (Role, error)
 	GetRoles(ctx context.Context) ([]Role, error)
-	GetRolesByUser(ctx context.Context, userID pgtype.UUID) ([]Role, error)
+	GetRolesByUser(ctx context.Context, userID int32) ([]Role, error)
 	GetSession(ctx context.Context, id int32) (Session, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
@@ -44,7 +44,7 @@ type Querier interface {
 	UpdatePermission(ctx context.Context, arg UpdatePermissionParams) error
 	UpdateRole(ctx context.Context, arg UpdateRoleParams) error
 	UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (UpdateUserStatusRow, error)
-	VerifyUser(ctx context.Context, id pgtype.UUID) error
+	VerifyUser(ctx context.Context, id int32) error
 }
 
 var _ Querier = (*Queries)(nil)

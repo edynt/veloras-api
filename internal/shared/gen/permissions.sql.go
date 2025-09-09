@@ -29,7 +29,7 @@ const deletePermission = `-- name: DeletePermission :exec
 DELETE FROM permissions WHERE id = $1
 `
 
-func (q *Queries) DeletePermission(ctx context.Context, id pgtype.UUID) error {
+func (q *Queries) DeletePermission(ctx context.Context, id int32) error {
 	_, err := q.db.Exec(ctx, deletePermission, id)
 	return err
 }
@@ -38,7 +38,7 @@ const getPermissionById = `-- name: GetPermissionById :one
 SELECT id, name, description, created_at FROM permissions WHERE id = $1
 `
 
-func (q *Queries) GetPermissionById(ctx context.Context, id pgtype.UUID) (Permission, error) {
+func (q *Queries) GetPermissionById(ctx context.Context, id int32) (Permission, error) {
 	row := q.db.QueryRow(ctx, getPermissionById, id)
 	var i Permission
 	err := row.Scan(
@@ -102,7 +102,7 @@ UPDATE permissions SET name = $1, description = $2 WHERE id = $3
 type UpdatePermissionParams struct {
 	Name        string
 	Description pgtype.Text
-	ID          pgtype.UUID
+	ID          int32
 }
 
 func (q *Queries) UpdatePermission(ctx context.Context, arg UpdatePermissionParams) error {

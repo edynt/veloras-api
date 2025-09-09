@@ -29,7 +29,7 @@ const deleteRole = `-- name: DeleteRole :exec
 DELETE FROM roles WHERE id = $1
 `
 
-func (q *Queries) DeleteRole(ctx context.Context, id pgtype.UUID) error {
+func (q *Queries) DeleteRole(ctx context.Context, id int32) error {
 	_, err := q.db.Exec(ctx, deleteRole, id)
 	return err
 }
@@ -38,7 +38,7 @@ const getRoleById = `-- name: GetRoleById :one
 SELECT id, name, description, created_at FROM roles WHERE id = $1
 `
 
-func (q *Queries) GetRoleById(ctx context.Context, id pgtype.UUID) (Role, error) {
+func (q *Queries) GetRoleById(ctx context.Context, id int32) (Role, error) {
 	row := q.db.QueryRow(ctx, getRoleById, id)
 	var i Role
 	err := row.Scan(
@@ -102,7 +102,7 @@ UPDATE roles SET name = $1, description = $2 WHERE id = $3
 type UpdateRoleParams struct {
 	Name        string
 	Description pgtype.Text
-	ID          pgtype.UUID
+	ID          int32
 }
 
 func (q *Queries) UpdateRole(ctx context.Context, arg UpdateRoleParams) error {

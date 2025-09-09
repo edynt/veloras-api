@@ -87,7 +87,7 @@ func (rh *RoleHandler) UpdateRole(ctx *gin.Context) (res interface{}, err error)
 	}
 
 	requestRole := dto.RoleAppDTO{
-		ID:          ctx.Param("id"),
+		ID:          utils.StringToInt(ctx.Param("id")),
 		Name:        req.Name,
 		Description: req.Description,
 	}
@@ -113,7 +113,7 @@ func (rh *RoleHandler) UpdateRole(ctx *gin.Context) (res interface{}, err error)
 // @Router /roles/{id} [delete]
 func (rh *RoleHandler) DeleteRole(ctx *gin.Context) (res interface{}, err error) {
 
-	err = rh.service.DeleteRole(ctx, ctx.Param("id"))
+	err = rh.service.DeleteRole(ctx, utils.StringToInt(ctx.Param("id")))
 
 	if err != nil {
 		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
@@ -152,7 +152,7 @@ func (rh *RoleHandler) GetRoles(ctx *gin.Context) (res interface{}, err error) {
 // @Failure 400 {object} response.APIError "Invalid request or role not found"
 // @Router /roles/{id} [get]
 func (rh *RoleHandler) GetRole(ctx *gin.Context) (res interface{}, err error) {
-	role, err := rh.service.GetRoleById(ctx, ctx.Param("id"))
+	role, err := rh.service.GetRoleById(ctx, utils.StringToInt(ctx.Param("id")))
 
 	if err != nil {
 		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())

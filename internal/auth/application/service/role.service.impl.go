@@ -17,7 +17,7 @@ type roleService struct {
 }
 
 // GetRoleById implements RoleService.
-func (r *roleService) GetRoleById(ctx context.Context, id string) (dto.RoleOutPut, error) {
+func (r *roleService) GetRoleById(ctx context.Context, id int) (dto.RoleOutPut, error) {
 	exists, _ := r.roleRepo.GetRoleById(ctx, id)
 
 	if exists == nil {
@@ -48,7 +48,7 @@ func (r *roleService) GetRoles(ctx context.Context) ([]dto.RoleOutPut, error) {
 }
 
 // DeleteRole implements RoleService.
-func (r *roleService) DeleteRole(ctx context.Context, id string) error {
+func (r *roleService) DeleteRole(ctx context.Context, id int) error {
 	exists, _ := r.roleRepo.GetRoleById(ctx, id)
 
 	if exists == nil {
@@ -65,11 +65,11 @@ func (r *roleService) DeleteRole(ctx context.Context, id string) error {
 }
 
 // UpdateRole implements RoleService.
-func (r *roleService) UpdateRole(ctx context.Context, roleAppDTO dto.RoleAppDTO) (string, error) {
+func (r *roleService) UpdateRole(ctx context.Context, roleAppDTO dto.RoleAppDTO) (int, error) {
 	exists, _ := r.roleRepo.GetRoleById(ctx, roleAppDTO.ID)
 
 	if exists == nil {
-		return "", fmt.Errorf(msg.RoleNotExists)
+		return 0, fmt.Errorf(msg.RoleNotExists)
 	}
 
 	err := r.roleRepo.UpdateRole(ctx, &entity.Role{
@@ -79,18 +79,18 @@ func (r *roleService) UpdateRole(ctx context.Context, roleAppDTO dto.RoleAppDTO)
 	})
 
 	if err != nil {
-		return "", fmt.Errorf("%s: %w", msg.CouldNotCreateRole, err)
+		return 0, fmt.Errorf("%s: %w", msg.CouldNotCreateRole, err)
 	}
 
-	return msg.Success, nil
+	return roleAppDTO.ID, nil
 }
 
 // CreateRole implements RoleService.
-func (r *roleService) CreateRole(ctx context.Context, roleAppDTO dto.RoleAppDTO) (string, error) {
+func (r *roleService) CreateRole(ctx context.Context, roleAppDTO dto.RoleAppDTO) (int, error) {
 	exists, _ := r.roleRepo.GetRoleByName(ctx, roleAppDTO.Name)
 
 	if exists != nil {
-		return "", fmt.Errorf(msg.RoleExists)
+		return 0, fmt.Errorf(msg.RoleExists)
 	}
 
 	err := r.roleRepo.CreateRole(ctx, &entity.Role{
@@ -99,10 +99,16 @@ func (r *roleService) CreateRole(ctx context.Context, roleAppDTO dto.RoleAppDTO)
 	})
 
 	if err != nil {
-		return "", fmt.Errorf("%s: %w", msg.CouldNotCreateRole, err)
+		return 0, fmt.Errorf("%s: %w", msg.CouldNotCreateRole, err)
 	}
 
-	return msg.Success, nil
+	// Get the created role to return its ID
+	createdRole, err := r.roleRepo.GetRoleByName(ctx, roleAppDTO.Name)
+	if err != nil {
+		return 0, fmt.Errorf("%s: %w", msg.CouldNotCreateRole, err)
+	}
+
+	return createdRole.ID, nil
 }
 
 // CreateUser implements RoleService.

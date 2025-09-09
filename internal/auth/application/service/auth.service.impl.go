@@ -121,34 +121,34 @@ func (as *authService) VerifyUser(ctx context.Context, verificationEmailAppDTO a
 }
 
 // Create implements AuthService.
-func (as *authService) CreateUser(ctx context.Context, accountDto appDto.AccountAppDTO) (string, error) {
+func (as *authService) CreateUser(ctx context.Context, accountDto appDto.AccountAppDTO) (int, error) {
 	//1. Check permissions -> event registered
 
 	// 2. Check username exists
 	exists, err := as.authRepo.UsernameExists(ctx, accountDto.Username)
 
 	if err != nil {
-		return "", fmt.Errorf("%s: %w", msg.FailedToCheckUserNameExists, err)
+		return 0, fmt.Errorf("%s: %w", msg.FailedToCheckUserNameExists, err)
 	}
 	if exists {
-		return "", fmt.Errorf(msg.UsernameExists)
+		return 0, fmt.Errorf(msg.UsernameExists)
 	}
 
 	// 3. Check email exists
 	exists, err = as.authRepo.EmailExists(ctx, accountDto.Email)
 	if err != nil {
-		return "", fmt.Errorf("%s: %w", msg.FailedToCheckEmailExists, err)
+		return 0, fmt.Errorf("%s: %w", msg.FailedToCheckEmailExists, err)
 	}
 
 	if exists {
-		return "", fmt.Errorf(msg.EmailExists)
+		return 0, fmt.Errorf(msg.EmailExists)
 	}
 
 	// 4. GenerateFromPassword
 	hashedPasswordBytes, err := bcrypt.GenerateFromPassword([]byte(accountDto.Password), bcrypt.DefaultCost)
 	if err != nil {
 		// log.Printf("Error hashing password for user %s: %v", accountDto.Username, err)
-		return "", fmt.Errorf("%s: %w", msg.FailedToSecurePassword, err) // Không lộ chi tiết lỗi hash
+		return 0, fmt.Errorf("%s: %w", msg.FailedToSecurePassword, err) // Không lộ chi tiết lỗi hash
 	}
 	hashedPassword := string(hashedPasswordBytes)
 
@@ -165,11 +165,11 @@ func (as *authService) CreateUser(ctx context.Context, accountDto appDto.Account
 	})
 
 	if err != nil {
-		return "", fmt.Errorf("%s: %w", msg.CouldNotCreateAccount, err)
+		return 0, fmt.Errorf("%s: %w", msg.CouldNotCreateAccount, err)
 	}
 
-	if newAccountId == "" {
-		return "", fmt.Errorf(msg.CouldNotCreateAccount)
+	if newAccountId == 0 {
+		return 0, fmt.Errorf(msg.CouldNotCreateAccount)
 	}
 
 	codeGen := utils.GenerateSixDigitCode()

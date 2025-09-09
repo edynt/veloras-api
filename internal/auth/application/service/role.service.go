@@ -7,9 +7,9 @@ import (
 )
 
 type RoleService interface {
-	CreateRole(ctx context.Context, roleAppDTO appDto.RoleAppDTO) (string, error)
-	UpdateRole(ctx context.Context, roleAppDTO appDto.RoleAppDTO) (string, error)
-	DeleteRole(ctx context.Context, id string) error
+	CreateRole(ctx context.Context, roleAppDTO appDto.RoleAppDTO) (int, error)
+	UpdateRole(ctx context.Context, roleAppDTO appDto.RoleAppDTO) (int, error)
+	DeleteRole(ctx context.Context, id int) error
 	GetRoles(ctx context.Context) ([]appDto.RoleOutPut, error)
-	GetRoleById(ctx context.Context, id string) (appDto.RoleOutPut, error)
+	GetRoleById(ctx context.Context, id int) (appDto.RoleOutPut, error)
 }

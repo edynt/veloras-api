@@ -7,8 +7,6 @@ package gen
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const assignRoleToUser = `-- name: AssignRoleToUser :exec
@@ -16,8 +14,8 @@ INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2)
 `
 
 type AssignRoleToUserParams struct {
-	UserID pgtype.UUID
-	RoleID pgtype.UUID
+	UserID int32
+	RoleID int32
 }
 
 func (q *Queries) AssignRoleToUser(ctx context.Context, arg AssignRoleToUserParams) error {
@@ -31,7 +29,7 @@ JOIN user_roles ur ON ur.role_id = r.role_id
 WHERE ur.user_id = $1
 `
 
-func (q *Queries) GetRolesByUser(ctx context.Context, userID pgtype.UUID) ([]Role, error) {
+func (q *Queries) GetRolesByUser(ctx context.Context, userID int32) ([]Role, error) {
 	rows, err := q.db.Query(ctx, getRolesByUser, userID)
 	if err != nil {
 		return nil, err

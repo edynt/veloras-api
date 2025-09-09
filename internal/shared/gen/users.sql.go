@@ -16,12 +16,12 @@ UPDATE users SET is_verified = TRUE WHERE id = $1 RETURNING id, email, status
 `
 
 type ActiveUserRow struct {
-	ID     pgtype.UUID
+	ID     int32
 	Email  string
 	Status pgtype.Int4
 }
 
-func (q *Queries) ActiveUser(ctx context.Context, id pgtype.UUID) (ActiveUserRow, error) {
+func (q *Queries) ActiveUser(ctx context.Context, id int32) (ActiveUserRow, error) {
 	row := q.db.QueryRow(ctx, activeUser, id)
 	var i ActiveUserRow
 	err := row.Scan(&i.ID, &i.Email, &i.Status)
@@ -44,7 +44,7 @@ type CreateUserParams struct {
 }
 
 type CreateUserRow struct {
-	ID     pgtype.UUID
+	ID     int32
 	Email  string
 	Status pgtype.Int4
 }
@@ -67,7 +67,7 @@ const deleteUser = `-- name: DeleteUser :exec
 DELETE FROM users WHERE id = $1
 `
 
-func (q *Queries) DeleteUser(ctx context.Context, id pgtype.UUID) error {
+func (q *Queries) DeleteUser(ctx context.Context, id int32) error {
 	_, err := q.db.Exec(ctx, deleteUser, id)
 	return err
 }
@@ -76,7 +76,7 @@ const deleteVerificationCode = `-- name: DeleteVerificationCode :exec
 DELETE FROM email_verifications WHERE user_id = $1
 `
 
-func (q *Queries) DeleteVerificationCode(ctx context.Context, userID pgtype.UUID) error {
+func (q *Queries) DeleteVerificationCode(ctx context.Context, userID pgtype.Int4) error {
 	_, err := q.db.Exec(ctx, deleteVerificationCode, userID)
 	return err
 }
@@ -157,11 +157,11 @@ UPDATE users SET status = $1 WHERE id = $2 RETURNING id, email, status
 
 type UpdateUserStatusParams struct {
 	Status pgtype.Int4
-	ID     pgtype.UUID
+	ID     int32
 }
 
 type UpdateUserStatusRow struct {
-	ID     pgtype.UUID
+	ID     int32
 	Email  string
 	Status pgtype.Int4
 }
@@ -177,7 +177,7 @@ const verifyUser = `-- name: VerifyUser :exec
 UPDATE users SET is_verified = TRUE WHERE id = $1
 `
 
-func (q *Queries) VerifyUser(ctx context.Context, id pgtype.UUID) error {
+func (q *Queries) VerifyUser(ctx context.Context, id int32) error {
 	_, err := q.db.Exec(ctx, verifyUser, id)
 	return err
 }

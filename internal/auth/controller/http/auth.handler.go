@@ -83,7 +83,7 @@ func (ah *AuthHandler) VerifyUser(ctx *gin.Context) (res interface{}, err error)
 	code := ctx.Param("code")
 
 	verificationEmail := appDto.EmailVerification{
-		UserID: userId,
+		UserID: utils.StringToInt(userId),
 		Code:   utils.StringToInt(code),
 	}
 

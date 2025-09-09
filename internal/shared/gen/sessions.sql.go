@@ -18,7 +18,7 @@ RETURNING id, user_id, refresh_token, expires_at, created_at
 `
 
 type CreateSessionParams struct {
-	UserID       pgtype.UUID
+	UserID       pgtype.Int4
 	RefreshToken string
 	ExpiresAt    int64
 }

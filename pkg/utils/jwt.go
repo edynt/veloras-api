@@ -18,7 +18,7 @@ func GenTokenJWT(payload jwt.Claims) (string, error) {
 	return token.SignedString([]byte(global.Config.JWT.ApiSecret))
 }
 
-func CreateToken(uuidToken string, isRefreshToken bool) (string, error) {
+func CreateToken(userID int, isRefreshToken bool) (string, error) {
 	var (
 		expireValue int
 		expiration  time.Duration
@@ -41,7 +41,7 @@ func CreateToken(uuidToken string, isRefreshToken bool) (string, error) {
 			ExpiresAt: expiresAt.Unix(),
 			IssuedAt:  now.Unix(),
 			Issuer:    "veloras-api",
-			Subject:   uuidToken,
+			Subject:   fmt.Sprintf("%d", userID),
 		},
 	})
 }

@@ -16,7 +16,7 @@ type permissionService struct {
 }
 
 // DeletePermission implements PermissionService.
-func (p *permissionService) DeletePermission(ctx context.Context, id string) error {
+func (p *permissionService) DeletePermission(ctx context.Context, id int) error {
 	exists, _ := p.permissionRepo.GetPermissionById(ctx, id)
 
 	if exists == nil {
@@ -33,11 +33,11 @@ func (p *permissionService) DeletePermission(ctx context.Context, id string) err
 }
 
 // UpdatePermission implements PermissionService.
-func (p *permissionService) UpdatePermission(ctx context.Context, permissionAppDto appDto.PermissionAppDTO) (string, error) {
+func (p *permissionService) UpdatePermission(ctx context.Context, permissionAppDto appDto.PermissionAppDTO) (int, error) {
 	exists, _ := p.permissionRepo.GetPermissionById(ctx, permissionAppDto.ID)
 
 	if exists == nil {
-		return "", fmt.Errorf(msg.PermissionNotFound)
+		return 0, fmt.Errorf(msg.PermissionNotFound)
 	}
 
 	err := p.permissionRepo.UpdatePermission(ctx, &entity.Permission{
@@ -47,19 +47,19 @@ func (p *permissionService) UpdatePermission(ctx context.Context, permissionAppD
 	})
 
 	if err != nil {
-		return "", fmt.Errorf("%s: %w", msg.CouldNotUpdatePermission, err)
+		return 0, fmt.Errorf("%s: %w", msg.CouldNotUpdatePermission, err)
 	}
 
-	return msg.Success, nil
+	return permissionAppDto.ID, nil
 }
 
 // CreatePermission implements PermissionService.
-func (p *permissionService) CreatePermission(ctx context.Context, permissionAppDto appDto.PermissionAppDTO) (string, error) {
+func (p *permissionService) CreatePermission(ctx context.Context, permissionAppDto appDto.PermissionAppDTO) (int, error) {
 
 	exists, _ := p.permissionRepo.GetPermissionByName(ctx, permissionAppDto.Name)
 
 	if exists != nil {
-		return "", fmt.Errorf(msg.PermissionExists)
+		return 0, fmt.Errorf(msg.PermissionExists)
 	}
 
 	err := p.permissionRepo.CreatePermission(ctx, &entity.Permission{
@@ -68,10 +68,16 @@ func (p *permissionService) CreatePermission(ctx context.Context, permissionAppD
 	})
 
 	if err != nil {
-		return "", fmt.Errorf("%s: %w", msg.CouldNotCreatePermission, err)
+		return 0, fmt.Errorf("%s: %w", msg.CouldNotCreatePermission, err)
 	}
 
-	return msg.Success, nil
+	// Get the created permission to return its ID
+	createdPermission, err := p.permissionRepo.GetPermissionByName(ctx, permissionAppDto.Name)
+	if err != nil {
+		return 0, fmt.Errorf("%s: %w", msg.CouldNotCreatePermission, err)
+	}
+
+	return createdPermission.ID, nil
 }
 
 // GetPermissions implements PermissionService.

@@ -1,7 +1,7 @@
 package entity
 
 type Account struct {
-	ID          string `json:"id"`
+	ID          int    `json:"id"`
 	Email       string `json:"email"`
 	Username    string `json:"username"`
 	Password    string `json:"password"`
@@ -14,18 +14,18 @@ type Account struct {
 }
 
 type EmailVerification struct {
-	UserID    string `json:"user_id"`
-	Code      int    `json:"code"`
-	ExpiresAt int64  `json:"expires_at"`
+	UserID    int   `json:"user_id"`
+	Code      int   `json:"code"`
+	ExpiresAt int64 `json:"expires_at"`
 }
 
 type UpdateUserStatus struct {
-	ID     string `json:"id"`
-	Status int    `json:"status"`
+	ID     int `json:"id"`
+	Status int `json:"status"`
 }
 
 type Session struct {
-	UserID       string `json:"user_id"`
+	UserID       int    `json:"user_id"`
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 	ExpiresAt    int64  `json:"expires_at"`

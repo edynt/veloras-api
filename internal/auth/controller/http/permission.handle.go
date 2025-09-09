@@ -110,7 +110,7 @@ func (ph *PermissionHandler) UpdatePermission(ctx *gin.Context) (res interface{}
 	}
 
 	requestPermission := dto.PermissionAppDTO{
-		ID:          ctx.Param("id"),
+		ID:          utils.StringToInt(ctx.Param("id")),
 		Name:        req.Name,
 		Description: req.Description,
 	}
@@ -136,7 +136,7 @@ func (ph *PermissionHandler) UpdatePermission(ctx *gin.Context) (res interface{}
 // @Router /permissions/{id} [delete]
 func (ph *PermissionHandler) DeletePermission(ctx *gin.Context) (res interface{}, err error) {
 
-	err = ph.service.DeletePermission(ctx, ctx.Param("id"))
+	err = ph.service.DeletePermission(ctx, utils.StringToInt(ctx.Param("id")))
 
 	if err != nil {
 		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())

@@ -8,7 +8,7 @@ import (
 
 type PermissionService interface {
 	GetPermissions(ctx context.Context) ([]appDto.PermissionOutPut, error)
-	CreatePermission(ctx context.Context, permissionAppDto appDto.PermissionAppDTO) (string, error)
-	UpdatePermission(ctx context.Context, permissionAppDto appDto.PermissionAppDTO) (string, error)
-	DeletePermission(ctx context.Context, id string) error
+	CreatePermission(ctx context.Context, permissionAppDto appDto.PermissionAppDTO) (int, error)
+	UpdatePermission(ctx context.Context, permissionAppDto appDto.PermissionAppDTO) (int, error)
+	DeletePermission(ctx context.Context, id int) error
 }
