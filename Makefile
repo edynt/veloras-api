@@ -87,6 +87,10 @@ migrate-down:
 seeder-create:
 	goose -dir $(SEEDERS_DIR) create $(name) sql
 
+seeder-up:
+	@GOOSE_DRIVER=$(GOOSE_DRIVER) GOOSE_DBSTRING=$(GOOSE_DBSTRING) \
+	goose -dir=$(SEEDERS_DIR) up
+
 seeder-up-one:
 	@GOOSE_DRIVER=$(GOOSE_DRIVER) GOOSE_DBSTRING=$(GOOSE_DBSTRING) \
 	goose -dir=$(SEEDERS_DIR) up-by-one
