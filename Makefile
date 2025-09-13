@@ -16,7 +16,8 @@ GOOSE_DRIVER = postgres
 BINARY_NAME = veloras-cli
 MAIN_RUN = ./cmd/server/main.go
 SWAG_DOCS = ./cmd/swag/docs
-MIGRATIONS_DIR = ./internal/shared/schemas
+MIGRATIONS_DIR = ./internal/shared/schemas/migrations
+SEEDERS_DIR= ./internal/shared/schemas/seeders
 GOOSE_DBSTRING = postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable
 
 # Default target is to build the binary
@@ -65,7 +66,7 @@ swag:
 	swag init -g $(MAIN_RUN) -o $(SWAG_DOCS) --parseDependency --parseInternal --dir .
 
 # migrations
-create-migration:
+migrate-create:
 	goose -dir $(MIGRATIONS_DIR) create $(name) sql
 
 migrate-up-one:
@@ -79,5 +80,15 @@ migrate-up:
 migrate-down:
 	@GOOSE_DRIVER=$(GOOSE_DRIVER) GOOSE_DBSTRING=$(GOOSE_DBSTRING) \
 	goose -dir=$(MIGRATIONS_DIR) down
+
+
+# seeders
+
+seeder-create:
+	goose -dir $(SEEDERS_DIR) create $(name) sql
+
+seeder-up-one:
+	@GOOSE_DRIVER=$(GOOSE_DRIVER) GOOSE_DBSTRING=$(GOOSE_DBSTRING) \
+	goose -dir=$(SEEDERS_DIR) up-by-one
 
 .PHONY: all build clean build-linux build-windows build-mac build-all install start swag
