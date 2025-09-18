@@ -143,8 +143,10 @@ func (r *roleService) CreateRole(ctx context.Context, roleAppDTO dto.RoleAppDTO)
 // CreateUser implements RoleService.
 func NewRoleService(
 	roleRepo roleRepo.RoleRepository,
+	permissionRepo permissionRepo.PermissisonRepository,
 ) RoleService {
 	return &roleService{
-		roleRepo: roleRepo,
+		roleRepo:       roleRepo,
+		permissionRepo: permissionRepo,
 	}
 }
