@@ -161,6 +161,37 @@ func (rh *RoleHandler) GetRole(ctx *gin.Context) (res interface{}, err error) {
 	return role, nil
 }
 
+func (rh *RoleHandler) AssignPermissions(ctx *gin.Context) (res interface{}, err error) {
+	var req ctlDto.AssignPermissionReq
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
+	}
+
+	validation, exists := ctx.Get("validation")
+
+	if !exists {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, msg.ValidationNotFoundInContext)
+	}
+
+	if apiErr := utils.ValidateStruct(req, validation.(*validator.Validate)); apiErr != nil {
+		return nil, apiErr
+	}
+
+	requestRolePermission := dto.RolePermissionAppDTO{
+		RoleID:       req.RoleID,
+		PermissionID: req.PermissionID,
+	}
+
+	err = rh.service.AssignPermissions(ctx, requestRolePermission)
+
+	if err != nil {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
+	}
+
+	return true, nil
+}
+
 func NewRoleHandler(service service.RoleService) *RoleHandler {
 	return &RoleHandler{service: service}
 }

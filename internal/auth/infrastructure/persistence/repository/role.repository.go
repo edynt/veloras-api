@@ -97,6 +97,17 @@ func (r *roleRepository) UpdateRole(ctx context.Context, Role *entity.Role) erro
 	return nil
 }
 
+// AssignPermissions implements repository.RoleRepository.
+func (r *roleRepository) AssignPermissions(ctx context.Context, rolePermission *entity.RolePermission) error {
+	var param gen.AssignPermissionToRoleParams
+
+	if err := utils.SafeCopy(&param, rolePermission); err != nil {
+		return err
+	}
+
+	return r.db.AssignPermissionToRole(ctx, param)
+}
+
 func NewRoleRepository(db *pgxpool.Pool) repository.RoleRepository {
 	queries := roleSqlc.New(db) // db is *pgxpool.Pool
 	return &roleRepository{db: queries}

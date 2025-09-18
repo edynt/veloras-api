@@ -12,4 +12,5 @@ type RoleService interface {
 	DeleteRole(ctx context.Context, id int) error
 	GetRoles(ctx context.Context) ([]appDto.RoleOutPut, error)
 	GetRoleById(ctx context.Context, id int) (appDto.RoleOutPut, error)
+	AssignPermissions(ctx context.Context, rolePermissionAppDto appDto.RolePermissionAppDTO) error
 }

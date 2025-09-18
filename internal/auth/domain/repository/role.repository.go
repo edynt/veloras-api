@@ -13,4 +13,5 @@ type RoleRepository interface {
 	CreateRole(ctx context.Context, Role *entity.Role) error
 	UpdateRole(ctx context.Context, Role *entity.Role) error
 	DeleteRole(ctx context.Context, id int) error
+	AssignPermissions(ctx context.Context, rolePermission *entity.RolePermission) error
 }

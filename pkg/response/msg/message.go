@@ -53,4 +53,11 @@ const (
 	RoleNotExists                  = "Role not exists"
 	CouldNotDeleteRole             = "Could not delete role"
 	NotFound                       = "Not found"
+	FailedToGetRoleByName          = "Failed to get role by name"
+	FailedToGetRoleById            = "Failed to get role by id"
+	CouldNotUpdateUser             = "Could not update user"
+	CouldNotDeleteUser             = "Could not delete user"
+	FailedToGetUserById            = "Failed to get user by id"
+	PermissionNotExists            = "Permission not exists"
+	CouldNotAssignPermission       = "Could not assign permission"
 )

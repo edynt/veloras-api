@@ -15,5 +15,5 @@ func RegisterRoleRoutes(rg *gin.RouterGroup, handler *RoleHandler) {
 	role.DELETE("/:id", response.Wrap(handler.DeleteRole))
 	role.GET("/:id", response.Wrap(handler.GetRole))
 	role.GET("/", response.Wrap(handler.GetRoles))
-
+	role.POST("/assign-permissions", response.Wrap(handler.AssignPermissions))
 }

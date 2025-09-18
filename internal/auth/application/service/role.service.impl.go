@@ -7,13 +7,42 @@ import (
 	"github.com/edynnt/veloras-api/internal/auth/application/service/dto"
 	appDto "github.com/edynnt/veloras-api/internal/auth/application/service/dto"
 	"github.com/edynnt/veloras-api/internal/auth/domain/model/entity"
+	permissionRepo "github.com/edynnt/veloras-api/internal/auth/domain/repository"
 	roleRepo "github.com/edynnt/veloras-api/internal/auth/domain/repository"
 	"github.com/edynnt/veloras-api/pkg/response/msg"
 	"github.com/edynnt/veloras-api/pkg/utils"
 )
 
 type roleService struct {
-	roleRepo roleRepo.RoleRepository
+	roleRepo       roleRepo.RoleRepository
+	permissionRepo permissionRepo.PermissisonRepository
+}
+
+// AssignPermissions implements RoleService.
+func (r *roleService) AssignPermissions(ctx context.Context, rolePermissionAppDto appDto.RolePermissionAppDTO) error {
+	existsRole, _ := r.roleRepo.GetRoleById(ctx, rolePermissionAppDto.RoleID)
+
+	if existsRole == nil {
+		return fmt.Errorf(msg.RoleNotExists)
+	}
+
+	existsPermission, _ := r.permissionRepo.GetPermissionById(ctx, rolePermissionAppDto.PermissionID)
+
+	if existsPermission == nil {
+		return fmt.Errorf(msg.PermissionNotExists)
+	}
+
+	err := r.roleRepo.AssignPermissions(ctx, &entity.RolePermission{
+		RoleID:       rolePermissionAppDto.RoleID,
+		PermissionID: rolePermissionAppDto.PermissionID,
+	})
+
+	if err != nil {
+		return fmt.Errorf("%s: %w", msg.CouldNotAssignPermission, err)
+	}
+
+	return nil
+
 }
 
 // GetRoleById implements RoleService.
