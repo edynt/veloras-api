@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/edynnt/veloras-api/internal/cron"
@@ -48,4 +49,29 @@ func (h *CronHandler) RunManualCleanup(c *gin.Context) {
 	}
 
 	response.SuccessResponse(c, "Cleanup completed successfully")
+}
+
+// RunManualLogCleanup runs log cleanup manually
+// @Summary Run manual log cleanup
+// @Description Manually trigger cleanup of old log files
+// @Tags admin
+// @Accept json
+// @Produce json
+// @Param days query int false "Number of days to keep logs (default: 30)"
+// @Success 200 {object} response.Response{data=string}
+// @Failure 500 {object} response.Response{data=string}
+// @Router /admin/cron/log-cleanup [post]
+func (h *CronHandler) RunManualLogCleanup(c *gin.Context) {
+	days := c.DefaultQuery("days", "30")
+	dayCount := 30
+	if d, err := fmt.Sscanf(days, "%d", &dayCount); err != nil || d != 1 {
+		dayCount = 30
+	}
+
+	if err := h.Scheduler.RunManualLogCleanup(dayCount); err != nil {
+		response.ErrorResponse(c, http.StatusInternalServerError, "Manual log cleanup failed", err.Error())
+		return
+	}
+
+	response.SuccessResponse(c, "Log cleanup completed successfully")
 }

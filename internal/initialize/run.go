@@ -29,6 +29,9 @@ func Run() (*gin.Engine, string) {
 	// Create cron handler for HTTP endpoints
 	cronHandler := cronHttp.NewCronHandler(cronScheduler)
 
-	r := InitRouter(db, global.Config.Logger.Log_level, cronHandler)
+	// Create log handler for log viewing
+	logHandler := cronHttp.NewLogHandler("./storage/logs")
+
+	r := InitRouter(db, global.Config.Logger.Log_level, cronHandler, logHandler)
 	return r, global.Config.Server.Port
 }

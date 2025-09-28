@@ -2,6 +2,8 @@ package logger
 
 import (
 	"os"
+	"path/filepath"
+	"time"
 
 	"github.com/edynnt/veloras-api/pkg/config"
 	"github.com/natefinch/lumberjack"
@@ -36,16 +38,33 @@ func NewLogger(config config.LoggerSetting) *LoggerZap {
 	}
 
 	encoder := getEncoderLog()
+
+	// Generate daily log filename
+	dailyLogFile := generateDailyLogFile(config.File_log_name)
+
 	hook := lumberjack.Logger{
-		Filename:   config.File_log_name,
+		Filename:   dailyLogFile,
 		MaxSize:    config.Max_size, // megabytes
 		MaxBackups: config.Max_backups,
 		MaxAge:     config.Max_age,  //days
-		Compress:   config.Compress, // disabled by defaultD
+		Compress:   config.Compress, // disabled by default
 	}
 
 	core := zapcore.NewCore(encoder, zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), zapcore.AddSync(&hook)), level)
 	return &LoggerZap{zap.New(core, zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel))}
+}
+
+// generateDailyLogFile creates a log filename with date suffix
+func generateDailyLogFile(basePath string) string {
+	dir := filepath.Dir(basePath)
+	filename := filepath.Base(basePath)
+	ext := filepath.Ext(filename)
+	name := filename[:len(filename)-len(ext)]
+
+	// Add date suffix: YYYY-MM-DD
+	dateStr := time.Now().Format("2006-01-02")
+
+	return filepath.Join(dir, name+"-"+dateStr+ext)
 }
 
 func getEncoderLog() zapcore.Encoder {

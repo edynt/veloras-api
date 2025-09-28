@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func InitRouter(db *pgxpool.Pool, logLevel string, cronScheduler *cronHttp.CronHandler) *gin.Engine {
+func InitRouter(db *pgxpool.Pool, logLevel string, cronScheduler *cronHttp.CronHandler, logHandler *cronHttp.LogHandler) *gin.Engine {
 	var r *gin.Engine
 
 	if logLevel == "debug" {
@@ -40,6 +40,17 @@ func InitRouter(db *pgxpool.Pool, logLevel string, cronScheduler *cronHttp.CronH
 	if cronScheduler != nil {
 		cronHttp.RegisterCronRoutes(v1, cronScheduler)
 	}
+
+	// Admin routes for log management
+	if logHandler != nil {
+		cronHttp.RegisterLogRoutes(v1, logHandler)
+	}
+
+	// Serve static files (log viewer)
+	r.Static("/web", "./web")
+	r.GET("/", func(c *gin.Context) {
+		c.Redirect(302, "/web/logs.html")
+	})
 
 	return r
 }

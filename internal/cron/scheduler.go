@@ -11,10 +11,11 @@ import (
 )
 
 type Scheduler struct {
-	cron           *cron.Cron
-	cleanupService *CleanupService
-	ctx            context.Context
-	cancel         context.CancelFunc
+	cron              *cron.Cron
+	cleanupService    *CleanupService
+	logCleanupService *LogCleanupService
+	ctx               context.Context
+	cancel            context.CancelFunc
 }
 
 func NewScheduler(queries *gen.Queries) *Scheduler {
@@ -24,12 +25,14 @@ func NewScheduler(queries *gen.Queries) *Scheduler {
 	c := cron.New(cron.WithLocation(time.UTC))
 
 	cleanupService := NewCleanupService(queries)
+	logCleanupService := NewLogCleanupService("./storage/logs")
 
 	return &Scheduler{
-		cron:           c,
-		cleanupService: cleanupService,
-		ctx:            ctx,
-		cancel:         cancel,
+		cron:              c,
+		cleanupService:    cleanupService,
+		logCleanupService: logCleanupService,
+		ctx:               ctx,
+		cancel:            cancel,
 	}
 }
 
@@ -49,6 +52,13 @@ func (s *Scheduler) Start() error {
 		return err
 	}
 
+	// Schedule log cleanup at 01:00 UTC (after daily cleanup)
+	_, err = s.cron.AddFunc("0 1 * * *", s.logCleanupJob)
+	if err != nil {
+		global.Logger.Error("Failed to schedule log cleanup job", zap.Error(err))
+		return err
+	}
+
 	// Schedule weekly stats report (optional)
 	_, err = s.cron.AddFunc("0 1 * * 1", s.weeklyStatsJob)
 	if err != nil {
@@ -61,6 +71,7 @@ func (s *Scheduler) Start() error {
 
 	global.Logger.Info("Cron scheduler started successfully",
 		zap.String("daily_cleanup", "00:01 UTC"),
+		zap.String("log_cleanup", "01:00 UTC"),
 		zap.String("weekly_stats", "01:00 UTC Monday"))
 
 	return nil
@@ -92,6 +103,19 @@ func (s *Scheduler) dailyCleanupJob() {
 		global.Logger.Error("Daily cleanup job failed", zap.Error(err))
 	} else {
 		global.Logger.Info("Daily cleanup job completed successfully")
+	}
+}
+
+// logCleanupJob runs daily log cleanup to remove old log files
+func (s *Scheduler) logCleanupJob() {
+	global.Logger.Info("Starting log cleanup job",
+		zap.String("scheduled_time", time.Now().Format("2006-01-02 15:04:05")))
+
+	// Cleanup logs older than 30 days
+	if err := s.logCleanupService.CleanupOldLogs(30); err != nil {
+		global.Logger.Error("Log cleanup job failed", zap.Error(err))
+	} else {
+		global.Logger.Info("Log cleanup job completed successfully")
 	}
 }
 
@@ -133,6 +157,21 @@ func (s *Scheduler) RunManualCleanup() error {
 	}
 
 	global.Logger.Info("Manual cleanup completed successfully")
+	return nil
+}
+
+// RunManualLogCleanup runs log cleanup manually (for testing or admin purposes)
+func (s *Scheduler) RunManualLogCleanup(days int) error {
+	global.Logger.Info("Running manual log cleanup",
+		zap.String("start_time", time.Now().Format("2006-01-02 15:04:05")),
+		zap.Int("days", days))
+
+	if err := s.logCleanupService.CleanupOldLogs(days); err != nil {
+		global.Logger.Error("Manual log cleanup failed", zap.Error(err))
+		return err
+	}
+
+	global.Logger.Info("Manual log cleanup completed successfully")
 	return nil
 }
 
