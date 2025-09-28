@@ -295,3 +295,86 @@ func (as *authService) ChangePassword(ctx context.Context, userID int, currentPa
 
 	return nil
 }
+
+// ForgotPassword implements AuthService.
+func (as *authService) ForgotPassword(ctx context.Context, email string) error {
+	// 1. Check if user exists with this email
+	user, err := as.authRepo.GetUserByEmail(ctx, email)
+	if err != nil {
+		return fmt.Errorf("%s: %w", msg.FailedToGetUserById, err)
+	}
+
+	if user == nil {
+		// For security reasons, don't reveal if email exists or not
+		// Just return success message
+		return nil
+	}
+
+	// 2. Generate reset token
+	resetToken := utils.GenerateRandomString(32)
+
+	// 3. Set token expiration (1 hour from now)
+	tokenExpiresAt := utils.AddHours(1)
+
+	// 4. Save reset token to database
+	err = as.authRepo.CreatePasswordReset(ctx, &entity.PasswordReset{
+		UserID:     user.ID,
+		ResetToken: resetToken,
+		ExpiresAt:  tokenExpiresAt,
+	})
+
+	if err != nil {
+		return fmt.Errorf("%s: %w", msg.FailedToCreatePasswordReset, err)
+	}
+
+	// 5. Send email with reset link
+	go utils.SendTemplateEmailOtp(
+		[]string{email}, global.Config.SMTP.User,
+		"reset-password.html",
+		map[string]interface{}{
+			"ResetToken": resetToken,
+			"Username":   user.Username,
+			"ExpiresAt":  tokenExpiresAt,
+		},
+	)
+
+	return nil
+}
+
+// ResetPassword implements AuthService.
+func (as *authService) ResetPassword(ctx context.Context, token, newPassword string) error {
+	// 1. Find password reset record by token
+	passwordReset, err := as.authRepo.GetPasswordResetByToken(ctx, token)
+	if err != nil {
+		return fmt.Errorf("%s: %w", msg.InvalidResetToken, err)
+	}
+
+	if passwordReset == nil {
+		return fmt.Errorf(msg.InvalidResetToken)
+	}
+
+	// 2. Check if token is expired
+	now := utils.GetNowUnix()
+	if passwordReset.ExpiresAt < now {
+		return fmt.Errorf(msg.ResetTokenExpired)
+	}
+
+	// 3. Hash new password
+	hashedPasswordBytes, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("%s: %w", msg.FailedToSecurePassword, err)
+	}
+	hashedPassword := string(hashedPasswordBytes)
+
+	// 4. Update user password
+	if err := as.authRepo.UpdateUserPassword(ctx, passwordReset.UserID, hashedPassword); err != nil {
+		return fmt.Errorf("%s: %w", msg.FailedToUpdatePassword, err)
+	}
+
+	// 5. Delete the reset token
+	if err := as.authRepo.DeletePasswordReset(ctx, passwordReset.UserID, token); err != nil {
+		return fmt.Errorf("%s: %w", msg.FailedToDeletePasswordReset, err)
+	}
+
+	return nil
+}

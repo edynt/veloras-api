@@ -219,3 +219,89 @@ func (a *authRepository) UpdateUserPassword(ctx context.Context, userId int, has
 
 	return nil
 }
+
+// GetUserByEmail implements repository.AuthRepository.
+func (a *authRepository) GetUserByEmail(ctx context.Context, email string) (*entity.Account, error) {
+	res, err := a.db.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+
+	var entityResult entity.Account
+	if err := utils.SafeCopy(&entityResult, &res); err != nil {
+		return nil, err
+	}
+
+	return &entityResult, nil
+}
+
+// CreatePasswordReset implements repository.AuthRepository.
+func (a *authRepository) CreatePasswordReset(ctx context.Context, passwordReset *entity.PasswordReset) error {
+	param := gen.CreatePasswordResetParams{
+		UserID: pgtype.Int4{
+			Int32: int32(passwordReset.UserID),
+			Valid: true,
+		},
+		ResetToken: passwordReset.ResetToken,
+		ExpiresAt:  passwordReset.ExpiresAt,
+	}
+
+	err := a.db.CreatePasswordReset(ctx, param)
+	if err != nil {
+		return fmt.Errorf("%s: %w", msg.FailedToCreatePasswordReset, err)
+	}
+
+	return nil
+}
+
+// GetPasswordReset implements repository.AuthRepository.
+func (a *authRepository) GetPasswordReset(ctx context.Context, userId int, token string) (*entity.PasswordReset, error) {
+	res, err := a.db.GetPasswordReset(ctx, gen.GetPasswordResetParams{
+		UserID: pgtype.Int4{
+			Int32: int32(userId),
+			Valid: true,
+		},
+		ResetToken: token,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var entityResult entity.PasswordReset
+	if err := utils.SafeCopy(&entityResult, &res); err != nil {
+		return nil, err
+	}
+
+	return &entityResult, nil
+}
+
+// GetPasswordResetByToken implements repository.AuthRepository.
+func (a *authRepository) GetPasswordResetByToken(ctx context.Context, token string) (*entity.PasswordReset, error) {
+	res, err := a.db.GetPasswordResetByToken(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+
+	var entityResult entity.PasswordReset
+	if err := utils.SafeCopy(&entityResult, &res); err != nil {
+		return nil, err
+	}
+
+	return &entityResult, nil
+}
+
+// DeletePasswordReset implements repository.AuthRepository.
+func (a *authRepository) DeletePasswordReset(ctx context.Context, userId int, token string) error {
+	err := a.db.DeletePasswordReset(ctx, gen.DeletePasswordResetParams{
+		UserID: pgtype.Int4{
+			Int32: int32(userId),
+			Valid: true,
+		},
+		ResetToken: token,
+	})
+	if err != nil {
+		return fmt.Errorf("%s: %w", msg.FailedToDeletePasswordReset, err)
+	}
+
+	return nil
+}

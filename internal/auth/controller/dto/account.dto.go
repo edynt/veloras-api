@@ -33,3 +33,13 @@ type ChangePasswordReq struct {
 	NewPassword     string `json:"new_password" validate:"required,min=6"`
 	ConfirmPassword string `json:"confirm_password" validate:"required,min=6,eqfield=NewPassword"`
 }
+
+type ForgotPasswordReq struct {
+	Email string `json:"email" validate:"required,email"`
+}
+
+type ResetPasswordReq struct {
+	Token           string `json:"token" validate:"required"`
+	NewPassword     string `json:"new_password" validate:"required,min=6"`
+	ConfirmPassword string `json:"confirm_password" validate:"required,min=6,eqfield=NewPassword"`
+}

@@ -13,6 +13,8 @@ func RegisterAuthRoutes(rg *gin.RouterGroup, handler *AuthHandler) {
 	auth.GET("/verify/:userId/:code", response.Wrap(handler.VerifyUser))
 	auth.POST("/login", response.Wrap(handler.LoginUser))
 	auth.POST("/refresh", response.Wrap(handler.RefreshToken))
+	auth.POST("/forgot-password", response.Wrap(handler.ForgotPassword))
+	auth.POST("/reset-password", response.Wrap(handler.ResetPassword))
 
 	// protected routes
 	protected := auth.Group("")

@@ -13,4 +13,6 @@ type AuthService interface {
 	RefreshToken(ctx context.Context, refreshToken string) (appDto.TokenOut, error)
 	Logout(ctx context.Context) error
 	ChangePassword(ctx context.Context, userID int, currentPassword, newPassword string) error
+	ForgotPassword(ctx context.Context, email string) error
+	ResetPassword(ctx context.Context, token, newPassword string) error
 }

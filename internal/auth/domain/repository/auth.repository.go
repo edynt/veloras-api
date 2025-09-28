@@ -14,6 +14,7 @@ type AuthRepository interface {
 	GetVerificationCode(ctx context.Context, userId int, code int) (*entity.EmailVerification, error)
 	UpdateUserStatus(ctx context.Context, userId int, status int) error
 	GetUserByUsername(ctx context.Context, userName string) (*entity.Account, error)
+	GetUserByEmail(ctx context.Context, email string) (*entity.Account, error)
 	GetUserByID(ctx context.Context, userId int) (*entity.Account, error)
 	ActiveUser(ctx context.Context, userId int) error
 	DeleteVerificationCode(ctx context.Context, userId int, code int) error
@@ -21,4 +22,8 @@ type AuthRepository interface {
 	RefreshToken(ctx context.Context, refreshToken string) error
 	DeleteSessionsByUser(ctx context.Context, userId int) error
 	UpdateUserPassword(ctx context.Context, userId int, hashedPassword string) error
+	CreatePasswordReset(ctx context.Context, passwordReset *entity.PasswordReset) error
+	GetPasswordReset(ctx context.Context, userId int, token string) (*entity.PasswordReset, error)
+	GetPasswordResetByToken(ctx context.Context, token string) (*entity.PasswordReset, error)
+	DeletePasswordReset(ctx context.Context, userId int, token string) error
 }

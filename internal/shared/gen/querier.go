@@ -29,6 +29,7 @@ type Querier interface {
 	DeleteVerificationCode(ctx context.Context, userID pgtype.Int4) error
 	GetEmailVerification(ctx context.Context, arg GetEmailVerificationParams) (EmailVerification, error)
 	GetPasswordReset(ctx context.Context, arg GetPasswordResetParams) (PasswordReset, error)
+	GetPasswordResetByToken(ctx context.Context, resetToken string) (PasswordReset, error)
 	GetPermissionById(ctx context.Context, id int32) (Permission, error)
 	GetPermissionByName(ctx context.Context, name string) (Permission, error)
 	GetPermissions(ctx context.Context) ([]Permission, error)

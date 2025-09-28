@@ -62,3 +62,20 @@ func (q *Queries) GetPasswordReset(ctx context.Context, arg GetPasswordResetPara
 	)
 	return i, err
 }
+
+const getPasswordResetByToken = `-- name: GetPasswordResetByToken :one
+SELECT id, user_id, reset_token, expires_at, created_at FROM password_resets WHERE reset_token = $1
+`
+
+func (q *Queries) GetPasswordResetByToken(ctx context.Context, resetToken string) (PasswordReset, error) {
+	row := q.db.QueryRow(ctx, getPasswordResetByToken, resetToken)
+	var i PasswordReset
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.ResetToken,
+		&i.ExpiresAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}

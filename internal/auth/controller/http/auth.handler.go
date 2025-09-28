@@ -240,3 +240,75 @@ func (ah *AuthHandler) ChangePassword(ctx *gin.Context) (res interface{}, err er
 		"message": msg.PasswordChangedSuccessfully,
 	}, nil
 }
+
+// ForgotPassword
+// @Summary Request password reset
+// @Description Send password reset instructions to user's email
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body ctlDto.ForgotPasswordReq true "Forgot password request"
+// @Success 200 {object} map[string]interface{} "Returns success message"
+// @Failure 400 {object} response.APIError "Invalid request"
+// @Router /auth/forgot-password [post]
+func (ah *AuthHandler) ForgotPassword(ctx *gin.Context) (res interface{}, err error) {
+	var req ctlDto.ForgotPasswordReq
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
+	}
+
+	validation, exists := ctx.Get("validation")
+	if !exists {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, msg.ValidationNotFoundInContext)
+	}
+
+	if apiErr := utils.ValidateStruct(req, validation.(*validator.Validate)); apiErr != nil {
+		return nil, apiErr
+	}
+
+	err = ah.service.ForgotPassword(ctx, req.Email)
+	if err != nil {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.ForgotPasswordFailed, err.Error())
+	}
+
+	return map[string]interface{}{
+		"message": msg.ForgotPasswordSuccess,
+	}, nil
+}
+
+// ResetPassword
+// @Summary Reset password with token
+// @Description Reset user password using the token received via email
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body ctlDto.ResetPasswordReq true "Reset password request"
+// @Success 200 {object} map[string]interface{} "Returns success message"
+// @Failure 400 {object} response.APIError "Invalid request or token"
+// @Router /auth/reset-password [post]
+func (ah *AuthHandler) ResetPassword(ctx *gin.Context) (res interface{}, err error) {
+	var req ctlDto.ResetPasswordReq
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
+	}
+
+	validation, exists := ctx.Get("validation")
+	if !exists {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, msg.ValidationNotFoundInContext)
+	}
+
+	if apiErr := utils.ValidateStruct(req, validation.(*validator.Validate)); apiErr != nil {
+		return nil, apiErr
+	}
+
+	err = ah.service.ResetPassword(ctx, req.Token, req.NewPassword)
+	if err != nil {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.ResetPasswordFailed, err.Error())
+	}
+
+	return map[string]interface{}{
+		"message": msg.ResetPasswordSuccess,
+	}, nil
+}
