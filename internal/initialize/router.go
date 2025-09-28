@@ -3,13 +3,14 @@ package initialize
 import (
 	authHttp "github.com/edynnt/veloras-api/internal/auth/controller/http"
 	permissionHttp "github.com/edynnt/veloras-api/internal/auth/controller/http"
+	cronHttp "github.com/edynnt/veloras-api/internal/cron/controller/http"
 	initialize "github.com/edynnt/veloras-api/internal/initialize/auth"
 	"github.com/edynnt/veloras-api/internal/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func InitRouter(db *pgxpool.Pool, logLevel string) *gin.Engine {
+func InitRouter(db *pgxpool.Pool, logLevel string, cronScheduler *cronHttp.CronHandler) *gin.Engine {
 	var r *gin.Engine
 
 	if logLevel == "debug" {
@@ -35,6 +36,10 @@ func InitRouter(db *pgxpool.Pool, logLevel string) *gin.Engine {
 	roleHandler := initialize.InitRole(db)
 	authHttp.RegisterRoleRoutes(v1, roleHandler)
 
-	return r
+	// Admin routes for cron management
+	if cronScheduler != nil {
+		cronHttp.RegisterCronRoutes(v1, cronScheduler)
+	}
 
+	return r
 }

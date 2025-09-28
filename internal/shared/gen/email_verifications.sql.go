@@ -11,6 +11,17 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const countExpiredEmailVerifications = `-- name: CountExpiredEmailVerifications :one
+SELECT COUNT(*) FROM email_verifications WHERE expires_at < $1
+`
+
+func (q *Queries) CountExpiredEmailVerifications(ctx context.Context, expiresAt int64) (int64, error) {
+	row := q.db.QueryRow(ctx, countExpiredEmailVerifications, expiresAt)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createEmailVerification = `-- name: CreateEmailVerification :one
 INSERT INTO email_verifications (user_id, code, expires_at)
 VALUES ($1, $2, $3)
@@ -34,6 +45,15 @@ func (q *Queries) CreateEmailVerification(ctx context.Context, arg CreateEmailVe
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const deleteExpiredEmailVerifications = `-- name: DeleteExpiredEmailVerifications :exec
+DELETE FROM email_verifications WHERE expires_at < $1
+`
+
+func (q *Queries) DeleteExpiredEmailVerifications(ctx context.Context, expiresAt int64) error {
+	_, err := q.db.Exec(ctx, deleteExpiredEmailVerifications, expiresAt)
+	return err
 }
 
 const getEmailVerification = `-- name: GetEmailVerification :one

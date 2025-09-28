@@ -6,6 +6,7 @@ type Config struct {
 	Server     ServerSetting     `mapstructure:"server"`
 	JWT        JWTSetting        `mapstructure:"jwt"`
 	SMTP       SMTPSetting       `mapstructure:"mail"`
+	Cron       CronSetting       `mapstructure:"cron"`
 }
 
 type LoggerSetting struct {
@@ -46,4 +47,12 @@ type SMTPSetting struct {
 	Port     string `mapstructure:"smtp_port"`
 	User     string `mapstructure:"smtp_user"`
 	Password string `mapstructure:"smtp_password"`
+}
+
+type CronSetting struct {
+	Enabled               bool `mapstructure:"enabled"`
+	CleanupSessions       bool `mapstructure:"cleanup_sessions"`
+	CleanupTokens         bool `mapstructure:"cleanup_tokens"`
+	CleanupVerifications  bool `mapstructure:"cleanup_verifications"`
+	CleanupPasswordResets bool `mapstructure:"cleanup_password_resets"`
 }

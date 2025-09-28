@@ -11,6 +11,17 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const countExpiredSessions = `-- name: CountExpiredSessions :one
+SELECT COUNT(*) FROM sessions WHERE expires_at < $1
+`
+
+func (q *Queries) CountExpiredSessions(ctx context.Context, expiresAt int64) (int64, error) {
+	row := q.db.QueryRow(ctx, countExpiredSessions, expiresAt)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createSession = `-- name: CreateSession :one
 INSERT INTO sessions (user_id, refresh_token, expires_at)
 VALUES ($1, $2, $3)
@@ -34,6 +45,15 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (S
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const deleteExpiredSessions = `-- name: DeleteExpiredSessions :exec
+DELETE FROM sessions WHERE expires_at < $1
+`
+
+func (q *Queries) DeleteExpiredSessions(ctx context.Context, expiresAt int64) error {
+	_, err := q.db.Exec(ctx, deleteExpiredSessions, expiresAt)
+	return err
 }
 
 const deleteSession = `-- name: DeleteSession :exec

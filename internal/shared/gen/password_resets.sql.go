@@ -11,6 +11,17 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const countExpiredPasswordResets = `-- name: CountExpiredPasswordResets :one
+SELECT COUNT(*) FROM password_resets WHERE expires_at < $1
+`
+
+func (q *Queries) CountExpiredPasswordResets(ctx context.Context, expiresAt int64) (int64, error) {
+	row := q.db.QueryRow(ctx, countExpiredPasswordResets, expiresAt)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createPasswordReset = `-- name: CreatePasswordReset :exec
 INSERT INTO password_resets (user_id, reset_token, expires_at)
 VALUES ($1, $2, $3)
@@ -24,6 +35,15 @@ type CreatePasswordResetParams struct {
 
 func (q *Queries) CreatePasswordReset(ctx context.Context, arg CreatePasswordResetParams) error {
 	_, err := q.db.Exec(ctx, createPasswordReset, arg.UserID, arg.ResetToken, arg.ExpiresAt)
+	return err
+}
+
+const deleteExpiredPasswordResets = `-- name: DeleteExpiredPasswordResets :exec
+DELETE FROM password_resets WHERE expires_at < $1
+`
+
+func (q *Queries) DeleteExpiredPasswordResets(ctx context.Context, expiresAt int64) error {
+	_, err := q.db.Exec(ctx, deleteExpiredPasswordResets, expiresAt)
 	return err
 }
 

@@ -11,3 +11,9 @@ DELETE FROM sessions WHERE id = $1;
 
 -- name: DeleteSessionsByUser :exec
 DELETE FROM sessions WHERE user_id = $1;
+
+-- name: DeleteExpiredSessions :exec
+DELETE FROM sessions WHERE expires_at < $1;
+
+-- name: CountExpiredSessions :one
+SELECT COUNT(*) FROM sessions WHERE expires_at < $1;

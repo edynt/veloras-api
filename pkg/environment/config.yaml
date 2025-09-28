@@ -28,3 +28,9 @@ mail:
   smtp_port: "587"
   smtp_user: ${SMTP_USER}
   smtp_password: ${SMTP_PASSWORD}
+cron:
+  enabled: true
+  cleanup_sessions: true
+  cleanup_tokens: true
+  cleanup_verifications: true
+  cleanup_password_resets: true

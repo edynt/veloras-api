@@ -10,3 +10,9 @@ DELETE FROM password_resets WHERE user_id = $1 AND reset_token = $2;
 
 -- name: GetPasswordResetByToken :one
 SELECT * FROM password_resets WHERE reset_token = $1;
+
+-- name: DeleteExpiredPasswordResets :exec
+DELETE FROM password_resets WHERE expires_at < $1;
+
+-- name: CountExpiredPasswordResets :one
+SELECT COUNT(*) FROM password_resets WHERE expires_at < $1;

@@ -14,12 +14,18 @@ type Querier interface {
 	ActiveUser(ctx context.Context, id int32) (ActiveUserRow, error)
 	AssignPermissionToRole(ctx context.Context, arg AssignPermissionToRoleParams) error
 	AssignRoleToUser(ctx context.Context, arg AssignRoleToUserParams) error
+	CountExpiredEmailVerifications(ctx context.Context, expiresAt int64) (int64, error)
+	CountExpiredPasswordResets(ctx context.Context, expiresAt int64) (int64, error)
+	CountExpiredSessions(ctx context.Context, expiresAt int64) (int64, error)
 	CreateEmailVerification(ctx context.Context, arg CreateEmailVerificationParams) (EmailVerification, error)
 	CreatePasswordReset(ctx context.Context, arg CreatePasswordResetParams) error
 	CreatePermission(ctx context.Context, arg CreatePermissionParams) error
 	CreateRole(ctx context.Context, arg CreateRoleParams) error
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error)
+	DeleteExpiredEmailVerifications(ctx context.Context, expiresAt int64) error
+	DeleteExpiredPasswordResets(ctx context.Context, expiresAt int64) error
+	DeleteExpiredSessions(ctx context.Context, expiresAt int64) error
 	DeletePasswordReset(ctx context.Context, arg DeletePasswordResetParams) error
 	DeletePermission(ctx context.Context, id int32) error
 	DeleteRole(ctx context.Context, id int32) error

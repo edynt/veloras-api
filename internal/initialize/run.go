@@ -3,6 +3,7 @@ package initialize
 import (
 	"log"
 
+	cronHttp "github.com/edynnt/veloras-api/internal/cron/controller/http"
 	"github.com/edynnt/veloras-api/pkg/global"
 	"github.com/edynnt/veloras-api/pkg/response/msg"
 	"github.com/gin-gonic/gin"
@@ -19,6 +20,15 @@ func Run() (*gin.Engine, string) {
 		log.Fatalf("%s: %v", msg.FailedToInitDB, err)
 	}
 
-	r := InitRouter(db, global.Config.Logger.Log_level)
+	// Initialize and start cron scheduler
+	cronScheduler := InitCronScheduler(db)
+	if err := cronScheduler.Start(); err != nil {
+		log.Fatalf("Failed to start cron scheduler: %v", err)
+	}
+
+	// Create cron handler for HTTP endpoints
+	cronHandler := cronHttp.NewCronHandler(cronScheduler)
+
+	r := InitRouter(db, global.Config.Logger.Log_level, cronHandler)
 	return r, global.Config.Server.Port
 }
