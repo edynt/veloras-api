@@ -29,3 +29,8 @@ type UserOutPut struct {
 	RefreshToken   string `json:"refresh_token"`
 	TokenExpiresAt int64  `json:"token_expires_at"`
 }
+
+type TokenOut struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}

@@ -11,4 +11,5 @@ func RegisterAuthRoutes(rg *gin.RouterGroup, handler *AuthHandler) {
 	auth.POST("/register", response.Wrap(handler.RegisterUser))
 	auth.GET("/verify/:userId/:code", response.Wrap(handler.VerifyUser))
 	auth.POST("/login", response.Wrap(handler.LoginUser))
+    auth.POST("/refresh", response.Wrap(handler.RefreshToken))
 }

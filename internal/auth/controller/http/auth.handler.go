@@ -137,3 +137,36 @@ func (ah *AuthHandler) LoginUser(ctx *gin.Context) (res interface{}, err error) 
 
 	return account, nil
 }
+
+// RefreshToken
+// @Summary Refresh access token
+// @Description Exchange a refresh token for a new access token
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body ctlDto.RefreshTokenReq true "Refresh token request"
+// @Success 200 {object} ctlDto.RefreshTokenRes "Returns new access token and refresh token"
+// @Failure 400 {object} response.APIError "Invalid request"
+// @Failure 401 {object} response.APIError "Refresh failed"
+// @Router /auth/refresh [post]
+func (ah *AuthHandler) RefreshToken(ctx *gin.Context) (res interface{}, err error) {
+	var req ctlDto.RefreshTokenReq
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
+	}
+
+	if req.RefreshToken == "" {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, "refresh_token is required")
+	}
+
+	out, err := ah.service.RefreshToken(ctx, req.RefreshToken)
+	if err != nil {
+		return nil, response.NewAPIError(http.StatusUnauthorized, msg.LoginFailed, err.Error())
+	}
+
+	return ctlDto.RefreshTokenRes{
+		AccessToken:  out.AccessToken,
+		RefreshToken: out.RefreshToken,
+	}, nil
+}

@@ -20,9 +20,14 @@ type authRepository struct {
 
 // SaveToken implements repository.AuthRepository.
 func (a *authRepository) SaveToken(ctx context.Context, token *entity.Session) error {
-	var param gen.CreateSessionParams
-	if err := utils.SafeCopy(&param, token); err != nil {
-		return err
+	// Map explicitly to ensure UserID is valid
+	param := gen.CreateSessionParams{
+		UserID: pgtype.Int4{
+			Int32: int32(token.UserID),
+			Valid: true,
+		},
+		RefreshToken: token.RefreshToken,
+		ExpiresAt:    token.ExpiresAt,
 	}
 
 	_, err := a.db.CreateSession(ctx, param)
@@ -162,4 +167,16 @@ func (a *authRepository) UsernameExists(ctx context.Context, username string) (b
 func NewAuthRepository(db *pgxpool.Pool) repository.AuthRepository {
 	queries := authsqlc.New(db) // db is *pgxpool.Pool
 	return &authRepository{db: queries}
+}
+
+// RefreshToken implements repository.AuthRepository.
+// Note: Basic stub verification that defers cryptographic/expiry validation to service layer.
+// Optionally, this could verify existence against the sessions table if a query exists.
+func (a *authRepository) RefreshToken(ctx context.Context, refreshToken string) error {
+	// Without an sqlc method to lookup by token, we accept the validated token from service.
+	// Extend later to check presence/blacklist or rotation in DB.
+	if refreshToken == "" {
+		return fmt.Errorf("%s", msg.InvalidRefreshToken)
+	}
+	return nil
 }

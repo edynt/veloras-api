@@ -39,6 +39,8 @@ const (
 	ValidationNotFoundInContext    = "Validation not found in context"
 	RegistrationFailed             = "Registration failed"
 	LoginFailed                    = "Login failed"
+	FailedToRefreshToken           = "Failed to refresh token"
+	InvalidRefreshToken            = "Invalid refresh token"
 	NoPermissionsFound             = "No permissions found"
 	VerifyTokenFailed              = "Verify token failed"
 	InvalidToken                   = "Invalid Token"

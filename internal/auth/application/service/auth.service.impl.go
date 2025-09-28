@@ -189,6 +189,55 @@ func (as *authService) CreateUser(ctx context.Context, accountDto appDto.Account
 	return newAccountId, nil
 }
 
+// Refresh token
+func (as *authService) RefreshToken(ctx context.Context, refreshToken string) (appDto.TokenOut, error) {
+	// 1. Verify refresh token (signature, expiry)
+	claims, err := utils.VerifyTokenSubject(refreshToken)
+	if err != nil {
+		return appDto.TokenOut{}, fmt.Errorf("%s: %w", msg.InvalidRefreshToken, err)
+	}
+
+	// 2. Optional: check token not expired (VerifyTokenSubject already does Valid())
+
+	// 3. Parse user id from subject
+	userID := utils.StringToInt(claims.Subject)
+	if userID == 0 {
+		return appDto.TokenOut{}, fmt.Errorf(msg.InvalidRefreshToken)
+	}
+
+	// 4. Optionally, validate the refresh token exists in sessions store
+	if err := as.authRepo.RefreshToken(ctx, refreshToken); err != nil {
+		return appDto.TokenOut{}, fmt.Errorf("%s: %w", msg.FailedToRefreshToken, err)
+	}
+
+	// 5. Generate new access token and new refresh token
+	accessToken, err := utils.CreateToken(userID, false)
+	if err != nil {
+		return appDto.TokenOut{}, fmt.Errorf("%s: %w", msg.FailedToCreateToken, err)
+	}
+
+	newRefreshToken, err := utils.CreateToken(userID, true)
+	if err != nil {
+		return appDto.TokenOut{}, fmt.Errorf("%s: %w", msg.FailedToCreateToken, err)
+	}
+
+	// 6. Save new refresh token to database
+	tokenExpiresAt := utils.AddDays(global.Config.JWT.RefreshTokenExpire)
+	err = as.authRepo.SaveToken(ctx, &entity.Session{
+		UserID:       userID,
+		RefreshToken: newRefreshToken,
+		ExpiresAt:    tokenExpiresAt,
+	})
+	if err != nil {
+		return appDto.TokenOut{}, fmt.Errorf("%s: %w", msg.FailedToSaveToken, err)
+	}
+
+	return appDto.TokenOut{
+		AccessToken:  accessToken,
+		RefreshToken: newRefreshToken,
+	}, nil
+}
+
 func NewAuthService(
 	authRepo authRepo.AuthRepository,
 ) AuthService {

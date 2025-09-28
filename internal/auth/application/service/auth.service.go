@@ -10,4 +10,5 @@ type AuthService interface {
 	CreateUser(ctx context.Context, accountAppDTO appDto.AccountAppDTO) (int, error)
 	VerifyUser(ctx context.Context, verificationEmailAppDTO appDto.EmailVerification) (bool, error)
 	LoginUser(ctx context.Context, accountAppDTO appDto.AccountAppDTO) (appDto.UserOutPut, error)
+    RefreshToken(ctx context.Context, refreshToken string) (appDto.TokenOut, error)
 }

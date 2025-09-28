@@ -18,3 +18,12 @@ type UserLoginReq struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
+
+type RefreshTokenReq struct {
+	RefreshToken string `json:"refresh_token"`
+}
+
+type RefreshTokenRes struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
