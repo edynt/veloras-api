@@ -64,4 +64,8 @@ const (
 	CouldNotAssignPermission       = "Could not assign permission"
 	FailedToDeleteSession          = "Failed to delete session"
 	LogoutFailed                   = "Logout failed"
+	FailedToUpdatePassword         = "Failed to update password"
+	CurrentPasswordIncorrect       = "Current password is incorrect"
+	ChangePasswordFailed           = "Change password failed"
+	PasswordChangedSuccessfully    = "Password changed successfully"
 )

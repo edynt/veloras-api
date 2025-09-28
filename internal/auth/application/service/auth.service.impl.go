@@ -263,3 +263,35 @@ func (as *authService) Logout(ctx context.Context) error {
 	}
 	return nil
 }
+
+// ChangePassword implements AuthService.
+func (as *authService) ChangePassword(ctx context.Context, userID int, currentPassword, newPassword string) error {
+	// 1. Get user by ID
+	user, err := as.authRepo.GetUserByID(ctx, userID)
+	if err != nil {
+		return fmt.Errorf("%s: %w", msg.FailedToGetUserById, err)
+	}
+
+	if user == nil {
+		return fmt.Errorf(msg.UserIdInvalid)
+	}
+
+	// 2. Verify current password
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(currentPassword)); err != nil {
+		return fmt.Errorf(msg.CurrentPasswordIncorrect)
+	}
+
+	// 3. Hash new password
+	hashedPasswordBytes, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("%s: %w", msg.FailedToSecurePassword, err)
+	}
+	hashedPassword := string(hashedPasswordBytes)
+
+	// 4. Update password in database
+	if err := as.authRepo.UpdateUserPassword(ctx, userID, hashedPassword); err != nil {
+		return fmt.Errorf("%s: %w", msg.FailedToUpdatePassword, err)
+	}
+
+	return nil
+}

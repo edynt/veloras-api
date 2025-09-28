@@ -189,3 +189,33 @@ func (a *authRepository) DeleteSessionsByUser(ctx context.Context, userId int) e
 	}
 	return nil
 }
+
+// GetUserByID implements repository.AuthRepository.
+func (a *authRepository) GetUserByID(ctx context.Context, userId int) (*entity.Account, error) {
+	res, err := a.db.GetUserByID(ctx, int32(userId))
+	if err != nil {
+		return nil, err
+	}
+
+	var entityResult entity.Account
+	if err := utils.SafeCopy(&entityResult, &res); err != nil {
+		return nil, err
+	}
+
+	return &entityResult, nil
+}
+
+// UpdateUserPassword implements repository.AuthRepository.
+func (a *authRepository) UpdateUserPassword(ctx context.Context, userId int, hashedPassword string) error {
+	params := gen.UpdateUserPasswordParams{
+		ID:       int32(userId),
+		Password: hashedPassword,
+	}
+
+	_, err := a.db.UpdateUserPassword(ctx, params)
+	if err != nil {
+		return fmt.Errorf("%s: %w", msg.FailedToUpdatePassword, err)
+	}
+
+	return nil
+}

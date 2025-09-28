@@ -27,3 +27,9 @@ type RefreshTokenRes struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
+
+type ChangePasswordReq struct {
+	CurrentPassword string `json:"current_password" validate:"required,min=6"`
+	NewPassword     string `json:"new_password" validate:"required,min=6"`
+	ConfirmPassword string `json:"confirm_password" validate:"required,min=6,eqfield=NewPassword"`
+}

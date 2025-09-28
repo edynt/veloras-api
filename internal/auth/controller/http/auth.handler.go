@@ -191,3 +191,52 @@ func (ah *AuthHandler) Logout(ctx *gin.Context) (res interface{}, err error) {
 		"message": "Logout successful",
 	}, nil
 }
+
+// ChangePassword
+// @Summary Change user password
+// @Description Change the current user's password by providing current password and new password
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body ctlDto.ChangePasswordReq true "Change password request"
+// @Success 200 {object} map[string]interface{} "Returns success message"
+// @Failure 400 {object} response.APIError "Invalid request"
+// @Failure 401 {object} response.APIError "Unauthorized or current password incorrect"
+// @Router /auth/change-password [post]
+func (ah *AuthHandler) ChangePassword(ctx *gin.Context) (res interface{}, err error) {
+	var req ctlDto.ChangePasswordReq
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
+	}
+
+	validation, exists := ctx.Get("validation")
+	if !exists {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, msg.ValidationNotFoundInContext)
+	}
+
+	if apiErr := utils.ValidateStruct(req, validation.(*validator.Validate)); apiErr != nil {
+		return nil, apiErr
+	}
+
+	// Get user ID from context
+	subject := ctx.Value("subjectID")
+	if subject == nil {
+		return nil, response.NewAPIError(http.StatusUnauthorized, msg.Unauthorized, "")
+	}
+
+	userID := utils.StringToInt(subject.(string))
+	if userID == 0 {
+		return nil, response.NewAPIError(http.StatusUnauthorized, msg.Unauthorized, msg.UserIdInvalid)
+	}
+
+	err = ah.service.ChangePassword(ctx, userID, req.CurrentPassword, req.NewPassword)
+	if err != nil {
+		return nil, response.NewAPIError(http.StatusBadRequest, msg.ChangePasswordFailed, err.Error())
+	}
+
+	return map[string]interface{}{
+		"message": msg.PasswordChangedSuccessfully,
+	}, nil
+}

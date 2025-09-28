@@ -18,4 +18,5 @@ func RegisterAuthRoutes(rg *gin.RouterGroup, handler *AuthHandler) {
 	protected := auth.Group("")
 	protected.Use(middleware.AuthenMiddleware())
 	protected.POST("/logout", response.Wrap(handler.Logout))
+	protected.POST("/change-password", response.Wrap(handler.ChangePassword))
 }

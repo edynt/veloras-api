@@ -105,6 +105,30 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 	return i, err
 }
 
+const getUserByID = `-- name: GetUserByID :one
+SELECT id, email, username, password, is_verified, phone_number, first_name, last_name, status, language, created_at, updated_at FROM users WHERE id = $1
+`
+
+func (q *Queries) GetUserByID(ctx context.Context, id int32) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByID, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Username,
+		&i.Password,
+		&i.IsVerified,
+		&i.PhoneNumber,
+		&i.FirstName,
+		&i.LastName,
+		&i.Status,
+		&i.Language,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getUserByUsername = `-- name: GetUserByUsername :one
 SELECT id, email, username, password, is_verified, phone_number, first_name, last_name, status, language, created_at, updated_at FROM users WHERE username = $1
 `
@@ -149,6 +173,28 @@ func (q *Queries) GetUsernameExists(ctx context.Context, username string) (bool,
 	var exists bool
 	err := row.Scan(&exists)
 	return exists, err
+}
+
+const updateUserPassword = `-- name: UpdateUserPassword :one
+UPDATE users SET password = $2 WHERE id = $1 RETURNING id, email, username
+`
+
+type UpdateUserPasswordParams struct {
+	ID       int32
+	Password string
+}
+
+type UpdateUserPasswordRow struct {
+	ID       int32
+	Email    string
+	Username string
+}
+
+func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) (UpdateUserPasswordRow, error) {
+	row := q.db.QueryRow(ctx, updateUserPassword, arg.ID, arg.Password)
+	var i UpdateUserPasswordRow
+	err := row.Scan(&i.ID, &i.Email, &i.Username)
+	return i, err
 }
 
 const updateUserStatus = `-- name: UpdateUserStatus :one

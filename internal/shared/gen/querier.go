@@ -24,6 +24,7 @@ type Querier interface {
 	DeletePermission(ctx context.Context, id int32) error
 	DeleteRole(ctx context.Context, id int32) error
 	DeleteSession(ctx context.Context, id int32) error
+	DeleteSessionsByUser(ctx context.Context, userID pgtype.Int4) error
 	DeleteUser(ctx context.Context, id int32) error
 	DeleteVerificationCode(ctx context.Context, userID pgtype.Int4) error
 	GetEmailVerification(ctx context.Context, arg GetEmailVerificationParams) (EmailVerification, error)
@@ -38,11 +39,13 @@ type Querier interface {
 	GetRolesByUser(ctx context.Context, userID int32) ([]Role, error)
 	GetSession(ctx context.Context, id int32) (Session, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
+	GetUserByID(ctx context.Context, id int32) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetUserEmailExists(ctx context.Context, email string) (bool, error)
 	GetUsernameExists(ctx context.Context, username string) (bool, error)
 	UpdatePermission(ctx context.Context, arg UpdatePermissionParams) error
 	UpdateRole(ctx context.Context, arg UpdateRoleParams) error
+	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) (UpdateUserPasswordRow, error)
 	UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (UpdateUserStatusRow, error)
 	VerifyUser(ctx context.Context, id int32) error
 }

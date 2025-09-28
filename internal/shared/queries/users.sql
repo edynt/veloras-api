@@ -29,3 +29,9 @@ UPDATE users SET is_verified = TRUE WHERE id = $1 RETURNING id, email, status;
 
 -- name: DeleteVerificationCode :exec
 DELETE FROM email_verifications WHERE user_id = $1;
+
+-- name: GetUserByID :one
+SELECT * FROM users WHERE id = $1;
+
+-- name: UpdateUserPassword :one
+UPDATE users SET password = $2 WHERE id = $1 RETURNING id, email, username;
