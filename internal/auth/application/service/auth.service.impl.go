@@ -245,3 +245,21 @@ func NewAuthService(
 		authRepo: authRepo,
 	}
 }
+
+// Logout implements AuthService.
+func (as *authService) Logout(ctx context.Context) error {
+	subject := ctx.Value("subjectID")
+	if subject == nil {
+		return fmt.Errorf(msg.Unauthorized)
+	}
+
+	userID := utils.StringToInt(subject.(string))
+	if userID == 0 {
+		return fmt.Errorf(msg.UserIdInvalid)
+	}
+
+	if err := as.authRepo.DeleteSessionsByUser(ctx, userID); err != nil {
+		return fmt.Errorf("%s: %w", msg.CouldNotDeleteUser, err)
+	}
+	return nil
+}

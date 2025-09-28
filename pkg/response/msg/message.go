@@ -62,4 +62,6 @@ const (
 	FailedToGetUserById            = "Failed to get user by id"
 	PermissionNotExists            = "Permission not exists"
 	CouldNotAssignPermission       = "Could not assign permission"
+	FailedToDeleteSession          = "Failed to delete session"
+	LogoutFailed                   = "Logout failed"
 )

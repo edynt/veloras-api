@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/edynnt/veloras-api/internal/middleware"
 	"github.com/edynnt/veloras-api/pkg/response"
 	"github.com/gin-gonic/gin"
 )
@@ -12,4 +13,9 @@ func RegisterAuthRoutes(rg *gin.RouterGroup, handler *AuthHandler) {
 	auth.GET("/verify/:userId/:code", response.Wrap(handler.VerifyUser))
 	auth.POST("/login", response.Wrap(handler.LoginUser))
 	auth.POST("/refresh", response.Wrap(handler.RefreshToken))
+
+	// protected routes
+	protected := auth.Group("")
+	protected.Use(middleware.AuthenMiddleware())
+	protected.POST("/logout", response.Wrap(handler.Logout))
 }

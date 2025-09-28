@@ -15,7 +15,8 @@ import (
 )
 
 type authRepository struct {
-	db *authsqlc.Queries
+	db   *authsqlc.Queries
+	pool *pgxpool.Pool
 }
 
 // SaveToken implements repository.AuthRepository.
@@ -166,7 +167,7 @@ func (a *authRepository) UsernameExists(ctx context.Context, username string) (b
 
 func NewAuthRepository(db *pgxpool.Pool) repository.AuthRepository {
 	queries := authsqlc.New(db) // db is *pgxpool.Pool
-	return &authRepository{db: queries}
+	return &authRepository{db: queries, pool: db}
 }
 
 // RefreshToken implements repository.AuthRepository.
@@ -177,6 +178,14 @@ func (a *authRepository) RefreshToken(ctx context.Context, refreshToken string) 
 	// Extend later to check presence/blacklist or rotation in DB.
 	if refreshToken == "" {
 		return fmt.Errorf("%s", msg.InvalidRefreshToken)
+	}
+	return nil
+}
+
+// DeleteSessionsByUser implements repository.AuthRepository.
+func (a *authRepository) DeleteSessionsByUser(ctx context.Context, userId int) error {
+	if _, err := a.pool.Exec(ctx, "DELETE FROM sessions WHERE user_id = $1", userId); err != nil {
+		return fmt.Errorf("%s: %w", msg.FailedToDeleteSession, err)
 	}
 	return nil
 }

@@ -170,3 +170,24 @@ func (ah *AuthHandler) RefreshToken(ctx *gin.Context) (res interface{}, err erro
 		RefreshToken: out.RefreshToken,
 	}, nil
 }
+
+// Logout
+// @Summary User logout
+// @Description Logout the current user and invalidate their session
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{} "Returns logout success message"
+// @Failure 401 {object} response.APIError "Unauthorized"
+// @Router /auth/logout [post]
+func (ah *AuthHandler) Logout(ctx *gin.Context) (res interface{}, err error) {
+	err = ah.service.Logout(ctx)
+	if err != nil {
+		return nil, response.NewAPIError(http.StatusUnauthorized, msg.LogoutFailed, err.Error())
+	}
+
+	return map[string]interface{}{
+		"message": "Logout successful",
+	}, nil
+}

@@ -18,4 +18,5 @@ type AuthRepository interface {
 	DeleteVerificationCode(ctx context.Context, userId int, code int) error
 	SaveToken(ctx context.Context, token *entity.Session) error
 	RefreshToken(ctx context.Context, refreshToken string) error
+	DeleteSessionsByUser(ctx context.Context, userId int) error
 }
