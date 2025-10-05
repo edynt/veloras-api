@@ -13,7 +13,7 @@ postgresql:
   connMaxLifetime: 3600 #thoi gian ket noi toi da
 logger:
   log_level: debug
-  file_log_name: "./storage/logs/dev.001.log"
+  file_log_name: "./storage/logs/dev.log"
   max_size: 500
   max_backups: 3
   max_age: 28

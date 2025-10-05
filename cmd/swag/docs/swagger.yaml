@@ -77,7 +77,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Authenticate a user with username and password credentials
+      description: Authenticate a user with email and password credentials
       parameters:
       - description: User login request
         in: body

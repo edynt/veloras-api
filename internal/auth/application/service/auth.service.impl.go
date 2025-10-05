@@ -20,15 +20,15 @@ type authService struct {
 
 // LoginUser implements AuthService.
 func (as *authService) LoginUser(ctx context.Context, accountAppDTO appDto.AccountAppDTO) (appDto.UserOutPut, error) {
-	// 1. check exists
-	user, err := as.authRepo.GetUserByUsername(ctx, accountAppDTO.Username)
+	// 1. check exists by email
+	user, err := as.authRepo.GetUserByEmail(ctx, accountAppDTO.Email)
 
 	if err != nil {
-		return appDto.UserOutPut{}, fmt.Errorf("%s: %w", msg.FailedToCheckUserNameExists, err)
+		return appDto.UserOutPut{}, fmt.Errorf("%s: %w", msg.FailedToCheckEmailExists, err)
 	}
 
 	if user == nil {
-		return appDto.UserOutPut{}, fmt.Errorf(msg.UsernameNotFound)
+		return appDto.UserOutPut{}, fmt.Errorf(msg.EmailNotFound)
 	}
 
 	// 2. check password

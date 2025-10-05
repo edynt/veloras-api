@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	_ "github.com/edynnt/veloras-api/cmd/swag/docs"
 	"github.com/edynnt/veloras-api/internal/initialize"
@@ -34,6 +35,8 @@ func main() {
 
 	fmt.Println("Server is running on port " + port)
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	time.Sleep(2000 * time.Millisecond)
 
 	if err := r.Run(":" + port); err != nil {
 		log.Fatalf("%s: %v", msg.FailedToStartServer, err)

@@ -98,11 +98,11 @@ func (ah *AuthHandler) VerifyUser(ctx *gin.Context) (res interface{}, err error)
 
 // LoginUser
 // @Summary User login
-// @Description Authenticate a user with username and password credentials
+// @Description Authenticate a user with email and password credentials
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Param request body ctlDto.UserLoginReq true "User login request"
+// @Param request body ctlDto.UserLoginReq true "User login request (email, password)"
 // @Success 200 {object} map[string]interface{} "Returns authenticated user account information"
 // @Failure 400 {object} response.APIError "Invalid request format or validation errors"
 // @Failure 401 {object} response.APIError "Login failed due to invalid credentials"
@@ -125,7 +125,7 @@ func (ah *AuthHandler) LoginUser(ctx *gin.Context) (res interface{}, err error) 
 	}
 
 	requestAccount := appDto.AccountAppDTO{
-		Username: req.Username,
+		Email:    req.Email,
 		Password: req.Password,
 	}
 

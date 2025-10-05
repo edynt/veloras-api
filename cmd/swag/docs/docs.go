@@ -26,7 +26,7 @@ const docTemplate = `{
     "paths": {
         "/auth/login": {
             "post": {
-                "description": "Authenticate a user with username and password credentials",
+                "description": "Authenticate a user with email and password credentials",
                 "consumes": [
                     "application/json"
                 ],
