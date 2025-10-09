@@ -14,6 +14,7 @@ type Querier interface {
 	ActiveUser(ctx context.Context, id int32) (ActiveUserRow, error)
 	AssignPermissionToRole(ctx context.Context, arg AssignPermissionToRoleParams) error
 	AssignRoleToUser(ctx context.Context, arg AssignRoleToUserParams) error
+	CountAllUsers(ctx context.Context) (int64, error)
 	CountExpiredEmailVerifications(ctx context.Context, expiresAt int64) (int64, error)
 	CountExpiredPasswordResets(ctx context.Context, expiresAt int64) (int64, error)
 	CountExpiredSessions(ctx context.Context, expiresAt int64) (int64, error)
@@ -33,6 +34,7 @@ type Querier interface {
 	DeleteSessionsByUser(ctx context.Context, userID pgtype.Int4) error
 	DeleteUser(ctx context.Context, id int32) error
 	DeleteVerificationCode(ctx context.Context, userID pgtype.Int4) error
+	GetAllUsers(ctx context.Context, arg GetAllUsersParams) ([]GetAllUsersRow, error)
 	GetEmailVerification(ctx context.Context, arg GetEmailVerificationParams) (EmailVerification, error)
 	GetPasswordReset(ctx context.Context, arg GetPasswordResetParams) (PasswordReset, error)
 	GetPasswordResetByToken(ctx context.Context, resetToken string) (PasswordReset, error)
@@ -53,6 +55,7 @@ type Querier interface {
 	UpdatePermission(ctx context.Context, arg UpdatePermissionParams) error
 	UpdateRole(ctx context.Context, arg UpdateRoleParams) error
 	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) (UpdateUserPasswordRow, error)
+	UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) (UpdateUserProfileRow, error)
 	UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (UpdateUserStatusRow, error)
 	VerifyUser(ctx context.Context, id int32) error
 }

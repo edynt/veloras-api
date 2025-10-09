@@ -4,8 +4,10 @@ import (
 	authHttp "github.com/edynnt/veloras-api/internal/auth/controller/http"
 	permissionHttp "github.com/edynnt/veloras-api/internal/auth/controller/http"
 	cronHttp "github.com/edynnt/veloras-api/internal/cron/controller/http"
-	initialize "github.com/edynnt/veloras-api/internal/initialize/auth"
+	authInit "github.com/edynnt/veloras-api/internal/initialize/auth"
+	userInit "github.com/edynnt/veloras-api/internal/initialize/user"
 	"github.com/edynnt/veloras-api/internal/middleware"
+	userHttp "github.com/edynnt/veloras-api/internal/user/controller/http"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -27,14 +29,17 @@ func InitRouter(db *pgxpool.Pool, logLevel string, cronScheduler *cronHttp.CronH
 
 	v1 := r.Group("/api/v1")
 
-	authHandler := initialize.InitAuth(db)
+	authHandler := authInit.InitAuth(db)
 	authHttp.RegisterAuthRoutes(v1, authHandler)
 
-	permissionHandler := initialize.InitPermission(db)
+	permissionHandler := authInit.InitPermission(db)
 	permissionHttp.RegisterPermissionRoutes(v1, permissionHandler)
 
-	roleHandler := initialize.InitRole(db)
+	roleHandler := authInit.InitRole(db)
 	authHttp.RegisterRoleRoutes(v1, roleHandler)
+
+	userHandler := userInit.InitUser(db)
+	userHttp.RegisterUserRoutes(v1, userHandler)
 
 	// Admin routes for cron management
 	if cronScheduler != nil {

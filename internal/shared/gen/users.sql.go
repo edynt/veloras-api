@@ -28,6 +28,17 @@ func (q *Queries) ActiveUser(ctx context.Context, id int32) (ActiveUserRow, erro
 	return i, err
 }
 
+const countAllUsers = `-- name: CountAllUsers :one
+SELECT COUNT(*) FROM users
+`
+
+func (q *Queries) CountAllUsers(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countAllUsers)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (email, username, password, phone_number, first_name, last_name)
 VALUES ($1, $2, $3, $4, $5, $6)
@@ -79,6 +90,64 @@ DELETE FROM email_verifications WHERE user_id = $1
 func (q *Queries) DeleteVerificationCode(ctx context.Context, userID pgtype.Int4) error {
 	_, err := q.db.Exec(ctx, deleteVerificationCode, userID)
 	return err
+}
+
+const getAllUsers = `-- name: GetAllUsers :many
+SELECT id, email, username, is_verified, phone_number, first_name, last_name, status, language, created_at, updated_at 
+FROM users 
+ORDER BY created_at DESC
+LIMIT $1 OFFSET $2
+`
+
+type GetAllUsersParams struct {
+	Limit  int32
+	Offset int32
+}
+
+type GetAllUsersRow struct {
+	ID          int32
+	Email       string
+	Username    string
+	IsVerified  pgtype.Bool
+	PhoneNumber string
+	FirstName   string
+	LastName    string
+	Status      pgtype.Int4
+	Language    pgtype.Text
+	CreatedAt   pgtype.Int8
+	UpdatedAt   pgtype.Int8
+}
+
+func (q *Queries) GetAllUsers(ctx context.Context, arg GetAllUsersParams) ([]GetAllUsersRow, error) {
+	rows, err := q.db.Query(ctx, getAllUsers, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetAllUsersRow{}
+	for rows.Next() {
+		var i GetAllUsersRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Email,
+			&i.Username,
+			&i.IsVerified,
+			&i.PhoneNumber,
+			&i.FirstName,
+			&i.LastName,
+			&i.Status,
+			&i.Language,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
@@ -194,6 +263,62 @@ func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPassword
 	row := q.db.QueryRow(ctx, updateUserPassword, arg.ID, arg.Password)
 	var i UpdateUserPasswordRow
 	err := row.Scan(&i.ID, &i.Email, &i.Username)
+	return i, err
+}
+
+const updateUserProfile = `-- name: UpdateUserProfile :one
+UPDATE users 
+SET 
+    username = COALESCE(NULLIF($2, ''), username),
+    phone_number = COALESCE(NULLIF($3, ''), phone_number),
+    first_name = COALESCE(NULLIF($4, ''), first_name),
+    last_name = COALESCE(NULLIF($5, ''), last_name),
+    language = COALESCE(NULLIF($6, ''), language),
+    updated_at = extract(epoch from now())
+WHERE id = $1
+RETURNING id, email, username, phone_number, first_name, last_name, language, updated_at
+`
+
+type UpdateUserProfileParams struct {
+	ID      int32
+	Column2 interface{}
+	Column3 interface{}
+	Column4 interface{}
+	Column5 interface{}
+	Column6 interface{}
+}
+
+type UpdateUserProfileRow struct {
+	ID          int32
+	Email       string
+	Username    string
+	PhoneNumber string
+	FirstName   string
+	LastName    string
+	Language    pgtype.Text
+	UpdatedAt   pgtype.Int8
+}
+
+func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) (UpdateUserProfileRow, error) {
+	row := q.db.QueryRow(ctx, updateUserProfile,
+		arg.ID,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+		arg.Column5,
+		arg.Column6,
+	)
+	var i UpdateUserProfileRow
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Username,
+		&i.PhoneNumber,
+		&i.FirstName,
+		&i.LastName,
+		&i.Language,
+		&i.UpdatedAt,
+	)
 	return i, err
 }
 

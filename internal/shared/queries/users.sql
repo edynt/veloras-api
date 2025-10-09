@@ -35,3 +35,24 @@ SELECT * FROM users WHERE id = $1;
 
 -- name: UpdateUserPassword :one
 UPDATE users SET password = $2 WHERE id = $1 RETURNING id, email, username;
+
+-- name: GetAllUsers :many
+SELECT id, email, username, is_verified, phone_number, first_name, last_name, status, language, created_at, updated_at 
+FROM users 
+ORDER BY created_at DESC
+LIMIT $1 OFFSET $2;
+
+-- name: CountAllUsers :one
+SELECT COUNT(*) FROM users;
+
+-- name: UpdateUserProfile :one
+UPDATE users 
+SET 
+    username = COALESCE(NULLIF($2, ''), username),
+    phone_number = COALESCE(NULLIF($3, ''), phone_number),
+    first_name = COALESCE(NULLIF($4, ''), first_name),
+    last_name = COALESCE(NULLIF($5, ''), last_name),
+    language = COALESCE(NULLIF($6, ''), language),
+    updated_at = extract(epoch from now())
+WHERE id = $1
+RETURNING id, email, username, phone_number, first_name, last_name, language, updated_at;
