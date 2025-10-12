@@ -1,9 +1,9 @@
 package initialize
 
 import (
-	"github.com/edynnt/veloras-api/internal/user/application/service"
-	"github.com/edynnt/veloras-api/internal/user/controller/http"
-	userRepo "github.com/edynnt/veloras-api/internal/user/infrastructure/persistence/repository"
+	"github.com/edynt/chogiare/veloras-api/internal/user/application/service"
+	"github.com/edynt/chogiare/veloras-api/internal/user/controller/http"
+	userRepo "github.com/edynt/chogiare/veloras-api/internal/user/infrastructure/persistence/repository"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

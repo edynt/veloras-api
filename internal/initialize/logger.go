@@ -1,8 +1,8 @@
 package initialize
 
 import (
-	"github.com/edynnt/veloras-api/pkg/global"
-	"github.com/edynnt/veloras-api/pkg/logger"
+	"github.com/edynt/chogiare/veloras-api/pkg/global"
+	"github.com/edynt/chogiare/veloras-api/pkg/logger"
 )
 
 func InitLogger() {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/edynnt/veloras-api/pkg/global"
+	"github.com/edynt/chogiare/veloras-api/pkg/global"
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 )

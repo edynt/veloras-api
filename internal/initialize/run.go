@@ -3,9 +3,9 @@ package initialize
 import (
 	"log"
 
-	cronHttp "github.com/edynnt/veloras-api/internal/cron/controller/http"
-	"github.com/edynnt/veloras-api/pkg/global"
-	"github.com/edynnt/veloras-api/pkg/response/msg"
+	cronHttp "github.com/edynt/chogiare/veloras-api/internal/cron/controller/http"
+	"github.com/edynt/chogiare/veloras-api/pkg/global"
+	"github.com/edynt/chogiare/veloras-api/pkg/response/msg"
 	"github.com/gin-gonic/gin"
 )
 

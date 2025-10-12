@@ -1,8 +1,8 @@
 package http
 
 import (
-	"github.com/edynnt/veloras-api/internal/middleware"
-	"github.com/edynnt/veloras-api/pkg/response"
+	"github.com/edynt/chogiare/veloras-api/internal/middleware"
+	"github.com/edynt/chogiare/veloras-api/pkg/response"
 	"github.com/gin-gonic/gin"
 )
 

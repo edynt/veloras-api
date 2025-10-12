@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/edynnt/veloras-api/internal/shared/gen"
-	"github.com/edynnt/veloras-api/internal/user/domain/model/entity"
-	"github.com/edynnt/veloras-api/internal/user/domain/repository"
+	"github.com/edynt/chogiare/veloras-api/internal/shared/gen"
+	"github.com/edynt/chogiare/veloras-api/internal/user/domain/model/entity"
+	"github.com/edynt/chogiare/veloras-api/internal/user/domain/repository"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/edynnt/veloras-api/internal/user/application/service/dto"
-	"github.com/edynnt/veloras-api/internal/user/domain/repository"
-	"github.com/edynnt/veloras-api/pkg/utils"
+	"github.com/edynt/chogiare/veloras-api/internal/user/application/service/dto"
+	"github.com/edynt/chogiare/veloras-api/internal/user/domain/repository"
+	"github.com/edynt/chogiare/veloras-api/pkg/utils"
 )
 
 type userServiceImpl struct {

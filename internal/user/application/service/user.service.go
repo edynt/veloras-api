@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/edynnt/veloras-api/internal/user/application/service/dto"
+	"github.com/edynt/chogiare/veloras-api/internal/user/application/service/dto"
 )
 
 type UserService interface {

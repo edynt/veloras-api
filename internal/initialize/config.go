@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/edynnt/veloras-api/pkg/config"
-	"github.com/edynnt/veloras-api/pkg/response/msg"
+	"github.com/edynt/chogiare/veloras-api/pkg/config"
+	"github.com/edynt/chogiare/veloras-api/pkg/response/msg"
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )

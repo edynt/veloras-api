@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/edynnt/veloras-api/pkg/response/msg"
-	"github.com/edynnt/veloras-api/pkg/utils"
+	"github.com/edynt/chogiare/veloras-api/pkg/response/msg"
+	"github.com/edynt/chogiare/veloras-api/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 

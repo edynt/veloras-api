@@ -1,10 +1,10 @@
 package initialize
 
 import (
-	"github.com/edynnt/veloras-api/internal/auth/application/service"
-	"github.com/edynnt/veloras-api/internal/auth/controller/http"
-	permissionRepo "github.com/edynnt/veloras-api/internal/auth/infrastructure/persistence/repository"
-	roleRepo "github.com/edynnt/veloras-api/internal/auth/infrastructure/persistence/repository"
+	"github.com/edynt/chogiare/veloras-api/internal/auth/application/service"
+	"github.com/edynt/chogiare/veloras-api/internal/auth/controller/http"
+	permissionRepo "github.com/edynt/chogiare/veloras-api/internal/auth/infrastructure/persistence/repository"
+	roleRepo "github.com/edynt/chogiare/veloras-api/internal/auth/infrastructure/persistence/repository"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

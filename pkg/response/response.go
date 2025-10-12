@@ -3,7 +3,7 @@ package response
 import (
 	"net/http"
 
-	"github.com/edynnt/veloras-api/pkg/response/msg"
+	"github.com/edynt/chogiare/veloras-api/pkg/response/msg"
 	"github.com/gin-gonic/gin"
 )
 

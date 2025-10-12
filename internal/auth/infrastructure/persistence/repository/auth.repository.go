@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/edynnt/veloras-api/internal/auth/domain/model/entity"
-	"github.com/edynnt/veloras-api/internal/auth/domain/repository"
-	"github.com/edynnt/veloras-api/internal/shared/gen"
-	authsqlc "github.com/edynnt/veloras-api/internal/shared/gen"
-	"github.com/edynnt/veloras-api/pkg/response/msg"
-	"github.com/edynnt/veloras-api/pkg/utils"
+	"github.com/edynt/chogiare/veloras-api/internal/auth/domain/model/entity"
+	"github.com/edynt/chogiare/veloras-api/internal/auth/domain/repository"
+	"github.com/edynt/chogiare/veloras-api/internal/shared/gen"
+	authsqlc "github.com/edynt/chogiare/veloras-api/internal/shared/gen"
+	"github.com/edynt/chogiare/veloras-api/pkg/response/msg"
+	"github.com/edynt/chogiare/veloras-api/pkg/utils"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 )

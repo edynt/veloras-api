@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/edynnt/veloras-api/pkg/config"
-	"github.com/edynnt/veloras-api/pkg/global"
-	"github.com/edynnt/veloras-api/pkg/response/msg"
+	"github.com/edynt/chogiare/veloras-api/pkg/config"
+	"github.com/edynt/chogiare/veloras-api/pkg/global"
+	"github.com/edynt/chogiare/veloras-api/pkg/response/msg"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 )

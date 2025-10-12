@@ -8,12 +8,104 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type Address struct {
+	ID        pgtype.UUID
+	UserID    int32
+	Street    string
+	City      string
+	State     string
+	ZipCode   string
+	Country   string
+	IsDefault pgtype.Bool
+	CreatedAt pgtype.Timestamptz
+	UpdatedAt pgtype.Timestamptz
+}
+
+type CartItem struct {
+	ID        pgtype.UUID
+	UserID    int32
+	ProductID pgtype.UUID
+	Quantity  int32
+	CreatedAt pgtype.Timestamptz
+	UpdatedAt pgtype.Timestamptz
+}
+
+type Category struct {
+	ID           pgtype.UUID
+	Name         string
+	Slug         string
+	Description  pgtype.Text
+	Image        pgtype.Text
+	ParentID     pgtype.UUID
+	ProductCount pgtype.Int4
+	IsActive     pgtype.Bool
+	CreatedAt    pgtype.Timestamptz
+	UpdatedAt    pgtype.Timestamptz
+}
+
+type ChatMessage struct {
+	ID             pgtype.UUID
+	ConversationID pgtype.UUID
+	SenderID       int32
+	Content        string
+	Type           string
+	Attachments    []string
+	IsRead         pgtype.Bool
+	CreatedAt      pgtype.Timestamptz
+}
+
+type Conversation struct {
+	ID        pgtype.UUID
+	CreatedAt pgtype.Timestamptz
+	UpdatedAt pgtype.Timestamptz
+}
+
+type ConversationParticipant struct {
+	ID             pgtype.UUID
+	ConversationID pgtype.UUID
+	UserID         int32
+	JoinedAt       pgtype.Timestamptz
+}
+
+type Coupon struct {
+	ID                pgtype.UUID
+	Code              string
+	Description       pgtype.Text
+	DiscountType      string
+	DiscountValue     pgtype.Numeric
+	MinOrderAmount    pgtype.Numeric
+	MaxDiscountAmount pgtype.Numeric
+	UsageLimit        pgtype.Int4
+	UsedCount         pgtype.Int4
+	IsActive          pgtype.Bool
+	ValidFrom         pgtype.Timestamptz
+	ValidUntil        pgtype.Timestamptz
+	CreatedAt         pgtype.Timestamptz
+	UpdatedAt         pgtype.Timestamptz
+}
+
 type EmailVerification struct {
 	ID        int32
 	UserID    pgtype.Int4
 	Code      int32
 	ExpiresAt int64
 	CreatedAt pgtype.Int8
+}
+
+type Order struct {
+	ID                pgtype.UUID
+	BuyerID           int32
+	SellerID          int32
+	ProductID         pgtype.UUID
+	Quantity          int32
+	TotalAmount       pgtype.Numeric
+	Status            string
+	PaymentMethod     string
+	PaymentStatus     string
+	ShippingAddressID pgtype.UUID
+	Notes             pgtype.Text
+	CreatedAt         pgtype.Timestamptz
+	UpdatedAt         pgtype.Timestamptz
 }
 
 type PasswordReset struct {
@@ -31,6 +123,42 @@ type Permission struct {
 	CreatedAt      pgtype.Int8
 	ResourceType   pgtype.Text
 	ResourceAction pgtype.Text
+}
+
+type Product struct {
+	ID            pgtype.UUID
+	Title         string
+	Description   string
+	Price         pgtype.Numeric
+	OriginalPrice pgtype.Numeric
+	CategoryID    pgtype.UUID
+	Images        []string
+	Condition     string
+	Tags          []string
+	Location      string
+	Stock         int32
+	SellerID      int32
+	Status        string
+	Badges        []string
+	Rating        pgtype.Numeric
+	ReviewCount   pgtype.Int4
+	ViewCount     pgtype.Int4
+	IsFeatured    pgtype.Bool
+	IsPromoted    pgtype.Bool
+	CreatedAt     pgtype.Timestamptz
+	UpdatedAt     pgtype.Timestamptz
+}
+
+type Review struct {
+	ID         pgtype.UUID
+	ProductID  pgtype.UUID
+	BuyerID    int32
+	SellerID   int32
+	Rating     int32
+	Comment    pgtype.Text
+	Images     []string
+	IsVerified pgtype.Bool
+	CreatedAt  pgtype.Timestamptz
 }
 
 type Role struct {
@@ -53,6 +181,23 @@ type Session struct {
 	CreatedAt    pgtype.Int8
 }
 
+type Store struct {
+	ID          pgtype.UUID
+	UserID      int32
+	Name        string
+	Description pgtype.Text
+	Logo        pgtype.Text
+	Banner      pgtype.Text
+	Address     pgtype.Text
+	Phone       pgtype.Text
+	Email       pgtype.Text
+	IsVerified  pgtype.Bool
+	Rating      pgtype.Numeric
+	ReviewCount pgtype.Int4
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
+}
+
 type User struct {
 	ID          int32
 	Email       string
@@ -68,7 +213,22 @@ type User struct {
 	UpdatedAt   pgtype.Int8
 }
 
+type UserCouponUsage struct {
+	ID       pgtype.UUID
+	UserID   int32
+	CouponID pgtype.UUID
+	OrderID  pgtype.UUID
+	UsedAt   pgtype.Timestamptz
+}
+
 type UserRole struct {
 	UserID int32
 	RoleID int32
+}
+
+type WishlistItem struct {
+	ID        pgtype.UUID
+	UserID    int32
+	ProductID pgtype.UUID
+	CreatedAt pgtype.Timestamptz
 }

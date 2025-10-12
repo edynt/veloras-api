@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/edynnt/veloras-api/internal/cron"
-	"github.com/edynnt/veloras-api/pkg/response"
+	"github.com/edynt/chogiare/veloras-api/internal/cron"
+	"github.com/edynt/chogiare/veloras-api/pkg/response"
 	"github.com/gin-gonic/gin"
 )
 

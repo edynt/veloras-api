@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log"
 
-	_ "github.com/edynnt/veloras-api/cmd/swag/docs"
-	"github.com/edynnt/veloras-api/internal/initialize"
-	"github.com/edynnt/veloras-api/pkg/response/msg"
+	_ "github.com/edynt/chogiare/veloras-api/cmd/swag/docs"
+	"github.com/edynt/chogiare/veloras-api/internal/initialize"
+	"github.com/edynt/chogiare/veloras-api/pkg/response/msg"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"

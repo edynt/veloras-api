@@ -7,8 +7,8 @@ import (
 	"net/smtp"
 	"strings"
 
-	"github.com/edynnt/veloras-api/pkg/config"
-	"github.com/edynnt/veloras-api/pkg/global"
+	"github.com/edynt/chogiare/veloras-api/pkg/config"
+	"github.com/edynt/chogiare/veloras-api/pkg/global"
 )
 
 type EmailAddress struct {

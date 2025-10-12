@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	appDto "github.com/edynnt/veloras-api/internal/auth/application/service/dto"
+	appDto "github.com/edynt/chogiare/veloras-api/internal/auth/application/service/dto"
 )
 
 type RoleService interface {

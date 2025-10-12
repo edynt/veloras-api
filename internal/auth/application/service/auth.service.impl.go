@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	appDto "github.com/edynnt/veloras-api/internal/auth/application/service/dto"
-	"github.com/edynnt/veloras-api/internal/auth/domain/model/entity"
-	authRepo "github.com/edynnt/veloras-api/internal/auth/domain/repository"
-	"github.com/edynnt/veloras-api/pkg/constants"
-	"github.com/edynnt/veloras-api/pkg/global"
-	"github.com/edynnt/veloras-api/pkg/response/msg"
-	"github.com/edynnt/veloras-api/pkg/utils"
+	appDto "github.com/edynt/chogiare/veloras-api/internal/auth/application/service/dto"
+	"github.com/edynt/chogiare/veloras-api/internal/auth/domain/model/entity"
+	authRepo "github.com/edynt/chogiare/veloras-api/internal/auth/domain/repository"
+	"github.com/edynt/chogiare/veloras-api/pkg/constants"
+	"github.com/edynt/chogiare/veloras-api/pkg/global"
+	"github.com/edynt/chogiare/veloras-api/pkg/response/msg"
+	"github.com/edynt/chogiare/veloras-api/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 

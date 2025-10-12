@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/edynnt/veloras-api/internal/shared/gen"
-	"github.com/edynnt/veloras-api/pkg/global"
+	"github.com/edynt/chogiare/veloras-api/internal/shared/gen"
+	"github.com/edynt/chogiare/veloras-api/pkg/global"
 	"github.com/robfig/cron/v3"
 	"go.uber.org/zap"
 )

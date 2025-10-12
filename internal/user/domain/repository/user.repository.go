@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/edynnt/veloras-api/internal/user/domain/model/entity"
+	"github.com/edynt/chogiare/veloras-api/internal/user/domain/model/entity"
 )
 
 type UserRepository interface {

@@ -12,51 +12,156 @@ import (
 
 type Querier interface {
 	ActiveUser(ctx context.Context, id int32) (ActiveUserRow, error)
+	AddConversationParticipant(ctx context.Context, arg AddConversationParticipantParams) (ConversationParticipant, error)
+	AddToCart(ctx context.Context, arg AddToCartParams) (CartItem, error)
+	AddToWishlist(ctx context.Context, arg AddToWishlistParams) (WishlistItem, error)
 	AssignPermissionToRole(ctx context.Context, arg AssignPermissionToRoleParams) error
 	AssignRoleToUser(ctx context.Context, arg AssignRoleToUserParams) error
+	CheckUserCanReview(ctx context.Context, arg CheckUserCanReviewParams) (bool, error)
+	ClearCart(ctx context.Context, userID int32) error
+	ClearWishlist(ctx context.Context, userID int32) error
 	CountAllUsers(ctx context.Context) (int64, error)
 	CountExpiredEmailVerifications(ctx context.Context, expiresAt int64) (int64, error)
 	CountExpiredPasswordResets(ctx context.Context, expiresAt int64) (int64, error)
 	CountExpiredSessions(ctx context.Context, expiresAt int64) (int64, error)
+	CreateAddress(ctx context.Context, arg CreateAddressParams) (Address, error)
+	CreateCategory(ctx context.Context, arg CreateCategoryParams) (Category, error)
+	CreateChatMessage(ctx context.Context, arg CreateChatMessageParams) (ChatMessage, error)
+	CreateConversation(ctx context.Context) (Conversation, error)
+	CreateCoupon(ctx context.Context, arg CreateCouponParams) (Coupon, error)
 	CreateEmailVerification(ctx context.Context, arg CreateEmailVerificationParams) (EmailVerification, error)
+	CreateOrder(ctx context.Context, arg CreateOrderParams) (Order, error)
 	CreatePasswordReset(ctx context.Context, arg CreatePasswordResetParams) error
 	CreatePermission(ctx context.Context, arg CreatePermissionParams) error
+	CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error)
+	CreateReview(ctx context.Context, arg CreateReviewParams) (Review, error)
 	CreateRole(ctx context.Context, arg CreateRoleParams) error
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
+	CreateStore(ctx context.Context, arg CreateStoreParams) (Store, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error)
+	DeactivateCoupon(ctx context.Context, id pgtype.UUID) (Coupon, error)
+	DeleteAddress(ctx context.Context, id pgtype.UUID) error
+	DeleteCategory(ctx context.Context, id pgtype.UUID) error
+	DeleteConversation(ctx context.Context, id pgtype.UUID) error
+	DeleteCoupon(ctx context.Context, id pgtype.UUID) error
 	DeleteExpiredEmailVerifications(ctx context.Context, expiresAt int64) error
 	DeleteExpiredPasswordResets(ctx context.Context, expiresAt int64) error
 	DeleteExpiredSessions(ctx context.Context, expiresAt int64) error
+	DeleteOrder(ctx context.Context, id pgtype.UUID) error
 	DeletePasswordReset(ctx context.Context, arg DeletePasswordResetParams) error
 	DeletePermission(ctx context.Context, id int32) error
+	DeleteProduct(ctx context.Context, id pgtype.UUID) error
+	DeleteReview(ctx context.Context, id pgtype.UUID) error
 	DeleteRole(ctx context.Context, id int32) error
 	DeleteSession(ctx context.Context, id int32) error
 	DeleteSessionsByUser(ctx context.Context, userID pgtype.Int4) error
+	DeleteStore(ctx context.Context, id pgtype.UUID) error
 	DeleteUser(ctx context.Context, id int32) error
 	DeleteVerificationCode(ctx context.Context, userID pgtype.Int4) error
+	GetAddress(ctx context.Context, id pgtype.UUID) (Address, error)
+	GetAddressCount(ctx context.Context, userID int32) (int64, error)
 	GetAllUsers(ctx context.Context, arg GetAllUsersParams) ([]GetAllUsersRow, error)
+	GetCartItem(ctx context.Context, arg GetCartItemParams) (GetCartItemRow, error)
+	GetCartItemCount(ctx context.Context, userID int32) (int64, error)
+	GetCartTotal(ctx context.Context, userID int32) (interface{}, error)
+	GetCategory(ctx context.Context, id pgtype.UUID) (Category, error)
+	GetCategoryBySlug(ctx context.Context, slug string) (Category, error)
+	GetCategoryStats(ctx context.Context) (GetCategoryStatsRow, error)
+	GetConversation(ctx context.Context, id pgtype.UUID) (GetConversationRow, error)
+	GetConversationByParticipants(ctx context.Context, dollar_1 []int32) (Conversation, error)
+	GetConversationUnreadCount(ctx context.Context, arg GetConversationUnreadCountParams) (int64, error)
+	GetCoupon(ctx context.Context, id pgtype.UUID) (Coupon, error)
+	GetCouponByCode(ctx context.Context, code string) (Coupon, error)
+	GetCouponStats(ctx context.Context) (GetCouponStatsRow, error)
+	GetCouponUsageHistory(ctx context.Context, arg GetCouponUsageHistoryParams) ([]GetCouponUsageHistoryRow, error)
+	GetDefaultAddress(ctx context.Context, userID int32) (Address, error)
 	GetEmailVerification(ctx context.Context, arg GetEmailVerificationParams) (EmailVerification, error)
+	GetFeaturedProducts(ctx context.Context, limit int32) ([]GetFeaturedProductsRow, error)
+	GetOrder(ctx context.Context, id pgtype.UUID) (GetOrderRow, error)
+	GetOrderStats(ctx context.Context) (GetOrderStatsRow, error)
+	GetOrdersByDateRange(ctx context.Context, arg GetOrdersByDateRangeParams) ([]GetOrdersByDateRangeRow, error)
 	GetPasswordReset(ctx context.Context, arg GetPasswordResetParams) (PasswordReset, error)
 	GetPasswordResetByToken(ctx context.Context, resetToken string) (PasswordReset, error)
 	GetPermissionById(ctx context.Context, id int32) (Permission, error)
 	GetPermissionByName(ctx context.Context, name string) (Permission, error)
 	GetPermissions(ctx context.Context) ([]Permission, error)
 	GetPermissionsByRole(ctx context.Context, roleID int32) ([]Permission, error)
+	GetProduct(ctx context.Context, id pgtype.UUID) (GetProductRow, error)
+	GetProductRatingStats(ctx context.Context, productID pgtype.UUID) (GetProductRatingStatsRow, error)
+	GetProductStats(ctx context.Context) (GetProductStatsRow, error)
+	GetProductsByFilters(ctx context.Context, arg GetProductsByFiltersParams) ([]GetProductsByFiltersRow, error)
+	GetPromotedProducts(ctx context.Context, limit int32) ([]GetPromotedProductsRow, error)
+	GetReview(ctx context.Context, id pgtype.UUID) (GetReviewRow, error)
 	GetRoleById(ctx context.Context, id int32) (Role, error)
 	GetRoleByName(ctx context.Context, name string) (Role, error)
 	GetRoles(ctx context.Context) ([]Role, error)
 	GetRolesByUser(ctx context.Context, userID int32) ([]Role, error)
+	GetSellerRatingStats(ctx context.Context, sellerID int32) (GetSellerRatingStatsRow, error)
 	GetSession(ctx context.Context, id int32) (Session, error)
+	GetStore(ctx context.Context, id pgtype.UUID) (GetStoreRow, error)
+	GetStoreByUserID(ctx context.Context, userID int32) (GetStoreByUserIDRow, error)
+	GetStoreStats(ctx context.Context) (GetStoreStatsRow, error)
+	GetUnreadMessageCount(ctx context.Context, userID int32) (int64, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByID(ctx context.Context, id int32) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetUserEmailExists(ctx context.Context, email string) (bool, error)
 	GetUsernameExists(ctx context.Context, username string) (bool, error)
+	GetWishlistItem(ctx context.Context, arg GetWishlistItemParams) (GetWishlistItemRow, error)
+	GetWishlistItemCount(ctx context.Context, userID int32) (int64, error)
+	IncrementCouponUsage(ctx context.Context, id pgtype.UUID) error
+	IncrementProductViews(ctx context.Context, id pgtype.UUID) error
+	IsInWishlist(ctx context.Context, arg IsInWishlistParams) (bool, error)
+	ListActiveCoupons(ctx context.Context, arg ListActiveCouponsParams) ([]Coupon, error)
+	ListCartItems(ctx context.Context, userID int32) ([]ListCartItemsRow, error)
+	ListCategories(ctx context.Context) ([]Category, error)
+	ListCategoriesWithPagination(ctx context.Context, arg ListCategoriesWithPaginationParams) ([]Category, error)
+	ListChatMessages(ctx context.Context, arg ListChatMessagesParams) ([]ListChatMessagesRow, error)
+	ListCoupons(ctx context.Context, arg ListCouponsParams) ([]Coupon, error)
+	ListOrdersByBuyer(ctx context.Context, arg ListOrdersByBuyerParams) ([]ListOrdersByBuyerRow, error)
+	ListOrdersBySeller(ctx context.Context, arg ListOrdersBySellerParams) ([]ListOrdersBySellerRow, error)
+	ListOrdersByStatus(ctx context.Context, arg ListOrdersByStatusParams) ([]ListOrdersByStatusRow, error)
+	ListProducts(ctx context.Context, arg ListProductsParams) ([]ListProductsRow, error)
+	ListProductsByCategory(ctx context.Context, arg ListProductsByCategoryParams) ([]ListProductsByCategoryRow, error)
+	ListProductsBySeller(ctx context.Context, arg ListProductsBySellerParams) ([]ListProductsBySellerRow, error)
+	ListReviewsByBuyer(ctx context.Context, arg ListReviewsByBuyerParams) ([]ListReviewsByBuyerRow, error)
+	ListReviewsByProduct(ctx context.Context, arg ListReviewsByProductParams) ([]ListReviewsByProductRow, error)
+	ListReviewsBySeller(ctx context.Context, arg ListReviewsBySellerParams) ([]ListReviewsBySellerRow, error)
+	ListStores(ctx context.Context, arg ListStoresParams) ([]ListStoresRow, error)
+	ListSubCategories(ctx context.Context, parentID pgtype.UUID) ([]Category, error)
+	ListUserAddresses(ctx context.Context, userID int32) ([]Address, error)
+	ListUserConversations(ctx context.Context, arg ListUserConversationsParams) ([]ListUserConversationsRow, error)
+	ListVerifiedStores(ctx context.Context, arg ListVerifiedStoresParams) ([]ListVerifiedStoresRow, error)
+	ListWishlistItems(ctx context.Context, arg ListWishlistItemsParams) ([]ListWishlistItemsRow, error)
+	MarkMessagesAsRead(ctx context.Context, arg MarkMessagesAsReadParams) error
+	RemoveConversationParticipant(ctx context.Context, arg RemoveConversationParticipantParams) error
+	RemoveFromCart(ctx context.Context, arg RemoveFromCartParams) error
+	RemoveFromWishlist(ctx context.Context, arg RemoveFromWishlistParams) error
+	SearchProducts(ctx context.Context, arg SearchProductsParams) ([]SearchProductsRow, error)
+	SetDefaultAddress(ctx context.Context, arg SetDefaultAddressParams) error
+	UpdateAddress(ctx context.Context, arg UpdateAddressParams) (Address, error)
+	UpdateCartItemQuantity(ctx context.Context, arg UpdateCartItemQuantityParams) (CartItem, error)
+	UpdateCategory(ctx context.Context, arg UpdateCategoryParams) (Category, error)
+	UpdateCategoryProductCount(ctx context.Context, arg UpdateCategoryProductCountParams) error
+	UpdateCoupon(ctx context.Context, arg UpdateCouponParams) (Coupon, error)
+	UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order, error)
+	UpdateOrderPaymentStatus(ctx context.Context, arg UpdateOrderPaymentStatusParams) (Order, error)
+	UpdateOrderStatus(ctx context.Context, arg UpdateOrderStatusParams) (Order, error)
 	UpdatePermission(ctx context.Context, arg UpdatePermissionParams) error
+	UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error)
+	UpdateProductRating(ctx context.Context, arg UpdateProductRatingParams) error
+	UpdateProductStatus(ctx context.Context, arg UpdateProductStatusParams) (Product, error)
+	UpdateProductStock(ctx context.Context, arg UpdateProductStockParams) (Product, error)
+	UpdateReview(ctx context.Context, arg UpdateReviewParams) (Review, error)
 	UpdateRole(ctx context.Context, arg UpdateRoleParams) error
+	UpdateStore(ctx context.Context, arg UpdateStoreParams) (Store, error)
+	UpdateStoreRating(ctx context.Context, arg UpdateStoreRatingParams) error
 	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) (UpdateUserPasswordRow, error)
 	UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) (UpdateUserProfileRow, error)
 	UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (UpdateUserStatusRow, error)
+	UseCoupon(ctx context.Context, arg UseCouponParams) (UserCouponUsage, error)
+	ValidateCoupon(ctx context.Context, code string) (ValidateCouponRow, error)
+	VerifyStore(ctx context.Context, id pgtype.UUID) (Store, error)
 	VerifyUser(ctx context.Context, id int32) error
 }
 

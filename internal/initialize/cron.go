@@ -1,8 +1,8 @@
 package initialize
 
 import (
-	"github.com/edynnt/veloras-api/internal/cron"
-	"github.com/edynnt/veloras-api/internal/shared/gen"
+	"github.com/edynt/chogiare/veloras-api/internal/cron"
+	"github.com/edynt/chogiare/veloras-api/internal/shared/gen"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

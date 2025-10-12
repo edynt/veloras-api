@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/edynnt/veloras-api/internal/auth/domain/model/entity"
+	"github.com/edynt/chogiare/veloras-api/internal/auth/domain/model/entity"
 )
 
 type PermissisonRepository interface {

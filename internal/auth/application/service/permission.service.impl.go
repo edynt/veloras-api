@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	appDto "github.com/edynnt/veloras-api/internal/auth/application/service/dto"
-	"github.com/edynnt/veloras-api/internal/auth/domain/model/entity"
-	permissionRepo "github.com/edynnt/veloras-api/internal/auth/domain/repository"
-	"github.com/edynnt/veloras-api/pkg/response/msg"
-	"github.com/edynnt/veloras-api/pkg/utils"
+	appDto "github.com/edynt/chogiare/veloras-api/internal/auth/application/service/dto"
+	"github.com/edynt/chogiare/veloras-api/internal/auth/domain/model/entity"
+	permissionRepo "github.com/edynt/chogiare/veloras-api/internal/auth/domain/repository"
+	"github.com/edynt/chogiare/veloras-api/pkg/response/msg"
+	"github.com/edynt/chogiare/veloras-api/pkg/utils"
 )
 
 type permissionService struct {

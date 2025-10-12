@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/edynnt/veloras-api/pkg/response"
-	"github.com/edynnt/veloras-api/pkg/response/msg"
+	"github.com/edynt/chogiare/veloras-api/pkg/response"
+	"github.com/edynt/chogiare/veloras-api/pkg/response/msg"
 	"github.com/go-playground/validator"
 )
 

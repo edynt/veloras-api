@@ -1,8 +1,8 @@
 package global
 
 import (
-	"github.com/edynnt/veloras-api/pkg/config"
-	"github.com/edynnt/veloras-api/pkg/logger"
+	"github.com/edynt/chogiare/veloras-api/pkg/config"
+	"github.com/edynt/chogiare/veloras-api/pkg/logger"
 )
 
 var (
