@@ -153,15 +153,15 @@ func (h *ProductHandler) ListProducts(c *gin.Context) {
 // @Tags products
 // @Accept json
 // @Produce json
-// @Param categoryId path string true "Category ID"
+// @Param id path string true "Category ID"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(20)
 // @Success 200 {object} response.Response{data=dto.ProductListResponse}
 // @Failure 400 {object} response.Response
 // @Failure 500 {object} response.Response
-// @Router /categories/{categoryId}/products [get]
+// @Router /categories/{id}/products [get]
 func (h *ProductHandler) ListProductsByCategory(c *gin.Context) {
-	categoryID := c.Param("categoryId")
+	categoryID := c.Param("id")
 	if categoryID == "" {
 		response.ErrorResponse(c, http.StatusBadRequest, "Category ID is required", nil)
 		return
