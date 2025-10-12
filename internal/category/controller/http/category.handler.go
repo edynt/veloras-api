@@ -178,7 +178,7 @@ func (h *CategoryHandler) ListCategoriesWithPagination(c *gin.Context) {
 // @Failure 500 {object} response.Response
 // @Router /categories/{parentId}/subcategories [get]
 func (h *CategoryHandler) ListSubCategories(c *gin.Context) {
-	parentID := c.Param("parentId")
+	parentID := c.Param("id")
 	if parentID == "" {
 		response.ErrorResponse(c, http.StatusBadRequest, "Parent category ID is required", nil)
 		return

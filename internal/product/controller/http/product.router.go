@@ -43,6 +43,6 @@ func RegisterProductRoutes(router *gin.RouterGroup, productHandler *ProductHandl
 	// Category-specific routes
 	categories := router.Group("/categories")
 	{
-		categories.GET("/:categoryId/products", productHandler.ListProductsByCategory)
+		categories.GET("/:id/products", productHandler.ListProductsByCategory)
 	}
 }
