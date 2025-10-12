@@ -39,17 +39,15 @@ func (s *cartService) ClearCart(ctx context.Context, userID int32) error {
 
 func (s *cartService) AddCartItem(ctx context.Context, userID int32, req *dto.AddCartItemAppDTO) (*dto.CartItemAppDTO, error) {
 	// Get or create cart for user
-	cart, err := s.cartRepo.GetOrCreateCart(ctx, userID)
+	_, err := s.cartRepo.GetOrCreateCart(ctx, userID)
 	if err != nil {
 		return nil, response.NewAPIError(http.StatusInternalServerError, "Failed to get cart", err)
 	}
 
 	// Add item to cart
-	item, err := s.cartRepo.AddCartItem(ctx, repository.AddCartItemParams{
-		CartID:    cart.ID,
+	item, err := s.cartRepo.AddCartItem(ctx, userID, repository.AddCartItemParams{
 		ProductID: req.ProductID,
 		Quantity:  req.Quantity,
-		Price:     10.0, // Placeholder price - should come from product service
 	})
 	if err != nil {
 		return nil, response.NewAPIError(http.StatusInternalServerError, "Failed to add item to cart", err)
@@ -58,8 +56,8 @@ func (s *cartService) AddCartItem(ctx context.Context, userID int32, req *dto.Ad
 	return s.convertToCartItemAppDTO(item), nil
 }
 
-func (s *cartService) UpdateCartItemQuantity(ctx context.Context, itemID string, req *dto.UpdateCartItemQuantityAppDTO) (*dto.CartItemAppDTO, error) {
-	item, err := s.cartRepo.UpdateCartItemQuantity(ctx, repository.UpdateCartItemQuantityParams{
+func (s *cartService) UpdateCartItemQuantity(ctx context.Context, userID int32, itemID string, req *dto.UpdateCartItemQuantityAppDTO) (*dto.CartItemAppDTO, error) {
+	item, err := s.cartRepo.UpdateCartItemQuantity(ctx, userID, repository.UpdateCartItemQuantityParams{
 		ItemID:   itemID,
 		Quantity: req.Quantity,
 	})
@@ -70,8 +68,8 @@ func (s *cartService) UpdateCartItemQuantity(ctx context.Context, itemID string,
 	return s.convertToCartItemAppDTO(item), nil
 }
 
-func (s *cartService) RemoveCartItem(ctx context.Context, itemID string) error {
-	err := s.cartRepo.RemoveCartItem(ctx, itemID)
+func (s *cartService) RemoveCartItem(ctx context.Context, userID int32, itemID string) error {
+	err := s.cartRepo.RemoveCartItem(ctx, userID, itemID)
 	if err != nil {
 		return response.NewAPIError(http.StatusInternalServerError, "Failed to remove cart item", err)
 	}

@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/edynt/chogiare/veloras-api/internal/auth/application/service"
-	"github.com/edynt/chogiare/veloras-api/internal/auth/application/service/dto"
-	ctlDto "github.com/edynt/chogiare/veloras-api/internal/auth/controller/dto"
+	appDto "github.com/edynt/chogiare/veloras-api/internal/auth/application/service/dto"
+	"github.com/edynt/chogiare/veloras-api/internal/auth/controller/dto"
 	"github.com/edynt/chogiare/veloras-api/pkg/response"
 	"github.com/edynt/chogiare/veloras-api/pkg/response/msg"
 	"github.com/edynt/chogiare/veloras-api/pkg/utils"
@@ -23,12 +23,12 @@ type RoleHandler struct {
 // @Tags Roles
 // @Accept json
 // @Produce json
-// @Param request body ctlDto.RoleReq true "Role creation request"
+// @Param request body dto.RoleReq true "Role creation request"
 // @Success 200 {object} map[string]interface{} "Returns created role"
 // @Failure 400 {object} response.APIError "Invalid request or validation errors"
 // @Router /roles [post]
 func (rh *RoleHandler) CreateRole(ctx *gin.Context) (res interface{}, err error) {
-	var req ctlDto.RoleReq
+	var req dto.RoleReq
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
@@ -44,7 +44,7 @@ func (rh *RoleHandler) CreateRole(ctx *gin.Context) (res interface{}, err error)
 		return nil, apiErr
 	}
 
-	requestRole := dto.RoleAppDTO{
+	requestRole := appDto.RoleAppDTO{
 		Name:        req.Name,
 		Description: req.Description,
 	}
@@ -70,7 +70,7 @@ func (rh *RoleHandler) CreateRole(ctx *gin.Context) (res interface{}, err error)
 // @Failure 400 {object} response.APIError "Invalid request or validation errors"
 // @Router /roles/{id} [put]
 func (rh *RoleHandler) UpdateRole(ctx *gin.Context) (res interface{}, err error) {
-	var req ctlDto.RoleReq
+	var req dto.RoleReq
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
@@ -86,7 +86,7 @@ func (rh *RoleHandler) UpdateRole(ctx *gin.Context) (res interface{}, err error)
 		return nil, apiErr
 	}
 
-	requestRole := dto.RoleAppDTO{
+	requestRole := appDto.RoleAppDTO{
 		ID:          utils.StringToInt(ctx.Param("id")),
 		Name:        req.Name,
 		Description: req.Description,
@@ -162,7 +162,7 @@ func (rh *RoleHandler) GetRole(ctx *gin.Context) (res interface{}, err error) {
 }
 
 func (rh *RoleHandler) AssignPermissions(ctx *gin.Context) (res interface{}, err error) {
-	var req ctlDto.AssignPermissionReq
+	var req dto.AssignPermissionReq
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.NewAPIError(http.StatusBadRequest, msg.InvalidRequest, err.Error())
@@ -178,7 +178,7 @@ func (rh *RoleHandler) AssignPermissions(ctx *gin.Context) (res interface{}, err
 		return nil, apiErr
 	}
 
-	requestRolePermission := dto.RolePermissionAppDTO{
+	requestRolePermission := appDto.RolePermissionAppDTO{
 		RoleID:       req.RoleID,
 		PermissionID: req.PermissionID,
 	}

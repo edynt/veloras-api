@@ -146,6 +146,46 @@ func convertTextPtrToString(t pgtype.Text) string {
 	return t.String
 }
 
+// Convert from SQLC model with details to domain entity (for GetCartItemsWithDetailsRow)
+func FromSQLCCartItemWithDetailsFromGet(ci gen.GetCartItemsWithDetailsRow, userID int32) CartItemWithDetails {
+	return CartItemWithDetails{
+		CartItem: CartItem{
+			ID:        ci.ID.String(),
+			CartID:    fmt.Sprintf("cart-%d", userID),
+			ProductID: ci.ProductID.String(),
+			Quantity:  ci.Quantity,
+			Price:     convertNumericToFloat64(ci.Price),
+			CreatedAt: ci.CreatedAt.Time,
+			UpdatedAt: ci.UpdatedAt.Time,
+		},
+		ProductName:   convertTextPtrToString(ci.Title),
+		ProductImage:  getFirstImage(ci.Images),
+		ProductPrice:  convertNumericToFloat64(ci.Price),
+		ProductStock:  int32(ci.Stock.Int32),
+		ProductStatus: convertTextPtrToString(ci.Status),
+	}
+}
+
+// Convert from SQLC model with details to domain entity (for GetCartItemWithDetailsRow)
+func FromSQLCCartItemWithDetailsFromGetSingle(ci gen.GetCartItemWithDetailsRow, userID int32) CartItemWithDetails {
+	return CartItemWithDetails{
+		CartItem: CartItem{
+			ID:        ci.ID.String(),
+			CartID:    fmt.Sprintf("cart-%d", userID),
+			ProductID: ci.ProductID.String(),
+			Quantity:  ci.Quantity,
+			Price:     convertNumericToFloat64(ci.Price),
+			CreatedAt: ci.CreatedAt.Time,
+			UpdatedAt: ci.UpdatedAt.Time,
+		},
+		ProductName:   convertTextPtrToString(ci.Title),
+		ProductImage:  getFirstImage(ci.Images),
+		ProductPrice:  convertNumericToFloat64(ci.Price),
+		ProductStock:  int32(ci.Stock.Int32),
+		ProductStatus: convertTextPtrToString(ci.Status),
+	}
+}
+
 // Helper function to get first image from array
 func getFirstImage(images []string) string {
 	if len(images) > 0 {

@@ -13,8 +13,8 @@ type CartService interface {
 
 	// Cart item operations
 	AddCartItem(ctx context.Context, userID int32, req *dto.AddCartItemAppDTO) (*dto.CartItemAppDTO, error)
-	UpdateCartItemQuantity(ctx context.Context, itemID string, req *dto.UpdateCartItemQuantityAppDTO) (*dto.CartItemAppDTO, error)
-	RemoveCartItem(ctx context.Context, itemID string) error
+	UpdateCartItemQuantity(ctx context.Context, userID int32, itemID string, req *dto.UpdateCartItemQuantityAppDTO) (*dto.CartItemAppDTO, error)
+	RemoveCartItem(ctx context.Context, userID int32, itemID string) error
 
 	// Statistics
 	GetCartStats(ctx context.Context, userID int32) (*dto.CartStatsAppDTO, error)
