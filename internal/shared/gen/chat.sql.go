@@ -35,6 +35,30 @@ func (q *Queries) AddConversationParticipant(ctx context.Context, arg AddConvers
 	return i, err
 }
 
+const addParticipant = `-- name: AddParticipant :one
+INSERT INTO conversation_participants (conversation_id, user_id)
+VALUES ($1, $2)
+ON CONFLICT (conversation_id, user_id) DO NOTHING
+RETURNING id, conversation_id, user_id, joined_at
+`
+
+type AddParticipantParams struct {
+	ConversationID pgtype.UUID
+	UserID         int32
+}
+
+func (q *Queries) AddParticipant(ctx context.Context, arg AddParticipantParams) (ConversationParticipant, error) {
+	row := q.db.QueryRow(ctx, addParticipant, arg.ConversationID, arg.UserID)
+	var i ConversationParticipant
+	err := row.Scan(
+		&i.ID,
+		&i.ConversationID,
+		&i.UserID,
+		&i.JoinedAt,
+	)
+	return i, err
+}
+
 const createChatMessage = `-- name: CreateChatMessage :one
 INSERT INTO chat_messages (
     conversation_id, sender_id, content, type, attachments
@@ -84,6 +108,15 @@ func (q *Queries) CreateConversation(ctx context.Context) (Conversation, error) 
 	return i, err
 }
 
+const deleteChatMessage = `-- name: DeleteChatMessage :exec
+DELETE FROM chat_messages WHERE id = $1
+`
+
+func (q *Queries) DeleteChatMessage(ctx context.Context, id pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, deleteChatMessage, id)
+	return err
+}
+
 const deleteConversation = `-- name: DeleteConversation :exec
 DELETE FROM conversations WHERE id = $1
 `
@@ -91,6 +124,68 @@ DELETE FROM conversations WHERE id = $1
 func (q *Queries) DeleteConversation(ctx context.Context, id pgtype.UUID) error {
 	_, err := q.db.Exec(ctx, deleteConversation, id)
 	return err
+}
+
+const getChatMessageWithDetails = `-- name: GetChatMessageWithDetails :one
+SELECT cm.id, cm.conversation_id, cm.sender_id, cm.content, cm.type, cm.attachments, cm.is_read, cm.created_at, 
+       u.first_name || ' ' || u.last_name as sender_name,
+       u.email as sender_email
+FROM chat_messages cm
+LEFT JOIN users u ON cm.sender_id = u.id
+WHERE cm.id = $1
+`
+
+type GetChatMessageWithDetailsRow struct {
+	ID             pgtype.UUID
+	ConversationID pgtype.UUID
+	SenderID       int32
+	Content        string
+	Type           string
+	Attachments    []string
+	IsRead         pgtype.Bool
+	CreatedAt      pgtype.Timestamptz
+	SenderName     interface{}
+	SenderEmail    pgtype.Text
+}
+
+func (q *Queries) GetChatMessageWithDetails(ctx context.Context, id pgtype.UUID) (GetChatMessageWithDetailsRow, error) {
+	row := q.db.QueryRow(ctx, getChatMessageWithDetails, id)
+	var i GetChatMessageWithDetailsRow
+	err := row.Scan(
+		&i.ID,
+		&i.ConversationID,
+		&i.SenderID,
+		&i.Content,
+		&i.Type,
+		&i.Attachments,
+		&i.IsRead,
+		&i.CreatedAt,
+		&i.SenderName,
+		&i.SenderEmail,
+	)
+	return i, err
+}
+
+const getChatStats = `-- name: GetChatStats :one
+SELECT 
+    COUNT(DISTINCT c.id) as total_conversations,
+    COUNT(cm.id) as total_messages,
+    COUNT(CASE WHEN cm.is_read = false THEN 1 END) as unread_messages
+FROM conversations c
+LEFT JOIN chat_messages cm ON c.id = cm.conversation_id
+`
+
+type GetChatStatsRow struct {
+	TotalConversations int64
+	TotalMessages      int64
+	UnreadMessages     int64
+}
+
+func (q *Queries) GetChatStats(ctx context.Context) (GetChatStatsRow, error) {
+	row := q.db.QueryRow(ctx, getChatStats)
+	var i GetChatStatsRow
+	err := row.Scan(&i.TotalConversations, &i.TotalMessages, &i.UnreadMessages)
+	return i, err
 }
 
 const getConversation = `-- name: GetConversation :one
@@ -141,6 +236,49 @@ func (q *Queries) GetConversationByParticipants(ctx context.Context, dollar_1 []
 	return i, err
 }
 
+const getConversationParticipants = `-- name: GetConversationParticipants :many
+SELECT cp.id, cp.conversation_id, cp.user_id, cp.joined_at, u.first_name || ' ' || u.last_name as user_name, u.email as user_email
+FROM conversation_participants cp
+LEFT JOIN users u ON cp.user_id = u.id
+WHERE cp.conversation_id = $1
+`
+
+type GetConversationParticipantsRow struct {
+	ID             pgtype.UUID
+	ConversationID pgtype.UUID
+	UserID         int32
+	JoinedAt       pgtype.Timestamptz
+	UserName       interface{}
+	UserEmail      pgtype.Text
+}
+
+func (q *Queries) GetConversationParticipants(ctx context.Context, conversationID pgtype.UUID) ([]GetConversationParticipantsRow, error) {
+	rows, err := q.db.Query(ctx, getConversationParticipants, conversationID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetConversationParticipantsRow{}
+	for rows.Next() {
+		var i GetConversationParticipantsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ConversationID,
+			&i.UserID,
+			&i.JoinedAt,
+			&i.UserName,
+			&i.UserEmail,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getConversationUnreadCount = `-- name: GetConversationUnreadCount :one
 SELECT COUNT(*) as unread_count
 FROM chat_messages cm
@@ -158,6 +296,39 @@ func (q *Queries) GetConversationUnreadCount(ctx context.Context, arg GetConvers
 	var unread_count int64
 	err := row.Scan(&unread_count)
 	return unread_count, err
+}
+
+const getConversationWithDetails = `-- name: GetConversationWithDetails :one
+SELECT c.id, c.created_at, c.updated_at, 
+       array_agg(
+           json_build_object(
+               'user_id', cp.user_id,
+               'joined_at', cp.created_at
+           )
+       ) as participants
+FROM conversations c
+LEFT JOIN conversation_participants cp ON c.id = cp.conversation_id
+WHERE c.id = $1
+GROUP BY c.id, c.created_at, c.updated_at
+`
+
+type GetConversationWithDetailsRow struct {
+	ID           pgtype.UUID
+	CreatedAt    pgtype.Timestamptz
+	UpdatedAt    pgtype.Timestamptz
+	Participants interface{}
+}
+
+func (q *Queries) GetConversationWithDetails(ctx context.Context, id pgtype.UUID) (GetConversationWithDetailsRow, error) {
+	row := q.db.QueryRow(ctx, getConversationWithDetails, id)
+	var i GetConversationWithDetailsRow
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Participants,
+	)
+	return i, err
 }
 
 const getUnreadMessageCount = `-- name: GetUnreadMessageCount :one
@@ -213,6 +384,67 @@ func (q *Queries) ListChatMessages(ctx context.Context, arg ListChatMessagesPara
 	items := []ListChatMessagesRow{}
 	for rows.Next() {
 		var i ListChatMessagesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ConversationID,
+			&i.SenderID,
+			&i.Content,
+			&i.Type,
+			&i.Attachments,
+			&i.IsRead,
+			&i.CreatedAt,
+			&i.SenderName,
+			&i.SenderEmail,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listConversationMessages = `-- name: ListConversationMessages :many
+SELECT cm.id, cm.conversation_id, cm.sender_id, cm.content, cm.type, cm.attachments, cm.is_read, cm.created_at, 
+       u.first_name || ' ' || u.last_name as sender_name,
+       u.email as sender_email
+FROM chat_messages cm
+LEFT JOIN users u ON cm.sender_id = u.id
+WHERE cm.conversation_id = $1
+ORDER BY cm.created_at ASC
+LIMIT $2 OFFSET $3
+`
+
+type ListConversationMessagesParams struct {
+	ConversationID pgtype.UUID
+	Limit          int32
+	Offset         int32
+}
+
+type ListConversationMessagesRow struct {
+	ID             pgtype.UUID
+	ConversationID pgtype.UUID
+	SenderID       int32
+	Content        string
+	Type           string
+	Attachments    []string
+	IsRead         pgtype.Bool
+	CreatedAt      pgtype.Timestamptz
+	SenderName     interface{}
+	SenderEmail    pgtype.Text
+}
+
+func (q *Queries) ListConversationMessages(ctx context.Context, arg ListConversationMessagesParams) ([]ListConversationMessagesRow, error) {
+	rows, err := q.db.Query(ctx, listConversationMessages, arg.ConversationID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListConversationMessagesRow{}
+	for rows.Next() {
+		var i ListConversationMessagesRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.ConversationID,
@@ -304,6 +536,33 @@ func (q *Queries) ListUserConversations(ctx context.Context, arg ListUserConvers
 	return items, nil
 }
 
+const markConversationAsRead = `-- name: MarkConversationAsRead :exec
+UPDATE chat_messages 
+SET is_read = true
+WHERE conversation_id = $1 AND sender_id != $2
+`
+
+type MarkConversationAsReadParams struct {
+	ConversationID pgtype.UUID
+	SenderID       int32
+}
+
+func (q *Queries) MarkConversationAsRead(ctx context.Context, arg MarkConversationAsReadParams) error {
+	_, err := q.db.Exec(ctx, markConversationAsRead, arg.ConversationID, arg.SenderID)
+	return err
+}
+
+const markMessageAsRead = `-- name: MarkMessageAsRead :exec
+UPDATE chat_messages 
+SET is_read = true
+WHERE id = $1
+`
+
+func (q *Queries) MarkMessageAsRead(ctx context.Context, id pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, markMessageAsRead, id)
+	return err
+}
+
 const markMessagesAsRead = `-- name: MarkMessagesAsRead :exec
 UPDATE chat_messages 
 SET is_read = true
@@ -333,4 +592,33 @@ type RemoveConversationParticipantParams struct {
 func (q *Queries) RemoveConversationParticipant(ctx context.Context, arg RemoveConversationParticipantParams) error {
 	_, err := q.db.Exec(ctx, removeConversationParticipant, arg.ConversationID, arg.UserID)
 	return err
+}
+
+const removeParticipant = `-- name: RemoveParticipant :exec
+DELETE FROM conversation_participants 
+WHERE conversation_id = $1 AND user_id = $2
+`
+
+type RemoveParticipantParams struct {
+	ConversationID pgtype.UUID
+	UserID         int32
+}
+
+func (q *Queries) RemoveParticipant(ctx context.Context, arg RemoveParticipantParams) error {
+	_, err := q.db.Exec(ctx, removeParticipant, arg.ConversationID, arg.UserID)
+	return err
+}
+
+const updateConversation = `-- name: UpdateConversation :one
+UPDATE conversations 
+SET updated_at = NOW()
+WHERE id = $1
+RETURNING id, created_at, updated_at
+`
+
+func (q *Queries) UpdateConversation(ctx context.Context, id pgtype.UUID) (Conversation, error) {
+	row := q.db.QueryRow(ctx, updateConversation, id)
+	var i Conversation
+	err := row.Scan(&i.ID, &i.CreatedAt, &i.UpdatedAt)
+	return i, err
 }

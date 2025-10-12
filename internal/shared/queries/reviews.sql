@@ -92,3 +92,59 @@ SELECT EXISTS(
           WHERE r.buyer_id = $1 AND r.product_id = $2
       )
 ) as can_review;
+
+-- name: ListReviews :many
+SELECT r.*, 
+       p.title as product_title,
+       b.first_name || ' ' || b.last_name as buyer_name,
+       s.first_name || ' ' || s.last_name as seller_name
+FROM reviews r
+LEFT JOIN products p ON r.product_id = p.id
+LEFT JOIN users b ON r.buyer_id = b.id
+LEFT JOIN users s ON r.seller_id = s.id
+ORDER BY r.created_at DESC
+LIMIT $1 OFFSET $2;
+
+-- name: ListReviewsByUser :many
+SELECT r.*, 
+       p.title as product_title, p.images as product_images,
+       s.first_name || ' ' || s.last_name as seller_name
+FROM reviews r
+LEFT JOIN products p ON r.product_id = p.id
+LEFT JOIN users s ON r.seller_id = s.id
+WHERE r.buyer_id = $1
+ORDER BY r.created_at DESC
+LIMIT $2 OFFSET $3;
+
+-- name: MarkReviewHelpful :exec
+-- Note: This would require a review_helpful table to be created
+-- For now, this is a placeholder that does nothing
+SELECT 1;
+
+-- name: UnmarkReviewHelpful :exec
+-- Note: This would require a review_helpful table to be created
+-- For now, this is a placeholder that does nothing
+SELECT 1;
+
+-- name: GetReviewStats :one
+SELECT 
+    COUNT(*) as total_reviews,
+    AVG(rating) as average_rating,
+    COUNT(CASE WHEN rating = 5 THEN 1 END) as five_star,
+    COUNT(CASE WHEN rating = 4 THEN 1 END) as four_star,
+    COUNT(CASE WHEN rating = 3 THEN 1 END) as three_star,
+    COUNT(CASE WHEN rating = 2 THEN 1 END) as two_star,
+    COUNT(CASE WHEN rating = 1 THEN 1 END) as one_star
+FROM reviews;
+
+-- name: GetUserReviewStats :one
+SELECT 
+    COUNT(*) as total_reviews,
+    AVG(rating) as average_rating,
+    COUNT(CASE WHEN rating = 5 THEN 1 END) as five_star,
+    COUNT(CASE WHEN rating = 4 THEN 1 END) as four_star,
+    COUNT(CASE WHEN rating = 3 THEN 1 END) as three_star,
+    COUNT(CASE WHEN rating = 2 THEN 1 END) as two_star,
+    COUNT(CASE WHEN rating = 1 THEN 1 END) as one_star
+FROM reviews 
+WHERE buyer_id = $1;

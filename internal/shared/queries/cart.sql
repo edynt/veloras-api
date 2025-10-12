@@ -46,3 +46,80 @@ SELECT COALESCE(SUM(ci.quantity * p.price), 0) as total
 FROM cart_items ci
 LEFT JOIN products p ON ci.product_id = p.id
 WHERE ci.user_id = $1 AND p.status = 'active';
+
+-- name: GetOrCreateCart :one
+SELECT user_id, 
+       array_agg(
+           json_build_object(
+               'id', ci.id,
+               'product_id', ci.product_id,
+               'quantity', ci.quantity,
+               'created_at', ci.created_at,
+               'updated_at', ci.updated_at,
+               'product_title', p.title,
+               'product_price', p.price,
+               'product_images', p.images,
+               'product_stock', p.stock,
+               'product_status', p.status
+           )
+       ) as items
+FROM cart_items ci
+LEFT JOIN products p ON ci.product_id = p.id
+WHERE ci.user_id = $1
+GROUP BY ci.user_id;
+
+-- name: GetCartWithDetails :one
+SELECT user_id, 
+       array_agg(
+           json_build_object(
+               'id', ci.id,
+               'product_id', ci.product_id,
+               'quantity', ci.quantity,
+               'created_at', ci.created_at,
+               'updated_at', ci.updated_at,
+               'product_title', p.title,
+               'product_price', p.price,
+               'product_images', p.images,
+               'product_stock', p.stock,
+               'product_status', p.status
+           )
+       ) as items
+FROM cart_items ci
+LEFT JOIN products p ON ci.product_id = p.id
+WHERE ci.user_id = $1
+GROUP BY ci.user_id;
+
+-- name: DeleteCart :exec
+DELETE FROM cart_items WHERE user_id = $1;
+
+-- name: AddCartItem :one
+INSERT INTO cart_items (user_id, product_id, quantity)
+VALUES ($1, $2, $3)
+ON CONFLICT (user_id, product_id) 
+DO UPDATE SET quantity = cart_items.quantity + $3, updated_at = NOW()
+RETURNING *;
+
+-- name: RemoveCartItem :exec
+DELETE FROM cart_items WHERE user_id = $1 AND product_id = $2;
+
+-- name: GetCartItemsWithDetails :many
+SELECT ci.*, p.title, p.price, p.images, p.stock, p.status
+FROM cart_items ci
+LEFT JOIN products p ON ci.product_id = p.id
+WHERE ci.user_id = $1
+ORDER BY ci.created_at DESC;
+
+-- name: GetCartItemWithDetails :one
+SELECT ci.*, p.title, p.price, p.images, p.stock, p.status
+FROM cart_items ci
+LEFT JOIN products p ON ci.product_id = p.id
+WHERE ci.id = $1;
+
+-- name: GetCartStats :one
+SELECT 
+    COUNT(ci.id) as total_items,
+    COALESCE(SUM(ci.quantity * p.price), 0) as total_value,
+    COUNT(DISTINCT ci.product_id) as unique_products
+FROM cart_items ci
+LEFT JOIN products p ON ci.product_id = p.id
+WHERE ci.user_id = $1;

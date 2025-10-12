@@ -340,6 +340,78 @@ func (q *Queries) ListVerifiedStores(ctx context.Context, arg ListVerifiedStores
 	return items, nil
 }
 
+const searchStores = `-- name: SearchStores :many
+SELECT s.id, s.user_id, s.name, s.description, s.logo, s.banner, s.address, s.phone, s.email, s.is_verified, s.rating, s.review_count, s.created_at, s.updated_at, u.first_name || ' ' || u.last_name as owner_name, u.email as owner_email
+FROM stores s
+LEFT JOIN users u ON s.user_id = u.id
+WHERE s.is_verified = true 
+  AND (s.name ILIKE '%' || $1 || '%' OR s.description ILIKE '%' || $1 || '%')
+ORDER BY s.rating DESC, s.review_count DESC
+LIMIT $2 OFFSET $3
+`
+
+type SearchStoresParams struct {
+	Column1 pgtype.Text
+	Limit   int32
+	Offset  int32
+}
+
+type SearchStoresRow struct {
+	ID          pgtype.UUID
+	UserID      int32
+	Name        string
+	Description pgtype.Text
+	Logo        pgtype.Text
+	Banner      pgtype.Text
+	Address     pgtype.Text
+	Phone       pgtype.Text
+	Email       pgtype.Text
+	IsVerified  pgtype.Bool
+	Rating      pgtype.Numeric
+	ReviewCount pgtype.Int4
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
+	OwnerName   interface{}
+	OwnerEmail  pgtype.Text
+}
+
+func (q *Queries) SearchStores(ctx context.Context, arg SearchStoresParams) ([]SearchStoresRow, error) {
+	rows, err := q.db.Query(ctx, searchStores, arg.Column1, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []SearchStoresRow{}
+	for rows.Next() {
+		var i SearchStoresRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Name,
+			&i.Description,
+			&i.Logo,
+			&i.Banner,
+			&i.Address,
+			&i.Phone,
+			&i.Email,
+			&i.IsVerified,
+			&i.Rating,
+			&i.ReviewCount,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.OwnerName,
+			&i.OwnerEmail,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateStore = `-- name: UpdateStore :one
 UPDATE stores 
 SET name = $2, description = $3, logo = $4, banner = $5, 
@@ -390,6 +462,28 @@ func (q *Queries) UpdateStore(ctx context.Context, arg UpdateStoreParams) (Store
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const updateStoreFollowerCount = `-- name: UpdateStoreFollowerCount :exec
+SELECT 1
+`
+
+// Note: follower_count column doesn't exist in stores table
+// This is a placeholder that does nothing
+func (q *Queries) UpdateStoreFollowerCount(ctx context.Context) error {
+	_, err := q.db.Exec(ctx, updateStoreFollowerCount)
+	return err
+}
+
+const updateStoreProductCount = `-- name: UpdateStoreProductCount :exec
+SELECT 1
+`
+
+// Note: product_count column doesn't exist in stores table
+// This is a placeholder that does nothing
+func (q *Queries) UpdateStoreProductCount(ctx context.Context) error {
+	_, err := q.db.Exec(ctx, updateStoreProductCount)
+	return err
 }
 
 const updateStoreRating = `-- name: UpdateStoreRating :exec

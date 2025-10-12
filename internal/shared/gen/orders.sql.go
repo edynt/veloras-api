@@ -273,6 +273,84 @@ func (q *Queries) GetOrdersByDateRange(ctx context.Context, arg GetOrdersByDateR
 	return items, nil
 }
 
+const listOrders = `-- name: ListOrders :many
+SELECT o.id, o.buyer_id, o.seller_id, o.product_id, o.quantity, o.total_amount, o.status, o.payment_method, o.payment_status, o.shipping_address_id, o.notes, o.created_at, o.updated_at, 
+       p.title as product_title, p.price as product_price, p.images as product_images,
+       b.first_name || ' ' || b.last_name as buyer_name,
+       s.first_name || ' ' || s.last_name as seller_name
+FROM orders o
+LEFT JOIN products p ON o.product_id = p.id
+LEFT JOIN users b ON o.buyer_id = b.id
+LEFT JOIN users s ON o.seller_id = s.id
+ORDER BY o.created_at DESC
+LIMIT $1 OFFSET $2
+`
+
+type ListOrdersParams struct {
+	Limit  int32
+	Offset int32
+}
+
+type ListOrdersRow struct {
+	ID                pgtype.UUID
+	BuyerID           int32
+	SellerID          int32
+	ProductID         pgtype.UUID
+	Quantity          int32
+	TotalAmount       pgtype.Numeric
+	Status            string
+	PaymentMethod     string
+	PaymentStatus     string
+	ShippingAddressID pgtype.UUID
+	Notes             pgtype.Text
+	CreatedAt         pgtype.Timestamptz
+	UpdatedAt         pgtype.Timestamptz
+	ProductTitle      pgtype.Text
+	ProductPrice      pgtype.Numeric
+	ProductImages     []string
+	BuyerName         interface{}
+	SellerName        interface{}
+}
+
+func (q *Queries) ListOrders(ctx context.Context, arg ListOrdersParams) ([]ListOrdersRow, error) {
+	rows, err := q.db.Query(ctx, listOrders, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListOrdersRow{}
+	for rows.Next() {
+		var i ListOrdersRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.BuyerID,
+			&i.SellerID,
+			&i.ProductID,
+			&i.Quantity,
+			&i.TotalAmount,
+			&i.Status,
+			&i.PaymentMethod,
+			&i.PaymentStatus,
+			&i.ShippingAddressID,
+			&i.Notes,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ProductTitle,
+			&i.ProductPrice,
+			&i.ProductImages,
+			&i.BuyerName,
+			&i.SellerName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listOrdersByBuyer = `-- name: ListOrdersByBuyer :many
 SELECT o.id, o.buyer_id, o.seller_id, o.product_id, o.quantity, o.total_amount, o.status, o.payment_method, o.payment_status, o.shipping_address_id, o.notes, o.created_at, o.updated_at, 
        p.title as product_title, p.price as product_price, p.images as product_images,
@@ -483,6 +561,167 @@ func (q *Queries) ListOrdersByStatus(ctx context.Context, arg ListOrdersByStatus
 	items := []ListOrdersByStatusRow{}
 	for rows.Next() {
 		var i ListOrdersByStatusRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.BuyerID,
+			&i.SellerID,
+			&i.ProductID,
+			&i.Quantity,
+			&i.TotalAmount,
+			&i.Status,
+			&i.PaymentMethod,
+			&i.PaymentStatus,
+			&i.ShippingAddressID,
+			&i.Notes,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ProductTitle,
+			&i.ProductPrice,
+			&i.ProductImages,
+			&i.BuyerName,
+			&i.SellerName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listOrdersByStore = `-- name: ListOrdersByStore :many
+SELECT o.id, o.buyer_id, o.seller_id, o.product_id, o.quantity, o.total_amount, o.status, o.payment_method, o.payment_status, o.shipping_address_id, o.notes, o.created_at, o.updated_at, 
+       p.title as product_title, p.price as product_price, p.images as product_images,
+       b.first_name || ' ' || b.last_name as buyer_name,
+       s.first_name || ' ' || s.last_name as seller_name
+FROM orders o
+LEFT JOIN products p ON o.product_id = p.id
+LEFT JOIN users b ON o.buyer_id = b.id
+LEFT JOIN users s ON o.seller_id = s.id
+LEFT JOIN stores st ON st.user_id = o.seller_id
+WHERE st.id = $1
+ORDER BY o.created_at DESC
+LIMIT $2 OFFSET $3
+`
+
+type ListOrdersByStoreParams struct {
+	ID     pgtype.UUID
+	Limit  int32
+	Offset int32
+}
+
+type ListOrdersByStoreRow struct {
+	ID                pgtype.UUID
+	BuyerID           int32
+	SellerID          int32
+	ProductID         pgtype.UUID
+	Quantity          int32
+	TotalAmount       pgtype.Numeric
+	Status            string
+	PaymentMethod     string
+	PaymentStatus     string
+	ShippingAddressID pgtype.UUID
+	Notes             pgtype.Text
+	CreatedAt         pgtype.Timestamptz
+	UpdatedAt         pgtype.Timestamptz
+	ProductTitle      pgtype.Text
+	ProductPrice      pgtype.Numeric
+	ProductImages     []string
+	BuyerName         interface{}
+	SellerName        interface{}
+}
+
+func (q *Queries) ListOrdersByStore(ctx context.Context, arg ListOrdersByStoreParams) ([]ListOrdersByStoreRow, error) {
+	rows, err := q.db.Query(ctx, listOrdersByStore, arg.ID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListOrdersByStoreRow{}
+	for rows.Next() {
+		var i ListOrdersByStoreRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.BuyerID,
+			&i.SellerID,
+			&i.ProductID,
+			&i.Quantity,
+			&i.TotalAmount,
+			&i.Status,
+			&i.PaymentMethod,
+			&i.PaymentStatus,
+			&i.ShippingAddressID,
+			&i.Notes,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ProductTitle,
+			&i.ProductPrice,
+			&i.ProductImages,
+			&i.BuyerName,
+			&i.SellerName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listOrdersByUser = `-- name: ListOrdersByUser :many
+SELECT o.id, o.buyer_id, o.seller_id, o.product_id, o.quantity, o.total_amount, o.status, o.payment_method, o.payment_status, o.shipping_address_id, o.notes, o.created_at, o.updated_at, 
+       p.title as product_title, p.price as product_price, p.images as product_images,
+       b.first_name || ' ' || b.last_name as buyer_name,
+       s.first_name || ' ' || s.last_name as seller_name
+FROM orders o
+LEFT JOIN products p ON o.product_id = p.id
+LEFT JOIN users b ON o.buyer_id = b.id
+LEFT JOIN users s ON o.seller_id = s.id
+WHERE o.buyer_id = $1 OR o.seller_id = $1
+ORDER BY o.created_at DESC
+LIMIT $2 OFFSET $3
+`
+
+type ListOrdersByUserParams struct {
+	BuyerID int32
+	Limit   int32
+	Offset  int32
+}
+
+type ListOrdersByUserRow struct {
+	ID                pgtype.UUID
+	BuyerID           int32
+	SellerID          int32
+	ProductID         pgtype.UUID
+	Quantity          int32
+	TotalAmount       pgtype.Numeric
+	Status            string
+	PaymentMethod     string
+	PaymentStatus     string
+	ShippingAddressID pgtype.UUID
+	Notes             pgtype.Text
+	CreatedAt         pgtype.Timestamptz
+	UpdatedAt         pgtype.Timestamptz
+	ProductTitle      pgtype.Text
+	ProductPrice      pgtype.Numeric
+	ProductImages     []string
+	BuyerName         interface{}
+	SellerName        interface{}
+}
+
+func (q *Queries) ListOrdersByUser(ctx context.Context, arg ListOrdersByUserParams) ([]ListOrdersByUserRow, error) {
+	rows, err := q.db.Query(ctx, listOrdersByUser, arg.BuyerID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListOrdersByUserRow{}
+	for rows.Next() {
+		var i ListOrdersByUserRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.BuyerID,

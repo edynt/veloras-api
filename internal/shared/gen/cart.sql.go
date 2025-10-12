@@ -11,6 +11,34 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const addCartItem = `-- name: AddCartItem :one
+INSERT INTO cart_items (user_id, product_id, quantity)
+VALUES ($1, $2, $3)
+ON CONFLICT (user_id, product_id) 
+DO UPDATE SET quantity = cart_items.quantity + $3, updated_at = NOW()
+RETURNING id, user_id, product_id, quantity, created_at, updated_at
+`
+
+type AddCartItemParams struct {
+	UserID    int32
+	ProductID pgtype.UUID
+	Quantity  int32
+}
+
+func (q *Queries) AddCartItem(ctx context.Context, arg AddCartItemParams) (CartItem, error) {
+	row := q.db.QueryRow(ctx, addCartItem, arg.UserID, arg.ProductID, arg.Quantity)
+	var i CartItem
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.ProductID,
+		&i.Quantity,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const addToCart = `-- name: AddToCart :one
 INSERT INTO cart_items (user_id, product_id, quantity)
 VALUES ($1, $2, $3)
@@ -45,6 +73,15 @@ DELETE FROM cart_items WHERE user_id = $1
 
 func (q *Queries) ClearCart(ctx context.Context, userID int32) error {
 	_, err := q.db.Exec(ctx, clearCart, userID)
+	return err
+}
+
+const deleteCart = `-- name: DeleteCart :exec
+DELETE FROM cart_items WHERE user_id = $1
+`
+
+func (q *Queries) DeleteCart(ctx context.Context, userID int32) error {
+	_, err := q.db.Exec(ctx, deleteCart, userID)
 	return err
 }
 
@@ -118,6 +155,123 @@ func (q *Queries) GetCartItemCount(ctx context.Context, userID int32) (int64, er
 	return count, err
 }
 
+const getCartItemWithDetails = `-- name: GetCartItemWithDetails :one
+SELECT ci.id, ci.user_id, ci.product_id, ci.quantity, ci.created_at, ci.updated_at, p.title, p.price, p.images, p.stock, p.status
+FROM cart_items ci
+LEFT JOIN products p ON ci.product_id = p.id
+WHERE ci.id = $1
+`
+
+type GetCartItemWithDetailsRow struct {
+	ID        pgtype.UUID
+	UserID    int32
+	ProductID pgtype.UUID
+	Quantity  int32
+	CreatedAt pgtype.Timestamptz
+	UpdatedAt pgtype.Timestamptz
+	Title     pgtype.Text
+	Price     pgtype.Numeric
+	Images    []string
+	Stock     pgtype.Int4
+	Status    pgtype.Text
+}
+
+func (q *Queries) GetCartItemWithDetails(ctx context.Context, id pgtype.UUID) (GetCartItemWithDetailsRow, error) {
+	row := q.db.QueryRow(ctx, getCartItemWithDetails, id)
+	var i GetCartItemWithDetailsRow
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.ProductID,
+		&i.Quantity,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Title,
+		&i.Price,
+		&i.Images,
+		&i.Stock,
+		&i.Status,
+	)
+	return i, err
+}
+
+const getCartItemsWithDetails = `-- name: GetCartItemsWithDetails :many
+SELECT ci.id, ci.user_id, ci.product_id, ci.quantity, ci.created_at, ci.updated_at, p.title, p.price, p.images, p.stock, p.status
+FROM cart_items ci
+LEFT JOIN products p ON ci.product_id = p.id
+WHERE ci.user_id = $1
+ORDER BY ci.created_at DESC
+`
+
+type GetCartItemsWithDetailsRow struct {
+	ID        pgtype.UUID
+	UserID    int32
+	ProductID pgtype.UUID
+	Quantity  int32
+	CreatedAt pgtype.Timestamptz
+	UpdatedAt pgtype.Timestamptz
+	Title     pgtype.Text
+	Price     pgtype.Numeric
+	Images    []string
+	Stock     pgtype.Int4
+	Status    pgtype.Text
+}
+
+func (q *Queries) GetCartItemsWithDetails(ctx context.Context, userID int32) ([]GetCartItemsWithDetailsRow, error) {
+	rows, err := q.db.Query(ctx, getCartItemsWithDetails, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetCartItemsWithDetailsRow{}
+	for rows.Next() {
+		var i GetCartItemsWithDetailsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.ProductID,
+			&i.Quantity,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Title,
+			&i.Price,
+			&i.Images,
+			&i.Stock,
+			&i.Status,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCartStats = `-- name: GetCartStats :one
+SELECT 
+    COUNT(ci.id) as total_items,
+    COALESCE(SUM(ci.quantity * p.price), 0) as total_value,
+    COUNT(DISTINCT ci.product_id) as unique_products
+FROM cart_items ci
+LEFT JOIN products p ON ci.product_id = p.id
+WHERE ci.user_id = $1
+`
+
+type GetCartStatsRow struct {
+	TotalItems     int64
+	TotalValue     interface{}
+	UniqueProducts int64
+}
+
+func (q *Queries) GetCartStats(ctx context.Context, userID int32) (GetCartStatsRow, error) {
+	row := q.db.QueryRow(ctx, getCartStats, userID)
+	var i GetCartStatsRow
+	err := row.Scan(&i.TotalItems, &i.TotalValue, &i.UniqueProducts)
+	return i, err
+}
+
 const getCartTotal = `-- name: GetCartTotal :one
 SELECT COALESCE(SUM(ci.quantity * p.price), 0) as total
 FROM cart_items ci
@@ -130,6 +284,74 @@ func (q *Queries) GetCartTotal(ctx context.Context, userID int32) (interface{}, 
 	var total interface{}
 	err := row.Scan(&total)
 	return total, err
+}
+
+const getCartWithDetails = `-- name: GetCartWithDetails :one
+SELECT user_id, 
+       array_agg(
+           json_build_object(
+               'id', ci.id,
+               'product_id', ci.product_id,
+               'quantity', ci.quantity,
+               'created_at', ci.created_at,
+               'updated_at', ci.updated_at,
+               'product_title', p.title,
+               'product_price', p.price,
+               'product_images', p.images,
+               'product_stock', p.stock,
+               'product_status', p.status
+           )
+       ) as items
+FROM cart_items ci
+LEFT JOIN products p ON ci.product_id = p.id
+WHERE ci.user_id = $1
+GROUP BY ci.user_id
+`
+
+type GetCartWithDetailsRow struct {
+	UserID int32
+	Items  interface{}
+}
+
+func (q *Queries) GetCartWithDetails(ctx context.Context, userID int32) (GetCartWithDetailsRow, error) {
+	row := q.db.QueryRow(ctx, getCartWithDetails, userID)
+	var i GetCartWithDetailsRow
+	err := row.Scan(&i.UserID, &i.Items)
+	return i, err
+}
+
+const getOrCreateCart = `-- name: GetOrCreateCart :one
+SELECT user_id, 
+       array_agg(
+           json_build_object(
+               'id', ci.id,
+               'product_id', ci.product_id,
+               'quantity', ci.quantity,
+               'created_at', ci.created_at,
+               'updated_at', ci.updated_at,
+               'product_title', p.title,
+               'product_price', p.price,
+               'product_images', p.images,
+               'product_stock', p.stock,
+               'product_status', p.status
+           )
+       ) as items
+FROM cart_items ci
+LEFT JOIN products p ON ci.product_id = p.id
+WHERE ci.user_id = $1
+GROUP BY ci.user_id
+`
+
+type GetOrCreateCartRow struct {
+	UserID int32
+	Items  interface{}
+}
+
+func (q *Queries) GetOrCreateCart(ctx context.Context, userID int32) (GetOrCreateCartRow, error) {
+	row := q.db.QueryRow(ctx, getOrCreateCart, userID)
+	var i GetOrCreateCartRow
+	err := row.Scan(&i.UserID, &i.Items)
+	return i, err
 }
 
 const listCartItems = `-- name: ListCartItems :many
@@ -198,6 +420,20 @@ func (q *Queries) ListCartItems(ctx context.Context, userID int32) ([]ListCartIt
 		return nil, err
 	}
 	return items, nil
+}
+
+const removeCartItem = `-- name: RemoveCartItem :exec
+DELETE FROM cart_items WHERE user_id = $1 AND product_id = $2
+`
+
+type RemoveCartItemParams struct {
+	UserID    int32
+	ProductID pgtype.UUID
+}
+
+func (q *Queries) RemoveCartItem(ctx context.Context, arg RemoveCartItemParams) error {
+	_, err := q.db.Exec(ctx, removeCartItem, arg.UserID, arg.ProductID)
+	return err
 }
 
 const removeFromCart = `-- name: RemoveFromCart :exec

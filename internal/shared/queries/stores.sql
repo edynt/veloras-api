@@ -61,3 +61,22 @@ SELECT
     AVG(rating) as average_rating,
     SUM(review_count) as total_reviews
 FROM stores;
+
+-- name: SearchStores :many
+SELECT s.*, u.first_name || ' ' || u.last_name as owner_name, u.email as owner_email
+FROM stores s
+LEFT JOIN users u ON s.user_id = u.id
+WHERE s.is_verified = true 
+  AND (s.name ILIKE '%' || $1 || '%' OR s.description ILIKE '%' || $1 || '%')
+ORDER BY s.rating DESC, s.review_count DESC
+LIMIT $2 OFFSET $3;
+
+-- name: UpdateStoreProductCount :exec
+-- Note: product_count column doesn't exist in stores table
+-- This is a placeholder that does nothing
+SELECT 1;
+
+-- name: UpdateStoreFollowerCount :exec
+-- Note: follower_count column doesn't exist in stores table
+-- This is a placeholder that does nothing
+SELECT 1;

@@ -12,7 +12,9 @@ import (
 
 type Querier interface {
 	ActiveUser(ctx context.Context, id int32) (ActiveUserRow, error)
+	AddCartItem(ctx context.Context, arg AddCartItemParams) (CartItem, error)
 	AddConversationParticipant(ctx context.Context, arg AddConversationParticipantParams) (ConversationParticipant, error)
+	AddParticipant(ctx context.Context, arg AddParticipantParams) (ConversationParticipant, error)
 	AddToCart(ctx context.Context, arg AddToCartParams) (CartItem, error)
 	AddToWishlist(ctx context.Context, arg AddToWishlistParams) (WishlistItem, error)
 	AssignPermissionToRole(ctx context.Context, arg AssignPermissionToRoleParams) error
@@ -41,7 +43,9 @@ type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error)
 	DeactivateCoupon(ctx context.Context, id pgtype.UUID) (Coupon, error)
 	DeleteAddress(ctx context.Context, id pgtype.UUID) error
+	DeleteCart(ctx context.Context, userID int32) error
 	DeleteCategory(ctx context.Context, id pgtype.UUID) error
+	DeleteChatMessage(ctx context.Context, id pgtype.UUID) error
 	DeleteConversation(ctx context.Context, id pgtype.UUID) error
 	DeleteCoupon(ctx context.Context, id pgtype.UUID) error
 	DeleteExpiredEmailVerifications(ctx context.Context, expiresAt int64) error
@@ -63,13 +67,21 @@ type Querier interface {
 	GetAllUsers(ctx context.Context, arg GetAllUsersParams) ([]GetAllUsersRow, error)
 	GetCartItem(ctx context.Context, arg GetCartItemParams) (GetCartItemRow, error)
 	GetCartItemCount(ctx context.Context, userID int32) (int64, error)
+	GetCartItemWithDetails(ctx context.Context, id pgtype.UUID) (GetCartItemWithDetailsRow, error)
+	GetCartItemsWithDetails(ctx context.Context, userID int32) ([]GetCartItemsWithDetailsRow, error)
+	GetCartStats(ctx context.Context, userID int32) (GetCartStatsRow, error)
 	GetCartTotal(ctx context.Context, userID int32) (interface{}, error)
+	GetCartWithDetails(ctx context.Context, userID int32) (GetCartWithDetailsRow, error)
 	GetCategory(ctx context.Context, id pgtype.UUID) (Category, error)
 	GetCategoryBySlug(ctx context.Context, slug string) (Category, error)
 	GetCategoryStats(ctx context.Context) (GetCategoryStatsRow, error)
+	GetChatMessageWithDetails(ctx context.Context, id pgtype.UUID) (GetChatMessageWithDetailsRow, error)
+	GetChatStats(ctx context.Context) (GetChatStatsRow, error)
 	GetConversation(ctx context.Context, id pgtype.UUID) (GetConversationRow, error)
 	GetConversationByParticipants(ctx context.Context, dollar_1 []int32) (Conversation, error)
+	GetConversationParticipants(ctx context.Context, conversationID pgtype.UUID) ([]GetConversationParticipantsRow, error)
 	GetConversationUnreadCount(ctx context.Context, arg GetConversationUnreadCountParams) (int64, error)
+	GetConversationWithDetails(ctx context.Context, id pgtype.UUID) (GetConversationWithDetailsRow, error)
 	GetCoupon(ctx context.Context, id pgtype.UUID) (Coupon, error)
 	GetCouponByCode(ctx context.Context, code string) (Coupon, error)
 	GetCouponStats(ctx context.Context) (GetCouponStatsRow, error)
@@ -77,6 +89,7 @@ type Querier interface {
 	GetDefaultAddress(ctx context.Context, userID int32) (Address, error)
 	GetEmailVerification(ctx context.Context, arg GetEmailVerificationParams) (EmailVerification, error)
 	GetFeaturedProducts(ctx context.Context, limit int32) ([]GetFeaturedProductsRow, error)
+	GetOrCreateCart(ctx context.Context, userID int32) (GetOrCreateCartRow, error)
 	GetOrder(ctx context.Context, id pgtype.UUID) (GetOrderRow, error)
 	GetOrderStats(ctx context.Context) (GetOrderStatsRow, error)
 	GetOrdersByDateRange(ctx context.Context, arg GetOrdersByDateRangeParams) ([]GetOrdersByDateRangeRow, error)
@@ -92,6 +105,7 @@ type Querier interface {
 	GetProductsByFilters(ctx context.Context, arg GetProductsByFiltersParams) ([]GetProductsByFiltersRow, error)
 	GetPromotedProducts(ctx context.Context, limit int32) ([]GetPromotedProductsRow, error)
 	GetReview(ctx context.Context, id pgtype.UUID) (GetReviewRow, error)
+	GetReviewStats(ctx context.Context) (GetReviewStatsRow, error)
 	GetRoleById(ctx context.Context, id int32) (Role, error)
 	GetRoleByName(ctx context.Context, name string) (Role, error)
 	GetRoles(ctx context.Context) ([]Role, error)
@@ -106,6 +120,7 @@ type Querier interface {
 	GetUserByID(ctx context.Context, id int32) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetUserEmailExists(ctx context.Context, email string) (bool, error)
+	GetUserReviewStats(ctx context.Context, buyerID int32) (GetUserReviewStatsRow, error)
 	GetUsernameExists(ctx context.Context, username string) (bool, error)
 	GetWishlistItem(ctx context.Context, arg GetWishlistItemParams) (GetWishlistItemRow, error)
 	GetWishlistItemCount(ctx context.Context, userID int32) (int64, error)
@@ -117,32 +132,50 @@ type Querier interface {
 	ListCategories(ctx context.Context) ([]Category, error)
 	ListCategoriesWithPagination(ctx context.Context, arg ListCategoriesWithPaginationParams) ([]Category, error)
 	ListChatMessages(ctx context.Context, arg ListChatMessagesParams) ([]ListChatMessagesRow, error)
+	ListConversationMessages(ctx context.Context, arg ListConversationMessagesParams) ([]ListConversationMessagesRow, error)
 	ListCoupons(ctx context.Context, arg ListCouponsParams) ([]Coupon, error)
+	ListOrders(ctx context.Context, arg ListOrdersParams) ([]ListOrdersRow, error)
 	ListOrdersByBuyer(ctx context.Context, arg ListOrdersByBuyerParams) ([]ListOrdersByBuyerRow, error)
 	ListOrdersBySeller(ctx context.Context, arg ListOrdersBySellerParams) ([]ListOrdersBySellerRow, error)
 	ListOrdersByStatus(ctx context.Context, arg ListOrdersByStatusParams) ([]ListOrdersByStatusRow, error)
+	ListOrdersByStore(ctx context.Context, arg ListOrdersByStoreParams) ([]ListOrdersByStoreRow, error)
+	ListOrdersByUser(ctx context.Context, arg ListOrdersByUserParams) ([]ListOrdersByUserRow, error)
 	ListProducts(ctx context.Context, arg ListProductsParams) ([]ListProductsRow, error)
 	ListProductsByCategory(ctx context.Context, arg ListProductsByCategoryParams) ([]ListProductsByCategoryRow, error)
 	ListProductsBySeller(ctx context.Context, arg ListProductsBySellerParams) ([]ListProductsBySellerRow, error)
+	ListReviews(ctx context.Context, arg ListReviewsParams) ([]ListReviewsRow, error)
 	ListReviewsByBuyer(ctx context.Context, arg ListReviewsByBuyerParams) ([]ListReviewsByBuyerRow, error)
 	ListReviewsByProduct(ctx context.Context, arg ListReviewsByProductParams) ([]ListReviewsByProductRow, error)
 	ListReviewsBySeller(ctx context.Context, arg ListReviewsBySellerParams) ([]ListReviewsBySellerRow, error)
+	ListReviewsByUser(ctx context.Context, arg ListReviewsByUserParams) ([]ListReviewsByUserRow, error)
 	ListStores(ctx context.Context, arg ListStoresParams) ([]ListStoresRow, error)
 	ListSubCategories(ctx context.Context, parentID pgtype.UUID) ([]Category, error)
 	ListUserAddresses(ctx context.Context, userID int32) ([]Address, error)
 	ListUserConversations(ctx context.Context, arg ListUserConversationsParams) ([]ListUserConversationsRow, error)
 	ListVerifiedStores(ctx context.Context, arg ListVerifiedStoresParams) ([]ListVerifiedStoresRow, error)
 	ListWishlistItems(ctx context.Context, arg ListWishlistItemsParams) ([]ListWishlistItemsRow, error)
+	MarkConversationAsRead(ctx context.Context, arg MarkConversationAsReadParams) error
+	MarkMessageAsRead(ctx context.Context, id pgtype.UUID) error
 	MarkMessagesAsRead(ctx context.Context, arg MarkMessagesAsReadParams) error
+	// Note: This would require a review_helpful table to be created
+	// For now, this is a placeholder that does nothing
+	MarkReviewHelpful(ctx context.Context) error
+	RemoveCartItem(ctx context.Context, arg RemoveCartItemParams) error
 	RemoveConversationParticipant(ctx context.Context, arg RemoveConversationParticipantParams) error
 	RemoveFromCart(ctx context.Context, arg RemoveFromCartParams) error
 	RemoveFromWishlist(ctx context.Context, arg RemoveFromWishlistParams) error
+	RemoveParticipant(ctx context.Context, arg RemoveParticipantParams) error
 	SearchProducts(ctx context.Context, arg SearchProductsParams) ([]SearchProductsRow, error)
+	SearchStores(ctx context.Context, arg SearchStoresParams) ([]SearchStoresRow, error)
 	SetDefaultAddress(ctx context.Context, arg SetDefaultAddressParams) error
+	// Note: This would require a review_helpful table to be created
+	// For now, this is a placeholder that does nothing
+	UnmarkReviewHelpful(ctx context.Context) error
 	UpdateAddress(ctx context.Context, arg UpdateAddressParams) (Address, error)
 	UpdateCartItemQuantity(ctx context.Context, arg UpdateCartItemQuantityParams) (CartItem, error)
 	UpdateCategory(ctx context.Context, arg UpdateCategoryParams) (Category, error)
 	UpdateCategoryProductCount(ctx context.Context, arg UpdateCategoryProductCountParams) error
+	UpdateConversation(ctx context.Context, id pgtype.UUID) (Conversation, error)
 	UpdateCoupon(ctx context.Context, arg UpdateCouponParams) (Coupon, error)
 	UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order, error)
 	UpdateOrderPaymentStatus(ctx context.Context, arg UpdateOrderPaymentStatusParams) (Order, error)
@@ -155,6 +188,12 @@ type Querier interface {
 	UpdateReview(ctx context.Context, arg UpdateReviewParams) (Review, error)
 	UpdateRole(ctx context.Context, arg UpdateRoleParams) error
 	UpdateStore(ctx context.Context, arg UpdateStoreParams) (Store, error)
+	// Note: follower_count column doesn't exist in stores table
+	// This is a placeholder that does nothing
+	UpdateStoreFollowerCount(ctx context.Context) error
+	// Note: product_count column doesn't exist in stores table
+	// This is a placeholder that does nothing
+	UpdateStoreProductCount(ctx context.Context) error
 	UpdateStoreRating(ctx context.Context, arg UpdateStoreRatingParams) error
 	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) (UpdateUserPasswordRow, error)
 	UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) (UpdateUserProfileRow, error)

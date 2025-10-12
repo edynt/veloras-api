@@ -101,3 +101,42 @@ LEFT JOIN users s ON o.seller_id = s.id
 WHERE o.created_at >= $1 AND o.created_at <= $2
 ORDER BY o.created_at DESC
 LIMIT $3 OFFSET $4;
+
+-- name: ListOrders :many
+SELECT o.*, 
+       p.title as product_title, p.price as product_price, p.images as product_images,
+       b.first_name || ' ' || b.last_name as buyer_name,
+       s.first_name || ' ' || s.last_name as seller_name
+FROM orders o
+LEFT JOIN products p ON o.product_id = p.id
+LEFT JOIN users b ON o.buyer_id = b.id
+LEFT JOIN users s ON o.seller_id = s.id
+ORDER BY o.created_at DESC
+LIMIT $1 OFFSET $2;
+
+-- name: ListOrdersByUser :many
+SELECT o.*, 
+       p.title as product_title, p.price as product_price, p.images as product_images,
+       b.first_name || ' ' || b.last_name as buyer_name,
+       s.first_name || ' ' || s.last_name as seller_name
+FROM orders o
+LEFT JOIN products p ON o.product_id = p.id
+LEFT JOIN users b ON o.buyer_id = b.id
+LEFT JOIN users s ON o.seller_id = s.id
+WHERE o.buyer_id = $1 OR o.seller_id = $1
+ORDER BY o.created_at DESC
+LIMIT $2 OFFSET $3;
+
+-- name: ListOrdersByStore :many
+SELECT o.*, 
+       p.title as product_title, p.price as product_price, p.images as product_images,
+       b.first_name || ' ' || b.last_name as buyer_name,
+       s.first_name || ' ' || s.last_name as seller_name
+FROM orders o
+LEFT JOIN products p ON o.product_id = p.id
+LEFT JOIN users b ON o.buyer_id = b.id
+LEFT JOIN users s ON o.seller_id = s.id
+LEFT JOIN stores st ON st.user_id = o.seller_id
+WHERE st.id = $1
+ORDER BY o.created_at DESC
+LIMIT $2 OFFSET $3;

@@ -173,6 +173,43 @@ func (q *Queries) GetReview(ctx context.Context, id pgtype.UUID) (GetReviewRow, 
 	return i, err
 }
 
+const getReviewStats = `-- name: GetReviewStats :one
+SELECT 
+    COUNT(*) as total_reviews,
+    AVG(rating) as average_rating,
+    COUNT(CASE WHEN rating = 5 THEN 1 END) as five_star,
+    COUNT(CASE WHEN rating = 4 THEN 1 END) as four_star,
+    COUNT(CASE WHEN rating = 3 THEN 1 END) as three_star,
+    COUNT(CASE WHEN rating = 2 THEN 1 END) as two_star,
+    COUNT(CASE WHEN rating = 1 THEN 1 END) as one_star
+FROM reviews
+`
+
+type GetReviewStatsRow struct {
+	TotalReviews  int64
+	AverageRating float64
+	FiveStar      int64
+	FourStar      int64
+	ThreeStar     int64
+	TwoStar       int64
+	OneStar       int64
+}
+
+func (q *Queries) GetReviewStats(ctx context.Context) (GetReviewStatsRow, error) {
+	row := q.db.QueryRow(ctx, getReviewStats)
+	var i GetReviewStatsRow
+	err := row.Scan(
+		&i.TotalReviews,
+		&i.AverageRating,
+		&i.FiveStar,
+		&i.FourStar,
+		&i.ThreeStar,
+		&i.TwoStar,
+		&i.OneStar,
+	)
+	return i, err
+}
+
 const getSellerRatingStats = `-- name: GetSellerRatingStats :one
 SELECT 
     COUNT(*) as total_reviews,
@@ -209,6 +246,110 @@ func (q *Queries) GetSellerRatingStats(ctx context.Context, sellerID int32) (Get
 		&i.OneStar,
 	)
 	return i, err
+}
+
+const getUserReviewStats = `-- name: GetUserReviewStats :one
+SELECT 
+    COUNT(*) as total_reviews,
+    AVG(rating) as average_rating,
+    COUNT(CASE WHEN rating = 5 THEN 1 END) as five_star,
+    COUNT(CASE WHEN rating = 4 THEN 1 END) as four_star,
+    COUNT(CASE WHEN rating = 3 THEN 1 END) as three_star,
+    COUNT(CASE WHEN rating = 2 THEN 1 END) as two_star,
+    COUNT(CASE WHEN rating = 1 THEN 1 END) as one_star
+FROM reviews 
+WHERE buyer_id = $1
+`
+
+type GetUserReviewStatsRow struct {
+	TotalReviews  int64
+	AverageRating float64
+	FiveStar      int64
+	FourStar      int64
+	ThreeStar     int64
+	TwoStar       int64
+	OneStar       int64
+}
+
+func (q *Queries) GetUserReviewStats(ctx context.Context, buyerID int32) (GetUserReviewStatsRow, error) {
+	row := q.db.QueryRow(ctx, getUserReviewStats, buyerID)
+	var i GetUserReviewStatsRow
+	err := row.Scan(
+		&i.TotalReviews,
+		&i.AverageRating,
+		&i.FiveStar,
+		&i.FourStar,
+		&i.ThreeStar,
+		&i.TwoStar,
+		&i.OneStar,
+	)
+	return i, err
+}
+
+const listReviews = `-- name: ListReviews :many
+SELECT r.id, r.product_id, r.buyer_id, r.seller_id, r.rating, r.comment, r.images, r.is_verified, r.created_at, 
+       p.title as product_title,
+       b.first_name || ' ' || b.last_name as buyer_name,
+       s.first_name || ' ' || s.last_name as seller_name
+FROM reviews r
+LEFT JOIN products p ON r.product_id = p.id
+LEFT JOIN users b ON r.buyer_id = b.id
+LEFT JOIN users s ON r.seller_id = s.id
+ORDER BY r.created_at DESC
+LIMIT $1 OFFSET $2
+`
+
+type ListReviewsParams struct {
+	Limit  int32
+	Offset int32
+}
+
+type ListReviewsRow struct {
+	ID           pgtype.UUID
+	ProductID    pgtype.UUID
+	BuyerID      int32
+	SellerID     int32
+	Rating       int32
+	Comment      pgtype.Text
+	Images       []string
+	IsVerified   pgtype.Bool
+	CreatedAt    pgtype.Timestamptz
+	ProductTitle pgtype.Text
+	BuyerName    interface{}
+	SellerName   interface{}
+}
+
+func (q *Queries) ListReviews(ctx context.Context, arg ListReviewsParams) ([]ListReviewsRow, error) {
+	rows, err := q.db.Query(ctx, listReviews, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListReviewsRow{}
+	for rows.Next() {
+		var i ListReviewsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProductID,
+			&i.BuyerID,
+			&i.SellerID,
+			&i.Rating,
+			&i.Comment,
+			&i.Images,
+			&i.IsVerified,
+			&i.CreatedAt,
+			&i.ProductTitle,
+			&i.BuyerName,
+			&i.SellerName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listReviewsByBuyer = `-- name: ListReviewsByBuyer :many
@@ -404,6 +545,94 @@ func (q *Queries) ListReviewsBySeller(ctx context.Context, arg ListReviewsBySell
 		return nil, err
 	}
 	return items, nil
+}
+
+const listReviewsByUser = `-- name: ListReviewsByUser :many
+SELECT r.id, r.product_id, r.buyer_id, r.seller_id, r.rating, r.comment, r.images, r.is_verified, r.created_at, 
+       p.title as product_title, p.images as product_images,
+       s.first_name || ' ' || s.last_name as seller_name
+FROM reviews r
+LEFT JOIN products p ON r.product_id = p.id
+LEFT JOIN users s ON r.seller_id = s.id
+WHERE r.buyer_id = $1
+ORDER BY r.created_at DESC
+LIMIT $2 OFFSET $3
+`
+
+type ListReviewsByUserParams struct {
+	BuyerID int32
+	Limit   int32
+	Offset  int32
+}
+
+type ListReviewsByUserRow struct {
+	ID            pgtype.UUID
+	ProductID     pgtype.UUID
+	BuyerID       int32
+	SellerID      int32
+	Rating        int32
+	Comment       pgtype.Text
+	Images        []string
+	IsVerified    pgtype.Bool
+	CreatedAt     pgtype.Timestamptz
+	ProductTitle  pgtype.Text
+	ProductImages []string
+	SellerName    interface{}
+}
+
+func (q *Queries) ListReviewsByUser(ctx context.Context, arg ListReviewsByUserParams) ([]ListReviewsByUserRow, error) {
+	rows, err := q.db.Query(ctx, listReviewsByUser, arg.BuyerID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListReviewsByUserRow{}
+	for rows.Next() {
+		var i ListReviewsByUserRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProductID,
+			&i.BuyerID,
+			&i.SellerID,
+			&i.Rating,
+			&i.Comment,
+			&i.Images,
+			&i.IsVerified,
+			&i.CreatedAt,
+			&i.ProductTitle,
+			&i.ProductImages,
+			&i.SellerName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const markReviewHelpful = `-- name: MarkReviewHelpful :exec
+SELECT 1
+`
+
+// Note: This would require a review_helpful table to be created
+// For now, this is a placeholder that does nothing
+func (q *Queries) MarkReviewHelpful(ctx context.Context) error {
+	_, err := q.db.Exec(ctx, markReviewHelpful)
+	return err
+}
+
+const unmarkReviewHelpful = `-- name: UnmarkReviewHelpful :exec
+SELECT 1
+`
+
+// Note: This would require a review_helpful table to be created
+// For now, this is a placeholder that does nothing
+func (q *Queries) UnmarkReviewHelpful(ctx context.Context) error {
+	_, err := q.db.Exec(ctx, unmarkReviewHelpful)
+	return err
 }
 
 const updateReview = `-- name: UpdateReview :one
