@@ -54,9 +54,8 @@ func (h *ReviewHandler) CreateReview(ctx *gin.Context) (res interface{}, err err
 	// Convert to application DTO
 	appReq := &appDto.CreateReviewAppDTO{
 		ProductID:  req.ProductID,
-		OrderID:    req.OrderID,
+		SellerID:   req.SellerID,
 		Rating:     req.Rating,
-		Title:      req.Title,
 		Comment:    req.Comment,
 		Images:     req.Images,
 		IsVerified: req.IsVerified,
@@ -251,7 +250,6 @@ func (h *ReviewHandler) UpdateReview(ctx *gin.Context) (res interface{}, err err
 	// Convert to application DTO
 	appReq := &appDto.UpdateReviewAppDTO{
 		Rating:     req.Rating,
-		Title:      req.Title,
 		Comment:    req.Comment,
 		Images:     req.Images,
 		IsVerified: req.IsVerified,
@@ -405,14 +403,12 @@ func (h *ReviewHandler) convertToReviewResponse(review *appDto.ReviewAppDTO) *dt
 	return &dto.ReviewResponse{
 		ID:           review.ID,
 		ProductID:    review.ProductID,
-		UserID:       review.UserID,
-		OrderID:      review.OrderID,
+		BuyerID:      review.BuyerID,
+		SellerID:     review.SellerID,
 		Rating:       review.Rating,
-		Title:        review.Title,
 		Comment:      review.Comment,
 		Images:       review.Images,
 		IsVerified:   review.IsVerified,
-		Helpful:      review.Helpful,
 		UserName:     review.UserName,
 		UserEmail:    review.UserEmail,
 		UserAvatar:   review.UserAvatar,

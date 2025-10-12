@@ -145,3 +145,48 @@ func convertInterfacePtr(i interface{}) *string {
 	}
 	return nil
 }
+
+// Convert from SQLC ListUserConversationsRow to domain entity
+func FromSQLCConversationWithDetailsFromList(c gen.ListUserConversationsRow) ConversationWithDetails {
+	return ConversationWithDetails{
+		Conversation: Conversation{
+			ID:        c.ID.String(),
+			Type:      "direct", // Default type, not in generated model
+			Title:     nil,      // Title not in generated model
+			CreatedAt: c.CreatedAt.Time,
+			UpdatedAt: c.UpdatedAt.Time,
+		},
+		// ParticipantCount not available in current schema
+		LastMessage: nil, // LastMessage not available in current schema
+		UnreadCount: 0,   // UnreadCount not available in current schema
+	}
+}
+
+// Convert from SQLC GetConversationParticipantsRow to domain entity
+func FromSQLCConversationParticipantFromGet(p gen.GetConversationParticipantsRow) ConversationParticipant {
+	return ConversationParticipant{
+		ID:             p.ID.String(),
+		ConversationID: p.ConversationID.String(),
+		UserID:         p.UserID,
+		Role:           "member", // Default role, not in generated model
+		JoinedAt:       p.JoinedAt.Time,
+	}
+}
+
+// Convert from SQLC ListConversationMessagesRow to domain entity
+func FromSQLCChatMessageWithDetailsFromList(m gen.ListConversationMessagesRow) ChatMessageWithDetails {
+	return ChatMessageWithDetails{
+		ChatMessage: ChatMessage{
+			ID:             m.ID.String(),
+			ConversationID: m.ConversationID.String(),
+			SenderID:       m.SenderID,
+			MessageType:    m.Type,
+			Content:        m.Content,
+			IsRead:         m.IsRead.Bool,
+			CreatedAt:      m.CreatedAt.Time,
+			UpdatedAt:      m.CreatedAt.Time,
+		},
+		SenderName:  convertInterfacePtr(m.SenderName),
+		SenderEmail: convertTextPtr(m.SenderEmail),
+	}
+}

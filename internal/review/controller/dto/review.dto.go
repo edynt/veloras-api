@@ -4,9 +4,8 @@ import "time"
 
 type CreateReviewRequest struct {
 	ProductID  string   `json:"productId" binding:"required"`
-	OrderID    *string  `json:"orderId,omitempty"`
+	SellerID   int32    `json:"sellerId" binding:"required"`
 	Rating     int32    `json:"rating" binding:"required,min=1,max=5"`
-	Title      *string  `json:"title,omitempty"`
 	Comment    *string  `json:"comment,omitempty"`
 	Images     []string `json:"images,omitempty"`
 	IsVerified bool     `json:"isVerified"`
@@ -14,7 +13,6 @@ type CreateReviewRequest struct {
 
 type UpdateReviewRequest struct {
 	Rating     int32    `json:"rating" binding:"required,min=1,max=5"`
-	Title      *string  `json:"title,omitempty"`
 	Comment    *string  `json:"comment,omitempty"`
 	Images     []string `json:"images,omitempty"`
 	IsVerified bool     `json:"isVerified"`
@@ -23,14 +21,12 @@ type UpdateReviewRequest struct {
 type ReviewResponse struct {
 	ID           string    `json:"id"`
 	ProductID    string    `json:"productId"`
-	UserID       int32     `json:"userId"`
-	OrderID      *string   `json:"orderId,omitempty"`
+	BuyerID      int32     `json:"buyerId"`
+	SellerID     int32     `json:"sellerId"`
 	Rating       int32     `json:"rating"`
-	Title        *string   `json:"title,omitempty"`
 	Comment      *string   `json:"comment,omitempty"`
 	Images       []string  `json:"images"`
 	IsVerified   bool      `json:"isVerified"`
-	Helpful      int32     `json:"helpful"`
 	UserName     *string   `json:"userName,omitempty"`
 	UserEmail    *string   `json:"userEmail,omitempty"`
 	UserAvatar   *string   `json:"userAvatar,omitempty"`

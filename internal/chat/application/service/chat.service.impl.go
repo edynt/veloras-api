@@ -34,7 +34,6 @@ func (s *chatService) CreateConversation(ctx context.Context, req *dto.CreateCon
 	_, err = s.chatRepo.AddParticipant(ctx, repository.AddParticipantParams{
 		ConversationID: conversation.ID,
 		UserID:         userID,
-		Role:           "admin",
 	})
 	if err != nil {
 		return nil, response.NewAPIError(http.StatusInternalServerError, "Failed to add participant", err)
@@ -46,7 +45,6 @@ func (s *chatService) CreateConversation(ctx context.Context, req *dto.CreateCon
 			_, err = s.chatRepo.AddParticipant(ctx, repository.AddParticipantParams{
 				ConversationID: conversation.ID,
 				UserID:         participantUserID,
-				Role:           "member",
 			})
 			if err != nil {
 				return nil, response.NewAPIError(http.StatusInternalServerError, "Failed to add participant", err)
@@ -133,7 +131,6 @@ func (s *chatService) AddParticipant(ctx context.Context, conversationID string,
 	participant, err := s.chatRepo.AddParticipant(ctx, repository.AddParticipantParams{
 		ConversationID: conversationID,
 		UserID:         userID,
-		Role:           role,
 	})
 	if err != nil {
 		return nil, response.NewAPIError(http.StatusInternalServerError, "Failed to add participant", err)

@@ -45,7 +45,6 @@ type UpdateConversationParams struct {
 type AddParticipantParams struct {
 	ConversationID string
 	UserID         int32
-	Role           string
 }
 
 type CreateChatMessageParams struct {

@@ -28,16 +28,10 @@ func (s *storeService) CreateStore(ctx context.Context, req *dto.CreateStoreAppD
 		Description: req.Description,
 		Logo:        req.Logo,
 		Banner:      req.Banner,
-		Website:     req.Website,
 		Phone:       req.Phone,
 		Email:       req.Email,
 		Address:     req.Address,
-		City:        req.City,
-		State:       req.State,
-		Country:     req.Country,
-		PostalCode:  req.PostalCode,
 		IsVerified:  req.IsVerified,
-		IsActive:    req.IsActive,
 	})
 	if err != nil {
 		return nil, response.NewAPIError(http.StatusInternalServerError, "Failed to create store", err)
@@ -129,16 +123,10 @@ func (s *storeService) UpdateStore(ctx context.Context, id string, req *dto.Upda
 		Description: existingStore.Description,
 		Logo:        existingStore.Logo,
 		Banner:      existingStore.Banner,
-		Website:     existingStore.Website,
 		Phone:       existingStore.Phone,
 		Email:       existingStore.Email,
 		Address:     existingStore.Address,
-		City:        existingStore.City,
-		State:       existingStore.State,
-		Country:     existingStore.Country,
-		PostalCode:  existingStore.PostalCode,
 		IsVerified:  existingStore.IsVerified,
-		IsActive:    existingStore.IsActive,
 	}
 
 	// Update only provided fields
@@ -154,9 +142,6 @@ func (s *storeService) UpdateStore(ctx context.Context, id string, req *dto.Upda
 	if req.Banner != nil {
 		updateParams.Banner = req.Banner
 	}
-	if req.Website != nil {
-		updateParams.Website = req.Website
-	}
 	if req.Phone != nil {
 		updateParams.Phone = req.Phone
 	}
@@ -166,23 +151,8 @@ func (s *storeService) UpdateStore(ctx context.Context, id string, req *dto.Upda
 	if req.Address != nil {
 		updateParams.Address = req.Address
 	}
-	if req.City != nil {
-		updateParams.City = req.City
-	}
-	if req.State != nil {
-		updateParams.State = req.State
-	}
-	if req.Country != nil {
-		updateParams.Country = req.Country
-	}
-	if req.PostalCode != nil {
-		updateParams.PostalCode = req.PostalCode
-	}
 	if req.IsVerified != nil {
 		updateParams.IsVerified = *req.IsVerified
-	}
-	if req.IsActive != nil {
-		updateParams.IsActive = *req.IsActive
 	}
 
 	store, err := s.storeRepo.UpdateStore(ctx, updateParams)
@@ -244,57 +214,41 @@ func (s *storeService) GetStoreStats(ctx context.Context) (*dto.StoreStatsAppDTO
 // Conversion methods
 func (s *storeService) convertToStoreAppDTO(store *entity.Store) *dto.StoreAppDTO {
 	return &dto.StoreAppDTO{
-		ID:            store.ID,
-		UserID:        store.UserID,
-		Name:          store.Name,
-		Description:   store.Description,
-		Logo:          store.Logo,
-		Banner:        store.Banner,
-		Website:       store.Website,
-		Phone:         store.Phone,
-		Email:         store.Email,
-		Address:       store.Address,
-		City:          store.City,
-		State:         store.State,
-		Country:       store.Country,
-		PostalCode:    store.PostalCode,
-		Rating:        store.Rating,
-		ReviewCount:   store.ReviewCount,
-		ProductCount:  store.ProductCount,
-		FollowerCount: store.FollowerCount,
-		IsVerified:    store.IsVerified,
-		IsActive:      store.IsActive,
-		CreatedAt:     store.CreatedAt,
-		UpdatedAt:     store.UpdatedAt,
+		ID:          store.ID,
+		UserID:      store.UserID,
+		Name:        store.Name,
+		Description: store.Description,
+		Logo:        store.Logo,
+		Banner:      store.Banner,
+		Phone:       store.Phone,
+		Email:       store.Email,
+		Address:     store.Address,
+		Rating:      store.Rating,
+		ReviewCount: store.ReviewCount,
+		IsVerified:  store.IsVerified,
+		CreatedAt:   store.CreatedAt,
+		UpdatedAt:   store.UpdatedAt,
 	}
 }
 
 func (s *storeService) convertToStoreAppDTOWithDetails(store *entity.StoreWithDetails) *dto.StoreAppDTO {
 	return &dto.StoreAppDTO{
-		ID:            store.ID,
-		UserID:        store.UserID,
-		Name:          store.Name,
-		Description:   store.Description,
-		Logo:          store.Logo,
-		Banner:        store.Banner,
-		Website:       store.Website,
-		Phone:         store.Phone,
-		Email:         store.Email,
-		Address:       store.Address,
-		City:          store.City,
-		State:         store.State,
-		Country:       store.Country,
-		PostalCode:    store.PostalCode,
-		Rating:        store.Rating,
-		ReviewCount:   store.ReviewCount,
-		ProductCount:  store.ProductCount,
-		FollowerCount: store.FollowerCount,
-		IsVerified:    store.IsVerified,
-		IsActive:      store.IsActive,
-		UserName:      store.UserName,
-		UserEmail:     store.UserEmail,
-		CreatedAt:     store.CreatedAt,
-		UpdatedAt:     store.UpdatedAt,
+		ID:          store.ID,
+		UserID:      store.UserID,
+		Name:        store.Name,
+		Description: store.Description,
+		Logo:        store.Logo,
+		Banner:      store.Banner,
+		Phone:       store.Phone,
+		Email:       store.Email,
+		Address:     store.Address,
+		Rating:      store.Rating,
+		ReviewCount: store.ReviewCount,
+		IsVerified:  store.IsVerified,
+		UserName:    store.UserName,
+		UserEmail:   store.UserEmail,
+		CreatedAt:   store.CreatedAt,
+		UpdatedAt:   store.UpdatedAt,
 	}
 }
 

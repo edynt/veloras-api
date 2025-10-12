@@ -3,28 +3,24 @@ package dto
 import "time"
 
 type OrderAppDTO struct {
-	ID              string            `json:"id"`
-	UserID          int32             `json:"userId"`
-	StoreID         string            `json:"storeId"`
-	Status          string            `json:"status"`
-	PaymentStatus   string            `json:"paymentStatus"`
-	PaymentMethod   string            `json:"paymentMethod"`
-	Subtotal        float64           `json:"subtotal"`
-	Tax             float64           `json:"tax"`
-	Shipping        float64           `json:"shipping"`
-	Discount        float64           `json:"discount"`
-	Total           float64           `json:"total"`
-	Currency        string            `json:"currency"`
-	ShippingAddress string            `json:"shippingAddress"`
-	BillingAddress  string            `json:"billingAddress"`
-	Notes           *string           `json:"notes,omitempty"`
-	StoreName       *string           `json:"storeName,omitempty"`
-	StoreLogo       *string           `json:"storeLogo,omitempty"`
-	UserEmail       *string           `json:"userEmail,omitempty"`
-	UserName        *string           `json:"userName,omitempty"`
-	Items           []OrderItemAppDTO `json:"items,omitempty"`
-	CreatedAt       time.Time         `json:"createdAt"`
-	UpdatedAt       time.Time         `json:"updatedAt"`
+	ID                string            `json:"id"`
+	BuyerID           int32             `json:"buyerId"`
+	SellerID          int32             `json:"sellerId"`
+	ProductID         string            `json:"productId"`
+	Quantity          int32             `json:"quantity"`
+	TotalAmount       float64           `json:"totalAmount"`
+	Status            string            `json:"status"`
+	PaymentMethod     string            `json:"paymentMethod"`
+	PaymentStatus     string            `json:"paymentStatus"`
+	ShippingAddressID string            `json:"shippingAddressId"`
+	Notes             *string           `json:"notes,omitempty"`
+	StoreName         *string           `json:"storeName,omitempty"`
+	StoreLogo         *string           `json:"storeLogo,omitempty"`
+	UserEmail         *string           `json:"userEmail,omitempty"`
+	UserName          *string           `json:"userName,omitempty"`
+	Items             []OrderItemAppDTO `json:"items,omitempty"`
+	CreatedAt         time.Time         `json:"createdAt"`
+	UpdatedAt         time.Time         `json:"updatedAt"`
 }
 
 type OrderItemAppDTO struct {
@@ -49,12 +45,12 @@ type OrderListAppDTO struct {
 }
 
 type CreateOrderAppDTO struct {
-	StoreID         string                  `json:"storeId" binding:"required"`
-	PaymentMethod   string                  `json:"paymentMethod" binding:"required"`
-	ShippingAddress string                  `json:"shippingAddress" binding:"required"`
-	BillingAddress  string                  `json:"billingAddress" binding:"required"`
-	Notes           *string                 `json:"notes,omitempty"`
-	Items           []CreateOrderItemAppDTO `json:"items" binding:"required,min=1"`
+	SellerID          int32   `json:"sellerId" binding:"required"`
+	ProductID         string  `json:"productId" binding:"required"`
+	Quantity          int32   `json:"quantity" binding:"required,min=1"`
+	PaymentMethod     string  `json:"paymentMethod" binding:"required"`
+	ShippingAddressID string  `json:"shippingAddressId" binding:"required"`
+	Notes             *string `json:"notes,omitempty"`
 }
 
 type CreateOrderItemAppDTO struct {
@@ -63,12 +59,9 @@ type CreateOrderItemAppDTO struct {
 }
 
 type UpdateOrderAppDTO struct {
-	Status          *string `json:"status,omitempty"`
-	PaymentStatus   *string `json:"paymentStatus,omitempty"`
-	PaymentMethod   *string `json:"paymentMethod,omitempty"`
-	ShippingAddress *string `json:"shippingAddress,omitempty"`
-	BillingAddress  *string `json:"billingAddress,omitempty"`
-	Notes           *string `json:"notes,omitempty"`
+	Status        *string `json:"status,omitempty"`
+	PaymentStatus *string `json:"paymentStatus,omitempty"`
+	Notes         *string `json:"notes,omitempty"`
 }
 
 type OrderStatsAppDTO struct {

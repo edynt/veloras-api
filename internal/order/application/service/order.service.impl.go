@@ -23,12 +23,8 @@ func NewOrderService(orderRepo repository.OrderRepository) OrderService {
 
 func (s *orderService) CreateOrder(ctx context.Context, req *dto.CreateOrderAppDTO, userID int32) (*dto.OrderAppDTO, error) {
 	// Calculate totals (this would typically involve fetching product prices)
-	subtotal := 0.0
-	for _, item := range req.Items {
-		// In a real implementation, you'd fetch the product price from the product service
-		// For now, we'll use a placeholder
-		subtotal += float64(item.Quantity) * 10.0 // Placeholder price
-	}
+	// For now, we'll use a placeholder price
+	subtotal := float64(req.Quantity) * 10.0 // Placeholder price
 
 	tax := subtotal * 0.1 // 10% tax
 	shipping := 5.0       // Fixed shipping cost
@@ -36,40 +32,22 @@ func (s *orderService) CreateOrder(ctx context.Context, req *dto.CreateOrderAppD
 	total := subtotal + tax + shipping - discount
 
 	order, err := s.orderRepo.CreateOrder(ctx, repository.CreateOrderParams{
-		UserID:          userID,
-		StoreID:         req.StoreID,
-		Status:          "pending",
-		PaymentStatus:   "pending",
-		PaymentMethod:   req.PaymentMethod,
-		Subtotal:        subtotal,
-		Tax:             tax,
-		Shipping:        shipping,
-		Discount:        discount,
-		Total:           total,
-		Currency:        "USD",
-		ShippingAddress: req.ShippingAddress,
-		BillingAddress:  req.BillingAddress,
-		Notes:           req.Notes,
+		UserID:            userID,
+		SellerID:          req.SellerID,
+		ProductID:         req.ProductID,
+		Quantity:          req.Quantity,
+		Total:             total,
+		Status:            "pending",
+		PaymentMethod:     req.PaymentMethod,
+		PaymentStatus:     "pending",
+		ShippingAddressID: req.ShippingAddressID,
+		Notes:             req.Notes,
 	})
 	if err != nil {
 		return nil, response.NewAPIError(http.StatusInternalServerError, "Failed to create order", err)
 	}
 
-	// Create order items
-	for _, item := range req.Items {
-		_, err := s.orderRepo.CreateOrderItem(ctx, repository.CreateOrderItemParams{
-			OrderID:      order.ID,
-			ProductID:    item.ProductID,
-			ProductName:  "Product Name",      // This should come from product service
-			ProductImage: "product-image.jpg", // This should come from product service
-			Price:        10.0,                // Placeholder price
-			Quantity:     item.Quantity,
-			Subtotal:     float64(item.Quantity) * 10.0,
-		})
-		if err != nil {
-			return nil, response.NewAPIError(http.StatusInternalServerError, "Failed to create order item", err)
-		}
-	}
+	// Order items are not supported in current schema - orders contain product info directly
 
 	return s.convertToOrderAppDTO(order), nil
 }
@@ -169,19 +147,10 @@ func (s *orderService) UpdateOrder(ctx context.Context, id string, req *dto.Upda
 	}
 
 	updateParams := repository.UpdateOrderParams{
-		ID:              id,
-		Status:          existingOrder.Status,
-		PaymentStatus:   existingOrder.PaymentStatus,
-		PaymentMethod:   existingOrder.PaymentMethod,
-		Subtotal:        existingOrder.Subtotal,
-		Tax:             existingOrder.Tax,
-		Shipping:        existingOrder.Shipping,
-		Discount:        existingOrder.Discount,
-		Total:           existingOrder.Total,
-		Currency:        existingOrder.Currency,
-		ShippingAddress: existingOrder.ShippingAddress,
-		BillingAddress:  existingOrder.BillingAddress,
-		Notes:           existingOrder.Notes,
+		ID:            id,
+		Status:        existingOrder.Status,
+		PaymentStatus: existingOrder.PaymentStatus,
+		Notes:         existingOrder.Notes,
 	}
 
 	// Update only provided fields
@@ -190,15 +159,6 @@ func (s *orderService) UpdateOrder(ctx context.Context, id string, req *dto.Upda
 	}
 	if req.PaymentStatus != nil {
 		updateParams.PaymentStatus = *req.PaymentStatus
-	}
-	if req.PaymentMethod != nil {
-		updateParams.PaymentMethod = *req.PaymentMethod
-	}
-	if req.ShippingAddress != nil {
-		updateParams.ShippingAddress = *req.ShippingAddress
-	}
-	if req.BillingAddress != nil {
-		updateParams.BillingAddress = *req.BillingAddress
 	}
 	if req.Notes != nil {
 		updateParams.Notes = req.Notes
@@ -337,49 +297,41 @@ func (s *orderService) GetOrderStatsByUser(ctx context.Context, userID int32) (*
 // Conversion methods
 func (s *orderService) convertToOrderAppDTO(order *entity.Order) *dto.OrderAppDTO {
 	return &dto.OrderAppDTO{
-		ID:              order.ID,
-		UserID:          order.UserID,
-		StoreID:         order.StoreID,
-		Status:          order.Status,
-		PaymentStatus:   order.PaymentStatus,
-		PaymentMethod:   order.PaymentMethod,
-		Subtotal:        order.Subtotal,
-		Tax:             order.Tax,
-		Shipping:        order.Shipping,
-		Discount:        order.Discount,
-		Total:           order.Total,
-		Currency:        order.Currency,
-		ShippingAddress: order.ShippingAddress,
-		BillingAddress:  order.BillingAddress,
-		Notes:           order.Notes,
-		CreatedAt:       order.CreatedAt,
-		UpdatedAt:       order.UpdatedAt,
+		ID:                order.ID,
+		BuyerID:           order.BuyerID,
+		SellerID:          order.SellerID,
+		ProductID:         order.ProductID,
+		Quantity:          order.Quantity,
+		TotalAmount:       order.TotalAmount,
+		Status:            order.Status,
+		PaymentMethod:     order.PaymentMethod,
+		PaymentStatus:     order.PaymentStatus,
+		ShippingAddressID: order.ShippingAddressID,
+		Notes:             order.Notes,
+		CreatedAt:         order.CreatedAt,
+		UpdatedAt:         order.UpdatedAt,
 	}
 }
 
 func (s *orderService) convertToOrderAppDTOWithDetails(order *entity.OrderWithDetails) *dto.OrderAppDTO {
 	result := &dto.OrderAppDTO{
-		ID:              order.ID,
-		UserID:          order.UserID,
-		StoreID:         order.StoreID,
-		Status:          order.Status,
-		PaymentStatus:   order.PaymentStatus,
-		PaymentMethod:   order.PaymentMethod,
-		Subtotal:        order.Subtotal,
-		Tax:             order.Tax,
-		Shipping:        order.Shipping,
-		Discount:        order.Discount,
-		Total:           order.Total,
-		Currency:        order.Currency,
-		ShippingAddress: order.ShippingAddress,
-		BillingAddress:  order.BillingAddress,
-		Notes:           order.Notes,
-		StoreName:       order.StoreName,
-		StoreLogo:       order.StoreLogo,
-		UserEmail:       order.UserEmail,
-		UserName:        order.UserName,
-		CreatedAt:       order.CreatedAt,
-		UpdatedAt:       order.UpdatedAt,
+		ID:                order.ID,
+		BuyerID:           order.BuyerID,
+		SellerID:          order.SellerID,
+		ProductID:         order.ProductID,
+		Quantity:          order.Quantity,
+		TotalAmount:       order.TotalAmount,
+		Status:            order.Status,
+		PaymentMethod:     order.PaymentMethod,
+		PaymentStatus:     order.PaymentStatus,
+		ShippingAddressID: order.ShippingAddressID,
+		Notes:             order.Notes,
+		StoreName:         order.StoreName,
+		StoreLogo:         order.StoreLogo,
+		UserEmail:         order.UserEmail,
+		UserName:          order.UserName,
+		CreatedAt:         order.CreatedAt,
+		UpdatedAt:         order.UpdatedAt,
 	}
 
 	// Convert order items

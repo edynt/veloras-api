@@ -28,9 +28,8 @@ type ReviewRepository interface {
 type CreateReviewParams struct {
 	ProductID  string
 	UserID     int32
-	OrderID    *string
+	SellerID   int32
 	Rating     int32
-	Title      *string
 	Comment    *string
 	Images     []string
 	IsVerified bool
@@ -39,7 +38,6 @@ type CreateReviewParams struct {
 type UpdateReviewParams struct {
 	ID         string
 	Rating     int32
-	Title      *string
 	Comment    *string
 	Images     []string
 	IsVerified bool

@@ -53,19 +53,12 @@ func (h *OrderHandler) CreateOrder(ctx *gin.Context) (res interface{}, err error
 
 	// Convert to application DTO
 	appReq := &appDto.CreateOrderAppDTO{
-		StoreID:         req.StoreID,
-		PaymentMethod:   req.PaymentMethod,
-		ShippingAddress: req.ShippingAddress,
-		BillingAddress:  req.BillingAddress,
-		Notes:           req.Notes,
-		Items:           make([]appDto.CreateOrderItemAppDTO, len(req.Items)),
-	}
-
-	for i, item := range req.Items {
-		appReq.Items[i] = appDto.CreateOrderItemAppDTO{
-			ProductID: item.ProductID,
-			Quantity:  item.Quantity,
-		}
+		SellerID:          req.SellerID,
+		ProductID:         req.ProductID,
+		Quantity:          req.Quantity,
+		PaymentMethod:     req.PaymentMethod,
+		ShippingAddressID: req.ShippingAddressID,
+		Notes:             req.Notes,
 	}
 
 	order, err := h.service.CreateOrder(ctx, appReq, userID)
@@ -256,12 +249,9 @@ func (h *OrderHandler) UpdateOrder(ctx *gin.Context) (res interface{}, err error
 
 	// Convert to application DTO
 	appReq := &appDto.UpdateOrderAppDTO{
-		Status:          req.Status,
-		PaymentStatus:   req.PaymentStatus,
-		PaymentMethod:   req.PaymentMethod,
-		ShippingAddress: req.ShippingAddress,
-		BillingAddress:  req.BillingAddress,
-		Notes:           req.Notes,
+		Status:        req.Status,
+		PaymentStatus: req.PaymentStatus,
+		Notes:         req.Notes,
 	}
 
 	order, err := h.service.UpdateOrder(ctx, id, appReq)
@@ -439,27 +429,23 @@ func (h *OrderHandler) GetUserOrderStats(ctx *gin.Context) (res interface{}, err
 // Conversion methods
 func (h *OrderHandler) convertToOrderResponse(order *appDto.OrderAppDTO) *ctlDto.OrderResponse {
 	result := &ctlDto.OrderResponse{
-		ID:              order.ID,
-		UserID:          order.UserID,
-		StoreID:         order.StoreID,
-		Status:          order.Status,
-		PaymentStatus:   order.PaymentStatus,
-		PaymentMethod:   order.PaymentMethod,
-		Subtotal:        order.Subtotal,
-		Tax:             order.Tax,
-		Shipping:        order.Shipping,
-		Discount:        order.Discount,
-		Total:           order.Total,
-		Currency:        order.Currency,
-		ShippingAddress: order.ShippingAddress,
-		BillingAddress:  order.BillingAddress,
-		Notes:           order.Notes,
-		StoreName:       order.StoreName,
-		StoreLogo:       order.StoreLogo,
-		UserEmail:       order.UserEmail,
-		UserName:        order.UserName,
-		CreatedAt:       order.CreatedAt,
-		UpdatedAt:       order.UpdatedAt,
+		ID:                order.ID,
+		BuyerID:           order.BuyerID,
+		SellerID:          order.SellerID,
+		ProductID:         order.ProductID,
+		Quantity:          order.Quantity,
+		TotalAmount:       order.TotalAmount,
+		Status:            order.Status,
+		PaymentMethod:     order.PaymentMethod,
+		PaymentStatus:     order.PaymentStatus,
+		ShippingAddressID: order.ShippingAddressID,
+		Notes:             order.Notes,
+		StoreName:         order.StoreName,
+		StoreLogo:         order.StoreLogo,
+		UserEmail:         order.UserEmail,
+		UserName:          order.UserName,
+		CreatedAt:         order.CreatedAt,
+		UpdatedAt:         order.UpdatedAt,
 	}
 
 	// Convert order items

@@ -1,7 +1,6 @@
 package entity
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/edynt/chogiare/veloras-api/internal/shared/gen"
@@ -9,23 +8,19 @@ import (
 )
 
 type Order struct {
-	ID              string
-	UserID          int32
-	StoreID         string
-	Status          string
-	PaymentStatus   string
-	PaymentMethod   string
-	Subtotal        float64
-	Tax             float64
-	Shipping        float64
-	Discount        float64
-	Total           float64
-	Currency        string
-	ShippingAddress string
-	BillingAddress  string
-	Notes           *string
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
+	ID                string
+	BuyerID           int32
+	SellerID          int32
+	ProductID         string
+	Quantity          int32
+	TotalAmount       float64
+	Status            string
+	PaymentMethod     string
+	PaymentStatus     string
+	ShippingAddressID string
+	Notes             *string
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
 }
 
 type OrderWithDetails struct {
@@ -64,23 +59,19 @@ type OrderStats struct {
 // Convert from SQLC model to domain entity
 func FromSQLCOrder(o gen.Order) Order {
 	return Order{
-		ID:              o.ID.String(),
-		UserID:          o.BuyerID,                           // Using BuyerID from generated model
-		StoreID:         fmt.Sprintf("store-%d", o.SellerID), // Generate store ID from seller ID
-		Status:          o.Status,
-		PaymentStatus:   o.PaymentStatus,
-		PaymentMethod:   o.PaymentMethod,
-		Subtotal:        convertNumericToFloat64(o.TotalAmount),
-		Tax:             0.0, // Not in generated model
-		Shipping:        0.0, // Not in generated model
-		Discount:        0.0, // Not in generated model
-		Total:           convertNumericToFloat64(o.TotalAmount),
-		Currency:        "USD", // Default currency
-		ShippingAddress: o.ShippingAddressID.String(),
-		BillingAddress:  o.ShippingAddressID.String(), // Using same as shipping for now
-		Notes:           convertTextPtr(o.Notes),
-		CreatedAt:       o.CreatedAt.Time,
-		UpdatedAt:       o.UpdatedAt.Time,
+		ID:                o.ID.String(),
+		BuyerID:           o.BuyerID,
+		SellerID:          o.SellerID,
+		ProductID:         o.ProductID.String(),
+		Quantity:          o.Quantity,
+		TotalAmount:       convertNumericToFloat64(o.TotalAmount),
+		Status:            o.Status,
+		PaymentMethod:     o.PaymentMethod,
+		PaymentStatus:     o.PaymentStatus,
+		ShippingAddressID: o.ShippingAddressID.String(),
+		Notes:             convertTextPtr(o.Notes),
+		CreatedAt:         o.CreatedAt.Time,
+		UpdatedAt:         o.UpdatedAt.Time,
 	}
 }
 
@@ -88,32 +79,101 @@ func FromSQLCOrder(o gen.Order) Order {
 func FromSQLCOrderWithDetails(o gen.GetOrderRow) OrderWithDetails {
 	return OrderWithDetails{
 		Order: Order{
-			ID:              o.ID.String(),
-			UserID:          o.BuyerID,                           // Using BuyerID from generated model
-			StoreID:         fmt.Sprintf("store-%d", o.SellerID), // Generate store ID from seller ID
-			Status:          o.Status,
-			PaymentStatus:   o.PaymentStatus,
-			PaymentMethod:   o.PaymentMethod,
-			Subtotal:        convertNumericToFloat64(o.TotalAmount),
-			Tax:             0.0, // Not in generated model
-			Shipping:        0.0, // Not in generated model
-			Discount:        0.0, // Not in generated model
-			Total:           convertNumericToFloat64(o.TotalAmount),
-			Currency:        "USD", // Default currency
-			ShippingAddress: o.ShippingAddressID.String(),
-			BillingAddress:  o.ShippingAddressID.String(), // Using same as shipping for now
-			Notes:           convertTextPtr(o.Notes),
-			CreatedAt:       o.CreatedAt.Time,
-			UpdatedAt:       o.UpdatedAt.Time,
+			ID:                o.ID.String(),
+			BuyerID:           o.BuyerID,
+			SellerID:          o.SellerID,
+			ProductID:         o.ProductID.String(),
+			Quantity:          o.Quantity,
+			TotalAmount:       convertNumericToFloat64(o.TotalAmount),
+			Status:            o.Status,
+			PaymentMethod:     o.PaymentMethod,
+			PaymentStatus:     o.PaymentStatus,
+			ShippingAddressID: o.ShippingAddressID.String(),
+			Notes:             convertTextPtr(o.Notes),
+			CreatedAt:         o.CreatedAt.Time,
+			UpdatedAt:         o.UpdatedAt.Time,
 		},
 		StoreName: nil,                              // Not in generated model
 		StoreLogo: nil,                              // Not in generated model
-		UserEmail: convertTextPtr(o.BuyerEmail),     // Using BuyerEmail from generated model
+		UserEmail: nil,                              // BuyerEmail not available in current schema     // Using BuyerEmail from generated model
 		UserName:  convertInterfacePtr(o.BuyerName), // Using BuyerName from generated model
 	}
 }
 
-// OrderItem conversion not needed as the generated Order model includes product and quantity directly
+// Convert from SQLC ListOrdersRow to domain entity
+func FromSQLCOrderWithDetailsFromList(o gen.ListOrdersRow) OrderWithDetails {
+	return OrderWithDetails{
+		Order: Order{
+			ID:                o.ID.String(),
+			BuyerID:           o.BuyerID,
+			SellerID:          o.SellerID,
+			ProductID:         o.ProductID.String(),
+			Quantity:          o.Quantity,
+			TotalAmount:       convertNumericToFloat64(o.TotalAmount),
+			Status:            o.Status,
+			PaymentMethod:     o.PaymentMethod,
+			PaymentStatus:     o.PaymentStatus,
+			ShippingAddressID: o.ShippingAddressID.String(),
+			Notes:             convertTextPtr(o.Notes),
+			CreatedAt:         o.CreatedAt.Time,
+			UpdatedAt:         o.UpdatedAt.Time,
+		},
+		StoreName: nil,
+		StoreLogo: nil,
+		UserEmail: nil, // BuyerEmail not available in current schema
+		UserName:  convertInterfacePtr(o.BuyerName),
+	}
+}
+
+// Convert from SQLC ListOrdersByUserRow to domain entity
+func FromSQLCOrderWithDetailsFromListByUser(o gen.ListOrdersByUserRow) OrderWithDetails {
+	return OrderWithDetails{
+		Order: Order{
+			ID:                o.ID.String(),
+			BuyerID:           o.BuyerID,
+			SellerID:          o.SellerID,
+			ProductID:         o.ProductID.String(),
+			Quantity:          o.Quantity,
+			TotalAmount:       convertNumericToFloat64(o.TotalAmount),
+			Status:            o.Status,
+			PaymentMethod:     o.PaymentMethod,
+			PaymentStatus:     o.PaymentStatus,
+			ShippingAddressID: o.ShippingAddressID.String(),
+			Notes:             convertTextPtr(o.Notes),
+			CreatedAt:         o.CreatedAt.Time,
+			UpdatedAt:         o.UpdatedAt.Time,
+		},
+		StoreName: nil,
+		StoreLogo: nil,
+		UserEmail: nil, // BuyerEmail not available in current schema
+		UserName:  convertInterfacePtr(o.BuyerName),
+	}
+}
+
+// Convert from SQLC ListOrdersByStoreRow to domain entity
+func FromSQLCOrderWithDetailsFromListByStore(o gen.ListOrdersByStoreRow) OrderWithDetails {
+	return OrderWithDetails{
+		Order: Order{
+			ID:                o.ID.String(),
+			BuyerID:           o.BuyerID,
+			SellerID:          o.SellerID,
+			ProductID:         o.ProductID.String(),
+			Quantity:          o.Quantity,
+			TotalAmount:       convertNumericToFloat64(o.TotalAmount),
+			Status:            o.Status,
+			PaymentMethod:     o.PaymentMethod,
+			PaymentStatus:     o.PaymentStatus,
+			ShippingAddressID: o.ShippingAddressID.String(),
+			Notes:             convertTextPtr(o.Notes),
+			CreatedAt:         o.CreatedAt.Time,
+			UpdatedAt:         o.UpdatedAt.Time,
+		},
+		StoreName: nil,
+		StoreLogo: nil,
+		UserEmail: nil, // BuyerEmail not available in current schema
+		UserName:  convertInterfacePtr(o.BuyerName),
+	}
+}
 
 // Helper function to convert pgtype.Numeric to float64
 func convertNumericToFloat64(n pgtype.Numeric) float64 {

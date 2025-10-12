@@ -31,36 +31,23 @@ type OrderRepository interface {
 }
 
 type CreateOrderParams struct {
-	UserID          int32
-	StoreID         string
-	Status          string
-	PaymentStatus   string
-	PaymentMethod   string
-	Subtotal        float64
-	Tax             float64
-	Shipping        float64
-	Discount        float64
-	Total           float64
-	Currency        string
-	ShippingAddress string
-	BillingAddress  string
-	Notes           *string
+	UserID            int32
+	SellerID          int32
+	ProductID         string
+	Quantity          int32
+	Total             float64
+	Status            string
+	PaymentMethod     string
+	PaymentStatus     string
+	ShippingAddressID string
+	Notes             *string
 }
 
 type UpdateOrderParams struct {
-	ID              string
-	Status          string
-	PaymentStatus   string
-	PaymentMethod   string
-	Subtotal        float64
-	Tax             float64
-	Shipping        float64
-	Discount        float64
-	Total           float64
-	Currency        string
-	ShippingAddress string
-	BillingAddress  string
-	Notes           *string
+	ID            string
+	Status        string
+	PaymentStatus string
+	Notes         *string
 }
 
 type CreateOrderItemParams struct {

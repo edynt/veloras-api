@@ -10,14 +10,12 @@ import (
 type Review struct {
 	ID         string
 	ProductID  string
-	UserID     int32
-	OrderID    *string
+	BuyerID    int32
+	SellerID   int32
 	Rating     int32
-	Title      *string
 	Comment    *string
 	Images     []string
 	IsVerified bool
-	Helpful    int32
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }
@@ -43,14 +41,12 @@ func FromSQLCReview(r gen.Review) Review {
 	return Review{
 		ID:         r.ID.String(),
 		ProductID:  r.ProductID.String(),
-		UserID:     r.BuyerID, // Using BuyerID from generated model
-		OrderID:    nil,       // OrderID not in generated model
+		BuyerID:    r.BuyerID,
+		SellerID:   r.SellerID,
 		Rating:     r.Rating,
-		Title:      nil, // Title not in generated model
 		Comment:    convertTextPtr(r.Comment),
 		Images:     r.Images,
 		IsVerified: r.IsVerified.Bool,
-		Helpful:    0, // Helpful not in generated model
 		CreatedAt:  r.CreatedAt.Time,
 		UpdatedAt:  r.CreatedAt.Time, // UpdatedAt not in generated model, using CreatedAt
 	}
@@ -62,22 +58,89 @@ func FromSQLCReviewWithDetails(r gen.GetReviewRow) ReviewWithDetails {
 		Review: Review{
 			ID:         r.ID.String(),
 			ProductID:  r.ProductID.String(),
-			UserID:     r.BuyerID, // Using BuyerID from generated model
-			OrderID:    nil,       // OrderID not in generated model
+			BuyerID:    r.BuyerID,
+			SellerID:   r.SellerID,
 			Rating:     r.Rating,
-			Title:      nil, // Title not in generated model
 			Comment:    convertTextPtr(r.Comment),
 			Images:     r.Images,
 			IsVerified: r.IsVerified.Bool,
-			Helpful:    0, // Helpful not in generated model
 			CreatedAt:  r.CreatedAt.Time,
 			UpdatedAt:  r.CreatedAt.Time, // UpdatedAt not in generated model, using CreatedAt
 		},
-		UserName:     convertInterfacePtr(r.BuyerName), // Using BuyerName from generated model
-		UserEmail:    nil,                              // UserEmail not in generated model
-		UserAvatar:   nil,                              // UserAvatar not in generated model
-		ProductName:  convertTextPtr(r.ProductTitle),   // Using ProductTitle from generated model
-		ProductImage: nil,                              // ProductImage not in generated model
+		UserName:     nil, // BuyerName not available in current schema // Using BuyerName from generated model
+		UserEmail:    nil, // UserEmail not in generated model
+		UserAvatar:   nil, // UserAvatar not in generated model
+		ProductName:  nil, // ProductTitle not available in current schema   // Using ProductTitle from generated model
+		ProductImage: nil, // ProductImage not in generated model
+	}
+}
+
+// Convert from SQLC ListReviewsRow to domain entity
+func FromSQLCReviewWithDetailsFromList(r gen.ListReviewsRow) ReviewWithDetails {
+	return ReviewWithDetails{
+		Review: Review{
+			ID:         r.ID.String(),
+			ProductID:  r.ProductID.String(),
+			BuyerID:    r.BuyerID,
+			SellerID:   r.SellerID,
+			Rating:     r.Rating,
+			Comment:    convertTextPtr(r.Comment),
+			Images:     r.Images,
+			IsVerified: r.IsVerified.Bool,
+			CreatedAt:  r.CreatedAt.Time,
+			UpdatedAt:  r.CreatedAt.Time,
+		},
+		UserName:     nil, // BuyerName not available in current schema
+		UserEmail:    nil,
+		UserAvatar:   nil,
+		ProductName:  nil, // ProductTitle not available in current schema
+		ProductImage: nil, // ProductImage not available in current schema
+	}
+}
+
+// Convert from SQLC ListReviewsByProductRow to domain entity
+func FromSQLCReviewWithDetailsFromListByProduct(r gen.ListReviewsByProductRow) ReviewWithDetails {
+	return ReviewWithDetails{
+		Review: Review{
+			ID:         r.ID.String(),
+			ProductID:  r.ProductID.String(),
+			BuyerID:    r.BuyerID,
+			SellerID:   r.SellerID,
+			Rating:     r.Rating,
+			Comment:    convertTextPtr(r.Comment),
+			Images:     r.Images,
+			IsVerified: r.IsVerified.Bool,
+			CreatedAt:  r.CreatedAt.Time,
+			UpdatedAt:  r.CreatedAt.Time,
+		},
+		UserName:     nil, // BuyerName not available in current schema
+		UserEmail:    nil,
+		UserAvatar:   nil,
+		ProductName:  nil, // ProductTitle not available in current schema
+		ProductImage: nil, // ProductImage not available in current schema
+	}
+}
+
+// Convert from SQLC ListReviewsByUserRow to domain entity
+func FromSQLCReviewWithDetailsFromListByUser(r gen.ListReviewsByUserRow) ReviewWithDetails {
+	return ReviewWithDetails{
+		Review: Review{
+			ID:         r.ID.String(),
+			ProductID:  r.ProductID.String(),
+			BuyerID:    r.BuyerID,
+			SellerID:   r.SellerID,
+			Rating:     r.Rating,
+			Comment:    convertTextPtr(r.Comment),
+			Images:     r.Images,
+			IsVerified: r.IsVerified.Bool,
+			CreatedAt:  r.CreatedAt.Time,
+			UpdatedAt:  r.CreatedAt.Time,
+		},
+		UserName:     nil, // BuyerName not available in current schema
+		UserEmail:    nil,
+		UserAvatar:   nil,
+		ProductName:  nil, // ProductTitle not available in current schema
+		ProductImage: nil, // ProductImage not available in current schema
 	}
 }
 

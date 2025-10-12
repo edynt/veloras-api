@@ -29,16 +29,10 @@ type CreateStoreParams struct {
 	Description *string
 	Logo        *string
 	Banner      *string
-	Website     *string
 	Phone       *string
 	Email       *string
 	Address     *string
-	City        *string
-	State       *string
-	Country     *string
-	PostalCode  *string
 	IsVerified  bool
-	IsActive    bool
 }
 
 type UpdateStoreParams struct {
@@ -47,14 +41,8 @@ type UpdateStoreParams struct {
 	Description *string
 	Logo        *string
 	Banner      *string
-	Website     *string
 	Phone       *string
 	Email       *string
 	Address     *string
-	City        *string
-	State       *string
-	Country     *string
-	PostalCode  *string
 	IsVerified  bool
-	IsActive    bool
 }
