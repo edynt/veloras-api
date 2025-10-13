@@ -25,7 +25,7 @@ func (q *Queries) AssignRoleToUser(ctx context.Context, arg AssignRoleToUserPara
 
 const getRolesByUser = `-- name: GetRolesByUser :many
 SELECT r.id, r.name, r.description, r.created_at FROM roles r
-JOIN user_roles ur ON ur.role_id = r.role_id
+JOIN user_roles ur ON ur.role_id = r.id
 WHERE ur.user_id = $1
 `
 
@@ -52,4 +52,24 @@ func (q *Queries) GetRolesByUser(ctx context.Context, userID int32) ([]Role, err
 		return nil, err
 	}
 	return items, nil
+}
+
+const userHasRole = `-- name: UserHasRole :one
+SELECT EXISTS(
+    SELECT 1 FROM user_roles ur
+    JOIN roles r ON r.id = ur.role_id
+    WHERE ur.user_id = $1 AND r.name = $2
+)
+`
+
+type UserHasRoleParams struct {
+	UserID int32
+	Name   string
+}
+
+func (q *Queries) UserHasRole(ctx context.Context, arg UserHasRoleParams) (bool, error) {
+	row := q.db.QueryRow(ctx, userHasRole, arg.UserID, arg.Name)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
 }

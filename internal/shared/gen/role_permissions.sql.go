@@ -25,7 +25,7 @@ func (q *Queries) AssignPermissionToRole(ctx context.Context, arg AssignPermissi
 
 const getPermissionsByRole = `-- name: GetPermissionsByRole :many
 SELECT p.id, p.name, p.description, p.created_at, p.resource_type, p.resource_action FROM permissions p
-JOIN role_permissions rp ON rp.permission_id = p.permission_id
+JOIN role_permissions rp ON rp.permission_id = p.id
 WHERE rp.role_id = $1
 `
 
@@ -54,4 +54,25 @@ func (q *Queries) GetPermissionsByRole(ctx context.Context, roleID int32) ([]Per
 		return nil, err
 	}
 	return items, nil
+}
+
+const userHasPermission = `-- name: UserHasPermission :one
+SELECT EXISTS(
+    SELECT 1 FROM user_roles ur
+    JOIN role_permissions rp ON rp.role_id = ur.role_id
+    JOIN permissions p ON p.id = rp.permission_id
+    WHERE ur.user_id = $1 AND p.name = $2
+)
+`
+
+type UserHasPermissionParams struct {
+	UserID int32
+	Name   string
+}
+
+func (q *Queries) UserHasPermission(ctx context.Context, arg UserHasPermissionParams) (bool, error) {
+	row := q.db.QueryRow(ctx, userHasPermission, arg.UserID, arg.Name)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
 }

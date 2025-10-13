@@ -58,6 +58,7 @@ type Querier interface {
 	DeleteReview(ctx context.Context, id pgtype.UUID) error
 	DeleteRole(ctx context.Context, id int32) error
 	DeleteSession(ctx context.Context, id int32) error
+	DeleteSessionByRefreshToken(ctx context.Context, refreshToken string) error
 	DeleteSessionsByUser(ctx context.Context, userID pgtype.Int4) error
 	DeleteStore(ctx context.Context, id pgtype.UUID) error
 	DeleteUser(ctx context.Context, id int32) error
@@ -112,6 +113,7 @@ type Querier interface {
 	GetRolesByUser(ctx context.Context, userID int32) ([]Role, error)
 	GetSellerRatingStats(ctx context.Context, sellerID int32) (GetSellerRatingStatsRow, error)
 	GetSession(ctx context.Context, id int32) (Session, error)
+	GetSessionByRefreshToken(ctx context.Context, refreshToken string) (Session, error)
 	GetStore(ctx context.Context, id pgtype.UUID) (GetStoreRow, error)
 	GetStoreByUserID(ctx context.Context, userID int32) (GetStoreByUserIDRow, error)
 	GetStoreStats(ctx context.Context) (GetStoreStatsRow, error)
@@ -199,6 +201,8 @@ type Querier interface {
 	UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) (UpdateUserProfileRow, error)
 	UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (UpdateUserStatusRow, error)
 	UseCoupon(ctx context.Context, arg UseCouponParams) (UserCouponUsage, error)
+	UserHasPermission(ctx context.Context, arg UserHasPermissionParams) (bool, error)
+	UserHasRole(ctx context.Context, arg UserHasRoleParams) (bool, error)
 	ValidateCoupon(ctx context.Context, code string) (ValidateCouponRow, error)
 	VerifyStore(ctx context.Context, id pgtype.UUID) (Store, error)
 	VerifyUser(ctx context.Context, id int32) error

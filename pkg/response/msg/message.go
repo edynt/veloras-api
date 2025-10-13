@@ -41,6 +41,7 @@ const (
 	LoginFailed                    = "Login failed"
 	FailedToRefreshToken           = "Failed to refresh token"
 	InvalidRefreshToken            = "Invalid refresh token"
+	RefreshTokenExpired            = "Refresh token has expired"
 	NoPermissionsFound             = "No permissions found"
 	VerifyTokenFailed              = "Verify token failed"
 	InvalidToken                   = "Invalid Token"

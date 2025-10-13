@@ -27,9 +27,10 @@ func RegisterProductRoutes(router *gin.RouterGroup, productHandler *ProductHandl
 		productsProtected.DELETE("/:id", productHandler.DeleteProduct)
 	}
 
-	// Seller-specific routes
+	// Seller-specific routes (require seller role)
 	seller := router.Group("/seller")
 	seller.Use(middleware.AuthenMiddleware())
+	seller.Use(middleware.RequireRole("seller"))
 	{
 		sellerProducts := seller.Group("/products")
 		{

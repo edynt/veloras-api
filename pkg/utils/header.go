@@ -9,9 +9,9 @@ import (
 func ExtractBearerToken(c *gin.Context) (string, bool) {
 	authHeader := c.GetHeader("Authorization")
 
-	if strings.HasPrefix(authHeader, "Bearer") {
+	if strings.HasPrefix(authHeader, "Bearer ") {
 		return strings.TrimPrefix(authHeader, "Bearer "), true
 	}
 
-	return "", true
+	return "", false
 }

@@ -210,7 +210,12 @@ func (as *authService) RefreshToken(ctx context.Context, refreshToken string) (a
 		return appDto.TokenOut{}, fmt.Errorf("%s: %w", msg.FailedToRefreshToken, err)
 	}
 
-	// 5. Generate new access token and new refresh token
+	// 5. Delete old refresh token from database
+	if err := as.authRepo.DeleteSessionByRefreshToken(ctx, refreshToken); err != nil {
+		return appDto.TokenOut{}, fmt.Errorf("%s: %w", msg.FailedToDeleteSession, err)
+	}
+
+	// 6. Generate new access token and new refresh token
 	accessToken, err := utils.CreateToken(userID, false)
 	if err != nil {
 		return appDto.TokenOut{}, fmt.Errorf("%s: %w", msg.FailedToCreateToken, err)
@@ -221,7 +226,7 @@ func (as *authService) RefreshToken(ctx context.Context, refreshToken string) (a
 		return appDto.TokenOut{}, fmt.Errorf("%s: %w", msg.FailedToCreateToken, err)
 	}
 
-	// 6. Save new refresh token to database
+	// 7. Save new refresh token to database
 	tokenExpiresAt := utils.AddDays(global.Config.JWT.RefreshTokenExpire)
 	err = as.authRepo.SaveToken(ctx, &entity.Session{
 		UserID:       userID,

@@ -171,20 +171,38 @@ func NewAuthRepository(db *pgxpool.Pool) repository.AuthRepository {
 }
 
 // RefreshToken implements repository.AuthRepository.
-// Note: Basic stub verification that defers cryptographic/expiry validation to service layer.
-// Optionally, this could verify existence against the sessions table if a query exists.
 func (a *authRepository) RefreshToken(ctx context.Context, refreshToken string) error {
-	// Without an sqlc method to lookup by token, we accept the validated token from service.
-	// Extend later to check presence/blacklist or rotation in DB.
 	if refreshToken == "" {
 		return fmt.Errorf("%s", msg.InvalidRefreshToken)
 	}
+
+	// Check if refresh token exists in database
+	session, err := a.db.GetSessionByRefreshToken(ctx, refreshToken)
+	if err != nil {
+		return fmt.Errorf("%s: %w", msg.InvalidRefreshToken, err)
+	}
+
+	// Check if session is expired
+	now := utils.GetNowUnix()
+	if session.ExpiresAt < now {
+		return fmt.Errorf("%s", msg.RefreshTokenExpired)
+	}
+
 	return nil
 }
 
 // DeleteSessionsByUser implements repository.AuthRepository.
 func (a *authRepository) DeleteSessionsByUser(ctx context.Context, userId int) error {
 	if _, err := a.pool.Exec(ctx, "DELETE FROM sessions WHERE user_id = $1", userId); err != nil {
+		return fmt.Errorf("%s: %w", msg.FailedToDeleteSession, err)
+	}
+	return nil
+}
+
+// DeleteSessionByRefreshToken implements repository.AuthRepository.
+func (a *authRepository) DeleteSessionByRefreshToken(ctx context.Context, refreshToken string) error {
+	err := a.db.DeleteSessionByRefreshToken(ctx, refreshToken)
+	if err != nil {
 		return fmt.Errorf("%s: %w", msg.FailedToDeleteSession, err)
 	}
 	return nil
@@ -304,4 +322,28 @@ func (a *authRepository) DeletePasswordReset(ctx context.Context, userId int, to
 	}
 
 	return nil
+}
+
+// UserHasPermission implements repository.AuthRepository.
+func (a *authRepository) UserHasPermission(ctx context.Context, userID int, permissionName string) (bool, error) {
+	hasPermission, err := a.db.UserHasPermission(ctx, gen.UserHasPermissionParams{
+		UserID: int32(userID),
+		Name:   permissionName,
+	})
+	if err != nil {
+		return false, fmt.Errorf("failed to check user permission: %w", err)
+	}
+	return hasPermission, nil
+}
+
+// UserHasRole implements repository.AuthRepository.
+func (a *authRepository) UserHasRole(ctx context.Context, userID int, roleName string) (bool, error) {
+	hasRole, err := a.db.UserHasRole(ctx, gen.UserHasRoleParams{
+		UserID: int32(userID),
+		Name:   roleName,
+	})
+	if err != nil {
+		return false, fmt.Errorf("failed to check user role: %w", err)
+	}
+	return hasRole, nil
 }

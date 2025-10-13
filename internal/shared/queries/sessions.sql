@@ -17,3 +17,9 @@ DELETE FROM sessions WHERE expires_at < $1;
 
 -- name: CountExpiredSessions :one
 SELECT COUNT(*) FROM sessions WHERE expires_at < $1;
+
+-- name: GetSessionByRefreshToken :one
+SELECT * FROM sessions WHERE refresh_token = $1;
+
+-- name: DeleteSessionByRefreshToken :exec
+DELETE FROM sessions WHERE refresh_token = $1;

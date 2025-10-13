@@ -65,6 +65,15 @@ func (q *Queries) DeleteSession(ctx context.Context, id int32) error {
 	return err
 }
 
+const deleteSessionByRefreshToken = `-- name: DeleteSessionByRefreshToken :exec
+DELETE FROM sessions WHERE refresh_token = $1
+`
+
+func (q *Queries) DeleteSessionByRefreshToken(ctx context.Context, refreshToken string) error {
+	_, err := q.db.Exec(ctx, deleteSessionByRefreshToken, refreshToken)
+	return err
+}
+
 const deleteSessionsByUser = `-- name: DeleteSessionsByUser :exec
 DELETE FROM sessions WHERE user_id = $1
 `
@@ -80,6 +89,23 @@ SELECT id, user_id, refresh_token, expires_at, created_at FROM sessions WHERE id
 
 func (q *Queries) GetSession(ctx context.Context, id int32) (Session, error) {
 	row := q.db.QueryRow(ctx, getSession, id)
+	var i Session
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.RefreshToken,
+		&i.ExpiresAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getSessionByRefreshToken = `-- name: GetSessionByRefreshToken :one
+SELECT id, user_id, refresh_token, expires_at, created_at FROM sessions WHERE refresh_token = $1
+`
+
+func (q *Queries) GetSessionByRefreshToken(ctx context.Context, refreshToken string) (Session, error) {
+	row := q.db.QueryRow(ctx, getSessionByRefreshToken, refreshToken)
 	var i Session
 	err := row.Scan(
 		&i.ID,

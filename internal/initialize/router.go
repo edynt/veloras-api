@@ -41,6 +41,9 @@ func InitRouter(db *pgxpool.Pool, logLevel string, cronScheduler *cronHttp.CronH
 	r.Use(middleware.CORS) // cross
 	r.Use(middleware.ValidatorMiddleware())
 
+	// Initialize authorization middleware
+	middleware.InitAuthorizationMiddleware(db)
+
 	v1 := r.Group("/api/v1")
 
 	authHandler := authInit.InitAuth(db)

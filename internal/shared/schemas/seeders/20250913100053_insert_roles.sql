@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS roles (
 INSERT INTO roles (name, description)
 VALUES 
     ('admin', 'Administrator role with full permissions'),
-    ('user', 'Standard user role with limited permissions')
+    ('user', 'Standard user role with limited permissions'),
+    ('seller', 'Seller role with product management permissions')
 ON CONFLICT (name) DO NOTHING;
 -- +goose StatementEnd
 

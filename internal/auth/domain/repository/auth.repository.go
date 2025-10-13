@@ -21,9 +21,12 @@ type AuthRepository interface {
 	SaveToken(ctx context.Context, token *entity.Session) error
 	RefreshToken(ctx context.Context, refreshToken string) error
 	DeleteSessionsByUser(ctx context.Context, userId int) error
+	DeleteSessionByRefreshToken(ctx context.Context, refreshToken string) error
 	UpdateUserPassword(ctx context.Context, userId int, hashedPassword string) error
 	CreatePasswordReset(ctx context.Context, passwordReset *entity.PasswordReset) error
 	GetPasswordReset(ctx context.Context, userId int, token string) (*entity.PasswordReset, error)
 	GetPasswordResetByToken(ctx context.Context, token string) (*entity.PasswordReset, error)
 	DeletePasswordReset(ctx context.Context, userId int, token string) error
+	UserHasPermission(ctx context.Context, userID int, permissionName string) (bool, error)
+	UserHasRole(ctx context.Context, userID int, roleName string) (bool, error)
 }

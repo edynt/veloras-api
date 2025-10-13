@@ -8,28 +8,38 @@ import (
 
 func RegisterOrderRoutes(r *gin.RouterGroup, handler *OrderHandler) {
 	orders := r.Group("/orders")
+
+	// Public routes (no authentication required)
+	// None for now
+
+	// Protected routes (require authentication)
+	ordersProtected := orders.Group("")
+	ordersProtected.Use(middleware.AuthenMiddleware())
 	{
-		// Public routes (if any)
-		// orders.GET("/", handler.ListOrders) // This might be admin-only
+		// User-specific order operations
+		ordersProtected.POST("/", response.Wrap(handler.CreateOrder))
+		ordersProtected.GET("/my", response.Wrap(handler.ListUserOrders))
+		ordersProtected.GET("/:id", response.Wrap(handler.GetOrder))
+		ordersProtected.PUT("/:id", response.Wrap(handler.UpdateOrder))
+		ordersProtected.DELETE("/:id", response.Wrap(handler.DeleteOrder))
 
-		// Protected routes
-		orders.Use(middleware.AuthenMiddleware())
-		{
-			// Order CRUD operations
-			orders.POST("/", response.Wrap(handler.CreateOrder))
-			orders.GET("/", response.Wrap(handler.ListOrders))
-			orders.GET("/my", response.Wrap(handler.ListUserOrders))
-			orders.GET("/store/:store_id", response.Wrap(handler.ListStoreOrders))
-			orders.GET("/:id", response.Wrap(handler.GetOrder))
-			orders.PUT("/:id", response.Wrap(handler.UpdateOrder))
-			orders.PATCH("/:id/status", response.Wrap(handler.UpdateOrderStatus))
-			orders.PATCH("/:id/payment-status", response.Wrap(handler.UpdateOrderPaymentStatus))
-			orders.DELETE("/:id", response.Wrap(handler.DeleteOrder))
+		// User statistics
+		ordersProtected.GET("/stats/my", response.Wrap(handler.GetUserOrderStats))
+	}
 
-			// Statistics
-			orders.GET("/stats", response.Wrap(handler.GetOrderStats))
-			orders.GET("/stats/my", response.Wrap(handler.GetUserOrderStats))
-			orders.GET("/stats/store/:store_id", response.Wrap(handler.GetStoreOrderStats))
-		}
+	// Admin routes (require admin role)
+	ordersAdmin := orders.Group("")
+	ordersAdmin.Use(middleware.AuthenMiddleware())
+	ordersAdmin.Use(middleware.RequireRole("admin"))
+	{
+		// Admin order operations
+		ordersAdmin.GET("/", response.Wrap(handler.ListOrders))
+		ordersAdmin.GET("/store/:store_id", response.Wrap(handler.ListStoreOrders))
+		ordersAdmin.PATCH("/:id/status", response.Wrap(handler.UpdateOrderStatus))
+		ordersAdmin.PATCH("/:id/payment-status", response.Wrap(handler.UpdateOrderPaymentStatus))
+
+		// Admin statistics
+		ordersAdmin.GET("/stats", response.Wrap(handler.GetOrderStats))
+		ordersAdmin.GET("/stats/store/:store_id", response.Wrap(handler.GetStoreOrderStats))
 	}
 }
