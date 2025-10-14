@@ -119,3 +119,10 @@ type ProductStatsAppDTO struct {
 	AverageRating    *float64 `json:"averageRating"`
 	TotalViews       *int64   `json:"totalViews"`
 }
+
+type SeedResultAppDTO struct {
+	Count      int32 `json:"count"`
+	Categories int32 `json:"categories"`
+	Users      int32 `json:"users"`
+	Products   int32 `json:"products"`
+}

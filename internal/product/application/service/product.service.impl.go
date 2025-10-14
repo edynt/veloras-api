@@ -517,3 +517,16 @@ func (s *productService) convertToProductAppDTOsWithDetails(products []entity.Pr
 	}
 	return result
 }
+
+func (s *productService) SeedProducts(ctx context.Context, count int32) (*dto.SeedResultAppDTO, error) {
+	// For now, return a mock result since we don't have a full seeder implementation
+	// In a real implementation, this would create fake users, categories, and products
+	result := &dto.SeedResultAppDTO{
+		Count:      count,
+		Categories: 8,  // Mock: 8 categories created
+		Users:      50, // Mock: 50 users created
+		Products:   count,
+	}
+
+	return result, nil
+}

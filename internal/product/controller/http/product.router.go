@@ -16,6 +16,8 @@ func RegisterProductRoutes(router *gin.RouterGroup, productHandler *ProductHandl
 		products.GET("/stats", productHandler.GetProductStats)
 		products.GET("/:id", productHandler.GetProduct)
 		products.POST("/:id/views", productHandler.IncrementProductViews)
+		// Development/Testing route
+		products.POST("/seed", productHandler.SeedProducts)
 	}
 
 	// Protected routes (require authentication)

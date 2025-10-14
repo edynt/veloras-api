@@ -23,4 +23,5 @@ type ProductService interface {
 	GetProductStats(ctx context.Context) (*dto.ProductStatsAppDTO, error)
 	GetMyProducts(ctx context.Context, sellerID int32, page, pageSize int32) (*dto.ProductListAppDTO, error)
 	BulkUpdateProducts(ctx context.Context, ids []string, req dto.UpdateProductAppDTO, sellerID int32) ([]dto.ProductAppDTO, error)
+	SeedProducts(ctx context.Context, count int32) (*dto.SeedResultAppDTO, error)
 }
