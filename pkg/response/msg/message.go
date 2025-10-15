@@ -11,8 +11,6 @@ const (
 	UserIdInvalid                  = "User Id is invalid"
 	UsernameNotFound               = "Username not found"
 	EmailExists                    = "Email already exists"
-	UsernameExists                 = "Username already exists"
-	FailedToCheckUserNameExists    = "Failed to check username exists"
 	FailedToCheckEmailExists       = "Failed to check email exists"
 	UserIsNotVerified              = "User is not verified"
 	UserIsNotActive                = "User is not active"

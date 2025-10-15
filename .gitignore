@@ -6,3 +6,4 @@
 .env.prod
 __debug_*
 install.sh
+server

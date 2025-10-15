@@ -1,7 +1,6 @@
 package dto
 
 type AccountAppDTO struct {
-	Username    string `json:"username"`
 	Password    string `json:"password"`
 	Email       string `json:"email"`
 	Language    string `json:"language"`
@@ -17,7 +16,6 @@ type EmailVerification struct {
 
 type UserOutPut struct {
 	ID             int    `json:"id"`
-	Username       string `json:"username"`
 	Email          string `json:"email"`
 	PhoneNumber    string `json:"phone_number"`
 	FirstName      string `json:"fisrt_name"`

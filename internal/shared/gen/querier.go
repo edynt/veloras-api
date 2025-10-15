@@ -123,7 +123,6 @@ type Querier interface {
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetUserEmailExists(ctx context.Context, email string) (bool, error)
 	GetUserReviewStats(ctx context.Context, buyerID int32) (GetUserReviewStatsRow, error)
-	GetUsernameExists(ctx context.Context, username string) (bool, error)
 	GetWishlistItem(ctx context.Context, arg GetWishlistItemParams) (GetWishlistItemRow, error)
 	GetWishlistItemCount(ctx context.Context, userID int32) (int64, error)
 	IncrementCouponUsage(ctx context.Context, id pgtype.UUID) error

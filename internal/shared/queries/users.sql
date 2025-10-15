@@ -1,6 +1,6 @@
 -- name: CreateUser :one
-INSERT INTO users (email, username, password, phone_number, first_name, last_name)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO users (email, password, phone_number, first_name, last_name)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING id, email, status;
 
 -- name: GetUserByEmail :one
@@ -18,8 +18,6 @@ DELETE FROM users WHERE id = $1;
 -- name: GetUserEmailExists :one
 SELECT EXISTS(SELECT 1 FROM users WHERE email = $1);
 
--- name: GetUsernameExists :one
-SELECT EXISTS(SELECT 1 FROM users WHERE username = $1);
 
 -- name: UpdateUserStatus :one
 UPDATE users SET status = $1 WHERE id = $2 RETURNING id, email, status;

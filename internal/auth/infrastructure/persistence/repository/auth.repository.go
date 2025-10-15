@@ -64,22 +64,6 @@ func (a *authRepository) ActiveUser(ctx context.Context, userId int) error {
 	return nil
 }
 
-// GetUserByUsername implements repository.AuthRepository.
-func (a *authRepository) GetUserByUsername(ctx context.Context, userName string) (*entity.Account, error) {
-	res, err := a.db.GetUserByUsername(ctx, userName)
-
-	if err != nil {
-		return nil, err
-	}
-
-	var entityResult entity.Account
-	if err := utils.SafeCopy(&entityResult, &res); err != nil {
-		return nil, err
-	}
-
-	return &entityResult, nil
-}
-
 // UpdateUserStatus implements repository.AuthRepository.
 func (a *authRepository) UpdateUserStatus(ctx context.Context, userId int, status int) error {
 	// Construct the parameter object
@@ -140,7 +124,7 @@ func (a *authRepository) CreateVerificationCode(ctx context.Context, userVerific
 
 // EmailExists implements repository.AuthRepository.
 func (a *authRepository) EmailExists(ctx context.Context, email string) (bool, error) {
-	return a.db.GetUsernameExists(ctx, email)
+	return a.db.GetUserEmailExists(ctx, email)
 }
 
 // CreateUser implements repository.AuthRepository.
@@ -158,11 +142,6 @@ func (a *authRepository) CreateUser(ctx context.Context, account *entity.Account
 	}
 
 	return int(createdAccount.ID), nil
-}
-
-// UsernameExists implements repository.AuthRepository.
-func (a *authRepository) UsernameExists(ctx context.Context, username string) (bool, error) {
-	return a.db.GetUsernameExists(ctx, username)
 }
 
 func NewAuthRepository(db *pgxpool.Pool) repository.AuthRepository {

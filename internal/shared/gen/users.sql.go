@@ -40,14 +40,13 @@ func (q *Queries) CountAllUsers(ctx context.Context) (int64, error) {
 }
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (email, username, password, phone_number, first_name, last_name)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO users (email, password, phone_number, first_name, last_name)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING id, email, status
 `
 
 type CreateUserParams struct {
 	Email       string
-	Username    string
 	Password    string
 	PhoneNumber string
 	FirstName   string
@@ -63,7 +62,6 @@ type CreateUserRow struct {
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error) {
 	row := q.db.QueryRow(ctx, createUser,
 		arg.Email,
-		arg.Username,
 		arg.Password,
 		arg.PhoneNumber,
 		arg.FirstName,
@@ -228,17 +226,6 @@ SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)
 
 func (q *Queries) GetUserEmailExists(ctx context.Context, email string) (bool, error) {
 	row := q.db.QueryRow(ctx, getUserEmailExists, email)
-	var exists bool
-	err := row.Scan(&exists)
-	return exists, err
-}
-
-const getUsernameExists = `-- name: GetUsernameExists :one
-SELECT EXISTS(SELECT 1 FROM users WHERE username = $1)
-`
-
-func (q *Queries) GetUsernameExists(ctx context.Context, username string) (bool, error) {
-	row := q.db.QueryRow(ctx, getUsernameExists, username)
 	var exists bool
 	err := row.Scan(&exists)
 	return exists, err
