@@ -30,7 +30,7 @@ func NewLogHandler(logDir string) *LogHandler {
 // @Tags admin
 // @Accept json
 // @Produce json
-// @Success 200 {object} response.Response{data=[]LogFile}
+// @Success 200 {object} response.APIResponse{data=[]LogFile}
 // @Router /admin/logs/files [get]
 func (h *LogHandler) GetLogFiles(c *gin.Context) {
 	files, err := h.getLogFiles()
@@ -50,7 +50,7 @@ func (h *LogHandler) GetLogFiles(c *gin.Context) {
 // @Produce json
 // @Param filename query string true "Log filename"
 // @Param lines query int false "Number of lines to return (default: 100)"
-// @Success 200 {object} response.Response{data=LogContent}
+// @Success 200 {object} response.APIResponse{data=LogContent}
 // @Router /admin/logs/content [get]
 func (h *LogHandler) GetLogContent(c *gin.Context) {
 	filename := c.Query("filename")
@@ -81,7 +81,7 @@ func (h *LogHandler) GetLogContent(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param days query int false "Number of days to keep logs (default: 30)"
-// @Success 200 {object} response.Response{data=LogCleanupResult}
+// @Success 200 {object} response.APIResponse{data=LogCleanupResult}
 // @Router /admin/logs/cleanup [post]
 func (h *LogHandler) CleanupOldLogs(c *gin.Context) {
 	days := c.DefaultQuery("days", "30")
@@ -166,7 +166,7 @@ func (h *LogHandler) getLogContent(filename string, lineCount int) (*LogContent,
 // cleanupOldLogs removes log files older than specified days
 func (h *LogHandler) cleanupOldLogs(days int) (*LogCleanupResult, error) {
 	cutoffTime := time.Now().AddDate(0, 0, -days)
-	
+
 	files, err := ioutil.ReadDir(h.LogDir)
 	if err != nil {
 		return nil, err
@@ -191,11 +191,11 @@ func (h *LogHandler) cleanupOldLogs(days int) (*LogCleanupResult, error) {
 	}
 
 	return &LogCleanupResult{
-		DeletedFiles:     deletedFiles,
+		DeletedFiles:      deletedFiles,
 		TotalFilesDeleted: len(deletedFiles),
-		TotalSizeDeleted: totalSizeDeleted,
-		CutoffDate:       cutoffTime,
-		Errors:           errors,
+		TotalSizeDeleted:  totalSizeDeleted,
+		CutoffDate:        cutoffTime,
+		Errors:            errors,
 	}, nil
 }
 

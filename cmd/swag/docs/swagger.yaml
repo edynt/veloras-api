@@ -1,11 +1,61 @@
 basePath: /api/v1
 definitions:
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.ChangePasswordReq:
+    properties:
+      confirm_password:
+        minLength: 6
+        type: string
+      current_password:
+        minLength: 6
+        type: string
+      new_password:
+        minLength: 6
+        type: string
+    required:
+    - confirm_password
+    - current_password
+    - new_password
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.ForgotPasswordReq:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
   github_com_edynnt_veloras-api_internal_auth_controller_dto.PermissionReq:
     properties:
       description:
         type: string
       name:
         type: string
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.RefreshTokenReq:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.RefreshTokenRes:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  github_com_edynnt_veloras-api_internal_auth_controller_dto.ResetPasswordReq:
+    properties:
+      confirm_password:
+        minLength: 6
+        type: string
+      new_password:
+        minLength: 6
+        type: string
+      token:
+        type: string
+    required:
+    - confirm_password
+    - new_password
+    - token
     type: object
   github_com_edynnt_veloras-api_internal_auth_controller_dto.RoleReq:
     properties:
@@ -46,6 +96,17 @@ definitions:
       username:
         type: string
     type: object
+  github_com_edynnt_veloras-api_internal_cron.ScheduledJob:
+    properties:
+      id:
+        type: integer
+      last_run:
+        type: string
+      next_run:
+        type: string
+      schedule:
+        type: string
+    type: object
   github_com_edynnt_veloras-api_pkg_response.APIError:
     properties:
       err: {}
@@ -54,6 +115,60 @@ definitions:
       message:
         type: string
       statusCode:
+        type: integer
+    type: object
+  github_com_edynnt_veloras-api_pkg_response.APIResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        description: data return null not show
+      error:
+        type: boolean
+      error_details:
+        description: Error return null not show
+      message:
+        type: string
+    type: object
+  internal_cron_controller_http.LogCleanupResult:
+    properties:
+      cutoff_date:
+        type: string
+      deleted_files:
+        items:
+          type: string
+        type: array
+      errors:
+        items:
+          type: string
+        type: array
+      total_files_deleted:
+        type: integer
+      total_size_deleted:
+        type: integer
+    type: object
+  internal_cron_controller_http.LogContent:
+    properties:
+      filename:
+        type: string
+      last_modified:
+        type: string
+      lines:
+        items:
+          type: string
+        type: array
+      returned_lines:
+        type: integer
+      total_lines:
+        type: integer
+    type: object
+  internal_cron_controller_http.LogFile:
+    properties:
+      modified:
+        type: string
+      name:
+        type: string
+      size:
         type: integer
     type: object
 externalDocs:
@@ -73,6 +188,229 @@ info:
   title: Go Drunk Backend API by DDD
   version: "1.0"
 paths:
+  /admin/cron/cleanup:
+    post:
+      consumes:
+      - application/json
+      description: Manually trigger cleanup of expired data
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Run manual cleanup
+      tags:
+      - admin
+  /admin/cron/jobs:
+    get:
+      consumes:
+      - application/json
+      description: Get information about all scheduled cron jobs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/github_com_edynnt_veloras-api_internal_cron.ScheduledJob'
+                  type: array
+              type: object
+      summary: Get scheduled cron jobs
+      tags:
+      - admin
+  /admin/cron/log-cleanup:
+    post:
+      consumes:
+      - application/json
+      description: Manually trigger cleanup of old log files
+      parameters:
+      - description: 'Number of days to keep logs (default: 30)'
+        in: query
+        name: days
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Run manual log cleanup
+      tags:
+      - admin
+  /admin/logs/cleanup:
+    post:
+      consumes:
+      - application/json
+      description: 'Remove log files older than specified days (default: 30)'
+      parameters:
+      - description: 'Number of days to keep logs (default: 30)'
+        in: query
+        name: days
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_cron_controller_http.LogCleanupResult'
+              type: object
+      summary: Cleanup old logs
+      tags:
+      - admin
+  /admin/logs/content:
+    get:
+      consumes:
+      - application/json
+      description: Get content of a specific log file
+      parameters:
+      - description: Log filename
+        in: query
+        name: filename
+        required: true
+        type: string
+      - description: 'Number of lines to return (default: 100)'
+        in: query
+        name: lines
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_cron_controller_http.LogContent'
+              type: object
+      summary: Get log content
+      tags:
+      - admin
+  /admin/logs/files:
+    get:
+      consumes:
+      - application/json
+      description: Get list of available log files
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/internal_cron_controller_http.LogFile'
+                  type: array
+              type: object
+      summary: Get log files
+      tags:
+      - admin
+  /auth/change-password:
+    post:
+      consumes:
+      - application/json
+      description: Change the current user's password by providing current password
+        and new password
+      parameters:
+      - description: Change password request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.ChangePasswordReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns success message
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+        "401":
+          description: Unauthorized or current password incorrect
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      security:
+      - BearerAuth: []
+      summary: Change user password
+      tags:
+      - Auth
+  /auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: Send password reset instructions to user's email
+      parameters:
+      - description: Forgot password request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.ForgotPasswordReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns success message
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Request password reset
+      tags:
+      - Auth
   /auth/login:
     post:
       consumes:
@@ -102,6 +440,58 @@ paths:
           schema:
             $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
       summary: User login
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout the current user and invalidate their session
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns logout success message
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      security:
+      - BearerAuth: []
+      summary: User logout
+      tags:
+      - Auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Exchange a refresh token for a new access token
+      parameters:
+      - description: Refresh token request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.RefreshTokenReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns new access token and refresh token
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.RefreshTokenRes'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+        "401":
+          description: Refresh failed
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Refresh access token
       tags:
       - Auth
   /auth/register:
@@ -134,6 +524,33 @@ paths:
           schema:
             $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
       summary: Register a new user
+      tags:
+      - Auth
+  /auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Reset user password using the token received via email
+      parameters:
+      - description: Reset password request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_edynnt_veloras-api_internal_auth_controller_dto.ResetPasswordReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns success message
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or token
+          schema:
+            $ref: '#/definitions/github_com_edynnt_veloras-api_pkg_response.APIError'
+      summary: Reset password with token
       tags:
       - Auth
   /auth/verify/{userId}/{code}:

@@ -25,7 +25,7 @@ func NewCronHandler(scheduler *cron.Scheduler) *CronHandler {
 // @Tags admin
 // @Accept json
 // @Produce json
-// @Success 200 {object} response.Response{data=[]cron.ScheduledJob}
+// @Success 200 {object} response.APIResponse{data=[]cron.ScheduledJob}
 // @Router /admin/cron/jobs [get]
 func (h *CronHandler) GetScheduledJobs(c *gin.Context) {
 	jobs := h.Scheduler.GetScheduledJobs()
@@ -39,8 +39,8 @@ func (h *CronHandler) GetScheduledJobs(c *gin.Context) {
 // @Tags admin
 // @Accept json
 // @Produce json
-// @Success 200 {object} response.Response{data=string}
-// @Failure 500 {object} response.Response{data=string}
+// @Success 200 {object} response.APIResponse{data=string}
+// @Failure 500 {object} response.APIResponse{data=string}
 // @Router /admin/cron/cleanup [post]
 func (h *CronHandler) RunManualCleanup(c *gin.Context) {
 	if err := h.Scheduler.RunManualCleanup(); err != nil {
@@ -58,8 +58,8 @@ func (h *CronHandler) RunManualCleanup(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param days query int false "Number of days to keep logs (default: 30)"
-// @Success 200 {object} response.Response{data=string}
-// @Failure 500 {object} response.Response{data=string}
+// @Success 200 {object} response.APIResponse{data=string}
+// @Failure 500 {object} response.APIResponse{data=string}
 // @Router /admin/cron/log-cleanup [post]
 func (h *CronHandler) RunManualLogCleanup(c *gin.Context) {
 	days := c.DefaultQuery("days", "30")
