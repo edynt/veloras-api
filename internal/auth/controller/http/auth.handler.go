@@ -23,7 +23,7 @@ func NewAuthHandler(service service.AuthService) *AuthHandler {
 
 // RegisterUser
 // @Summary Register a new user
-// @Description Create a new account with username, password, email, and other details
+// @Description Create a new account with email, password, and other details
 // @Tags Auth
 // @Accept json
 // @Produce json
@@ -49,7 +49,6 @@ func (ah *AuthHandler) RegisterUser(ctx *gin.Context) (res interface{}, err erro
 	}
 
 	account := appDto.AccountAppDTO{
-		Username:    req.Username,
 		Password:    req.Password,
 		Email:       req.Email,
 		Language:    req.Language,
@@ -98,7 +97,7 @@ func (ah *AuthHandler) VerifyUser(ctx *gin.Context) (res interface{}, err error)
 
 // LoginUser
 // @Summary User login
-// @Description Authenticate a user with username and password credentials
+// @Description Authenticate a user with email and password credentials
 // @Tags Auth
 // @Accept json
 // @Produce json
@@ -125,7 +124,7 @@ func (ah *AuthHandler) LoginUser(ctx *gin.Context) (res interface{}, err error) 
 	}
 
 	requestAccount := appDto.AccountAppDTO{
-		Username: req.Username,
+		Email:    req.Email,
 		Password: req.Password,
 	}
 

@@ -21,14 +21,14 @@ type authService struct {
 // LoginUser implements AuthService.
 func (as *authService) LoginUser(ctx context.Context, accountAppDTO appDto.AccountAppDTO) (appDto.UserOutPut, error) {
 	// 1. check exists
-	user, err := as.authRepo.GetUserByUsername(ctx, accountAppDTO.Username)
+	user, err := as.authRepo.GetUserByEmail(ctx, accountAppDTO.Email)
 
 	if err != nil {
-		return appDto.UserOutPut{}, fmt.Errorf("%s: %w", msg.FailedToCheckUserNameExists, err)
+		return appDto.UserOutPut{}, fmt.Errorf("%s: %w", msg.FailedToCheckEmailExists, err)
 	}
 
 	if user == nil {
-		return appDto.UserOutPut{}, fmt.Errorf(msg.UsernameNotFound)
+		return appDto.UserOutPut{}, fmt.Errorf(msg.EmailNotFound)
 	}
 
 	// 2. check password
@@ -74,7 +74,6 @@ func (as *authService) LoginUser(ctx context.Context, accountAppDTO appDto.Accou
 
 	return appDto.UserOutPut{
 		ID:             user.ID,
-		Username:       user.Username,
 		Email:          user.Email,
 		PhoneNumber:    user.PhoneNumber,
 		FirstName:      user.FirstName,
@@ -124,18 +123,8 @@ func (as *authService) VerifyUser(ctx context.Context, verificationEmailAppDTO a
 func (as *authService) CreateUser(ctx context.Context, accountDto appDto.AccountAppDTO) (int, error) {
 	//1. Check permissions -> event registered
 
-	// 2. Check username exists
-	exists, err := as.authRepo.UsernameExists(ctx, accountDto.Username)
-
-	if err != nil {
-		return 0, fmt.Errorf("%s: %w", msg.FailedToCheckUserNameExists, err)
-	}
-	if exists {
-		return 0, fmt.Errorf(msg.UsernameExists)
-	}
-
-	// 3. Check email exists
-	exists, err = as.authRepo.EmailExists(ctx, accountDto.Email)
+	// 2. Check email exists
+	exists, err := as.authRepo.EmailExists(ctx, accountDto.Email)
 	if err != nil {
 		return 0, fmt.Errorf("%s: %w", msg.FailedToCheckEmailExists, err)
 	}
@@ -144,19 +133,18 @@ func (as *authService) CreateUser(ctx context.Context, accountDto appDto.Account
 		return 0, fmt.Errorf(msg.EmailExists)
 	}
 
-	// 4. GenerateFromPassword
+	// 3. GenerateFromPassword
 	hashedPasswordBytes, err := bcrypt.GenerateFromPassword([]byte(accountDto.Password), bcrypt.DefaultCost)
 	if err != nil {
-		// log.Printf("Error hashing password for user %s: %v", accountDto.Username, err)
+		// log.Printf("Error hashing password for user %s: %v", accountDto.Email, err)
 		return 0, fmt.Errorf("%s: %w", msg.FailedToSecurePassword, err) // Không lộ chi tiết lỗi hash
 	}
 	hashedPassword := string(hashedPasswordBytes)
 
 	accountDto.Password = hashedPassword
 
-	// 5. Insert account into database
+	// 4. Insert account into database
 	newAccountId, err := as.authRepo.CreateUser(ctx, &entity.Account{
-		Username:    accountDto.Username,
 		Email:       accountDto.Email,
 		Password:    accountDto.Password,
 		PhoneNumber: accountDto.PhoneNumber,
@@ -333,7 +321,7 @@ func (as *authService) ForgotPassword(ctx context.Context, email string) error {
 		"reset-password.html",
 		map[string]interface{}{
 			"ResetToken": resetToken,
-			"Username":   user.Username,
+			"Email":      user.Email,
 			"ExpiresAt":  tokenExpiresAt,
 		},
 	)

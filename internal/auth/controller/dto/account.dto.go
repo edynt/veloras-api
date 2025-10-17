@@ -2,7 +2,6 @@ package dto
 
 type UserRegisterReq struct {
 	Email       string `json:"email"`
-	Username    string `json:"username"`
 	Password    string `json:"password"`
 	FirstName   string `json:"first_name"`
 	LastName    string `json:"last_name"`
@@ -15,7 +14,7 @@ type UserRegisterReq struct {
 }
 
 type UserLoginReq struct {
-	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 

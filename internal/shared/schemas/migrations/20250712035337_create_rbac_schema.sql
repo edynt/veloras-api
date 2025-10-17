@@ -2,7 +2,6 @@
 -- +goose StatementBegin
 -- USERS
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_emaill ON users(email);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(username);
 CREATE INDEX IF NOT EXISTS idx_users_is_verified ON users(is_verified);
 
 -- ROLES

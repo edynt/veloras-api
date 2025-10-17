@@ -66,9 +66,9 @@ definitions:
     type: object
   github_com_edynnt_veloras-api_internal_auth_controller_dto.UserLoginReq:
     properties:
-      password:
+      email:
         type: string
-      username:
+      password:
         type: string
     type: object
   github_com_edynnt_veloras-api_internal_auth_controller_dto.UserRegisterReq:
@@ -92,8 +92,6 @@ definitions:
       password:
         type: string
       phone_number:
-        type: string
-      username:
         type: string
     type: object
   github_com_edynnt_veloras-api_internal_cron.ScheduledJob:
@@ -415,7 +413,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Authenticate a user with username and password credentials
+      description: Authenticate a user with email and password credentials
       parameters:
       - description: User login request
         in: body
@@ -498,8 +496,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a new account with username, password, email, and other
-        details
+      description: Create a new account with email, password, and other details
       parameters:
       - description: User registration request
         in: body

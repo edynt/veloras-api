@@ -47,9 +47,7 @@ type Querier interface {
 	GetSession(ctx context.Context, id int32) (Session, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByID(ctx context.Context, id int32) (User, error)
-	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetUserEmailExists(ctx context.Context, email string) (bool, error)
-	GetUsernameExists(ctx context.Context, username string) (bool, error)
 	UpdatePermission(ctx context.Context, arg UpdatePermissionParams) error
 	UpdateRole(ctx context.Context, arg UpdateRoleParams) error
 	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) (UpdateUserPasswordRow, error)

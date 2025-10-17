@@ -3,7 +3,6 @@
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     email TEXT NOT NULL UNIQUE,
-    username TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
     is_verified BOOLEAN DEFAULT FALSE,
     phone_number TEXT NOT NULL,

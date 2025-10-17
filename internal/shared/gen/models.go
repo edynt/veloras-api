@@ -56,7 +56,6 @@ type Session struct {
 type User struct {
 	ID          int32
 	Email       string
-	Username    string
 	Password    string
 	IsVerified  pgtype.Bool
 	PhoneNumber string

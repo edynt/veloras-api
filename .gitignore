@@ -5,3 +5,5 @@
 .env
 .env.prod
 __debug_*
+server
+main

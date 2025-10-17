@@ -402,7 +402,7 @@ const docTemplate = `{
         },
         "/auth/login": {
             "post": {
-                "description": "Authenticate a user with username and password credentials",
+                "description": "Authenticate a user with email and password credentials",
                 "consumes": [
                     "application/json"
                 ],
@@ -530,7 +530,7 @@ const docTemplate = `{
         },
         "/auth/register": {
             "post": {
-                "description": "Create a new account with username, password, email, and other details",
+                "description": "Create a new account with email, password, and other details",
                 "consumes": [
                     "application/json"
                 ],
@@ -1113,10 +1113,10 @@ const docTemplate = `{
         "github_com_edynnt_veloras-api_internal_auth_controller_dto.UserLoginReq": {
             "type": "object",
             "properties": {
-                "password": {
+                "email": {
                     "type": "string"
                 },
-                "username": {
+                "password": {
                     "type": "string"
                 }
             }
@@ -1152,9 +1152,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "phone_number": {
-                    "type": "string"
-                },
-                "username": {
                     "type": "string"
                 }
             }

@@ -2,7 +2,6 @@
 -- +goose StatementBegin
 INSERT INTO users (
     email,
-    username,
     password,
     is_verified,
     phone_number,
@@ -12,7 +11,6 @@ INSERT INTO users (
     language
 ) VALUES (
     'admin@verloras.com',
-    'admin',
     '$2a$10$VF8ohSg8E48qd.jVM5U0SOes3aJGrHMXJPppvVYRh2XSGjZjOdMO6', -- hash của Abc@1234
     TRUE,
     '0000000000',
